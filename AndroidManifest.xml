@@ -15,7 +15,7 @@
         <activity
             android:name="UsbAccessoryActivity"
             android:launchMode="singleInstance"
-            android:taskAffinity="" >
+            android:taskAffinity="" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
@@ -24,6 +24,9 @@
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />
         </activity>
+        <service android:name="UsbConnectionService"></service>
+        
+        
     </application>
 
 </manifest>
