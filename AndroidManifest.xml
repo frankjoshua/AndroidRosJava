@@ -15,7 +15,7 @@
         <activity
             android:name="UsbAccessoryActivity"
             android:launchMode="singleInstance"
-            android:taskAffinity="" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            android:taskAffinity="" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>

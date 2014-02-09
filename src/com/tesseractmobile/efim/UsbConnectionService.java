@@ -4,7 +4,6 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -65,6 +64,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
     private final Object listenerLock = new Object();
     private final LinkedList<Command> commandQueue = new LinkedList<Command>();
     private final AtomicBoolean run = new AtomicBoolean(true);
+    private long lastCommandTime;
     
     @Override
     public IBinder onBind(final Intent intent) {
@@ -92,11 +92,25 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
 
     @Override
     public void onDestroy() {
+        closeAccessory();
         unregisterReceiver(usbReciever);
         run.set(false);
         super.onDestroy();
     }
 
+    private void closeAccessory() {
+
+        try {
+            if (mFileDescriptor != null) {
+                mFileDescriptor.close();
+            }
+        } catch (final IOException e) {
+        } finally {
+            mFileDescriptor = null;
+            mAccessory = null;
+        }
+    }
+    
     /**
      * 
      */
@@ -127,13 +141,21 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
             final FileDescriptor fd = mFileDescriptor.getFileDescriptor();
             mInputStream = new FileInputStream(fd);
             mOutputStream = new FileOutputStream(fd);
-             final Thread thread = new Thread(null, this, "DemoKit");
-             thread.start();
+            startThread();
             log("accessory opened");
         } else {
             final String name = accessory != null ? accessory.toString() : "null";
             log("accessory open fail: " + name);
         }
+    }
+
+    /**
+     * 
+     */
+    protected void startThread() {
+        lastCommandTime = System.currentTimeMillis();
+        final Thread thread = new Thread(null, this, "DemoKit");
+        thread.start();
     }
 
     @Override
@@ -229,22 +251,25 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
     @Override
     public void run() {
         while (run.get()) {
+            final long currentTimeMillis = System.currentTimeMillis();
+            final long timeElapsed = currentTimeMillis - lastCommandTime;
+            lastCommandTime = currentTimeMillis;
             //Read input Stream and Clear
-            final InputStream inputStream = mInputStream;
-            if (inputStream != null) {
-                final byte[] buffer = new byte[16384];
-                int ret = 0;
-                //log("Clearing Input Stream");
-                if (ret >= 0) {
-                    try {
-                        //Clear Buffer      
-                        ret = inputStream.read(buffer);
-                        //log("Clearing Input Stream: " + ret);
-                    } catch (final IOException e1) {
-                        ret = -1;
-                    }
-                }
-            }
+//            final InputStream inputStream = mInputStream;
+//            if (inputStream != null) {
+//                final byte[] buffer = new byte[16384];
+//                int ret = 0;
+//                //log("Clearing Input Stream");
+//                if (ret >= 0) {
+//                    try {
+//                        //Clear Buffer      
+//                        ret = inputStream.read(buffer);
+//                        //log("Clearing Input Stream: " + ret);
+//                    } catch (final IOException e1) {
+//                        ret = -1;
+//                    }
+//                }
+//            }
             
             synchronized (commandQueue) {
                 if (commandQueue.isEmpty() == false) {
@@ -254,11 +279,17 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
                     if (command.delay <= 0) {
                         commandQueue.poll();
                     } else {
-                        command.delay -= 50;
+                        command.delay -= timeElapsed;
                     }
                 } else {
                     //log("No Commands");
                 }
+            }
+            try {
+                Thread.sleep(10);
+            } catch (final InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
         log("Thread Exit");
