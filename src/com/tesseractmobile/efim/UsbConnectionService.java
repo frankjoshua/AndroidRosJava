@@ -218,25 +218,25 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         switch (robotCommand.getCommandType()) {
         case NOD:
             synchronized (commandQueue) {
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 100, 150));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 127, 0));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 150));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 127, 0));
                 log("Adding Commands. Queue size: " + commandQueue.size());
             }
             return true;
         case SHAKE:
             synchronized (commandQueue) {
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 100, 150));
-                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 127, 0));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 150));
+                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 127, 0));
                 log("Adding Commands. Queue size: " + commandQueue.size());
             }
             break;
