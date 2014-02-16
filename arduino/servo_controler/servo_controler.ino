@@ -1,131 +1,69 @@
-// Arduino pin connected to Pololu Servo Controller
-const int servoController = 1;  
+#include <Servo.h>
+#include <EasyTransfer.h>
 
-// location of Servo plugged into Pololu Servo Controller (defaults 0-7)
-const int servoTop = 0;
-const int servoBottom = 1;
+//SErvo Control Pins
+#define  SERVO1         11
+#define  SERVO2         12
 
-const int topMax = 5000;
-const int topMin = 2000;
-const int bottomMax = 3800;
-const int bottomMin = 2200;
+//Command IDs of Servos
+const int SERVO_HEAD_VERT=10;
+const int SERVO_HEAD_HORZ=11;
 
-void setup() {
-  Serial.begin(9600);
-  servoSetSpeed(servoTop,20);
-  servoSetSpeed(servoBottom,20);
-  delay(1000);
-  rangeTest();
-  delay(1000);
-  faceFront();
-  delay(1000);
-}
+EasyTransfer etData; 
 
-void loop() {
+struct COM_DATA_STRUCTURE{
+  //put your variable definitions here for the data you want to receive
+  //THIS MUST BE EXACTLY THE SAME ON THE OTHER ARDUINO
+  int tar;
+  int cmd;
+  int val;
+  int dur;
+};
+
+//give a name to the group of data
+COM_DATA_STRUCTURE dataStruct;
+
+Servo servos[2];
+ 
+void setup() 
+{ 
+  initCom();
+  initServos();
+} 
+ 
+ 
+void loop() 
+{ 
+  delay(10);
   
-  delay(1000);
-  faceFront();
-  delay(1000);
-  nod(10, 1000);
-  nod(10, 1000);
-  nod(10, 1000);
-  nod(10, 1000);
-  delay(1000);
-  shake(10,500);
-  shake(10,500);
-  shake(10,500);
-  shake(10,500);  
-  delay(1000);
-  faceFront();
-  delay(1000);
-  rangeTest();
-  
-}
-
-void faceFront(){
-  servoMove(servoTop,pos(topMax, topMin, 25));
-  servoMove(servoBottom,pos(bottomMax, bottomMin, 50));
-}
-
-void nod(int nodSpeed, int nodDelay){
-  servoSetSpeed(servoTop,nodSpeed);
-  servoMove(servoTop,pos(topMax, topMin, 50));
-  delay(nodDelay);
-  servoMove(servoTop,pos(topMax, topMin, 25));
-  delay(nodDelay);
-}
-
-void shake(int shakeSpeed, int nodDelay){
-  servoSetSpeed(servoTop,shakeSpeed);
-  servoMove(servoBottom,pos(bottomMax, bottomMin, 40));
-  delay(nodDelay);
-  servoMove(servoBottom,pos(bottomMax, bottomMin, 60));
-  delay(nodDelay);
-}
-
-int pos(int maxPos, int minPos, int ratio){
-  int tick = (maxPos - minPos) / 100;
-  return minPos + tick * ratio; 
-}
-
-void rangeTest(){
-  delay(1000);
-  servoMove(servoTop,topMin);
-  servoMove(servoBottom,bottomMin);
-  delay(1000);
-  servoMove(servoTop,topMax);
-  servoMove(servoBottom,bottomMax);
-  delay(1000);
-  servoMove(servoTop,topMin);
-  servoMove(servoBottom,bottomMax);
-  delay(1000);
-  servoMove(servoTop,topMax);
-  servoMove(servoBottom,bottomMin);
-}
-
-/*
-    Move Servo using Pololu Servo Controller
-    servo = servo number (default 0-7)
-    hornPos = position (500-5500)  {Test your servos maximum positions}
-*/
-void servoMove(int servo, int pos)
-{
-  if( pos > 5500 || pos < 500 ) return;   
-
-  // Build a Pololu Protocol Command Sequence
-  char cmd[6];
-  cmd[0] = 0x80;  // start byte
-  cmd[1] = 0x01;  // device id
-  cmd[2] = 0x04;  // command number
-  cmd[3] = servo; //servo number
-  cmd[4] = lowByte(pos >> 7);   // lower byte
-  cmd[5] = lowByte(pos & 0x7f); // upper byte
-
-  // Send the command to the Pololu Servo Controller
-  for ( int i = 0; i < 6; i++ ){
-    Serial.write(cmd[i]);
+  if(etData.receiveData()){
+    Servo servo = getServo(dataStruct.tar);
+    servo.write(dataStruct.val); 
   }
 
+} 
+
+Servo getServo(int target){
+    //Return servo based on ID
+     switch(target){
+      case SERVO_HEAD_VERT:
+        return servos[0];
+      case SERVO_HEAD_HORZ:
+        return servos[1];
+    };
+    //Return default servo
+    return servos[0]; 
 }
 
-/*
-*    Set Servo Speed using Pololu Servo Controller
-*    servo = servo number (default 0-7)
-*    speed = (1-127) (slowest - fastest) 0 to disable speed control
-*/
-void servoSetSpeed(int servo, int speed){
+void initServos(){
+  servos[0].attach(SERVO1);
+  servos[0].write(90);
+  servos[1].attach(SERVO2);
+  servos[1].write(90);
+}
 
-   // Build a Pololu Protocol Command Sequence
-   char cmd[5];
-   cmd[0] = 0x80;     // start byte
-   
-   cmd[1] = 0x01;     // device id
-   cmd[2] = 0x01;     // command number
-   cmd[3] = lowByte(servo);    // servo number
-   cmd[4] = lowByte(speed);    // speed
-
-  // Send the command to the Pololu Servo Controller
-   for ( int i = 0; i < 5; i++ ){
-      Serial.write(cmd[i]);
-   }
+void initCom(){
+  Serial.begin(9600);
+  //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
+  etData.begin(details(dataStruct), &Serial); 
 }

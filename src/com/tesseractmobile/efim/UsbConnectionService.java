@@ -19,6 +19,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 
+import com.tesseractmobile.efim.robot.CommandContract;
 import com.tesseractmobile.efim.robot.RobotCommand;
 import com.tesseractmobile.efim.robot.RobotCommandInterface;
 import com.tesseractmobile.efim.robot.RobotEvent;
@@ -165,8 +166,8 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         if (value > 255)
             value = 255;
 
-        buffer[0] = command;
-        buffer[1] = target;
+        buffer[0] = target;
+        buffer[1] = command;
         buffer[2] = (byte) value;
         if (mOutputStream != null && buffer[1] != -1) {
             try {
@@ -217,25 +218,25 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         switch (robotCommand.getCommandType()) {
         case NOD:
             synchronized (commandQueue) {
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 175, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 100, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 175, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 100, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 175, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 100, 150));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x10, 127, 0));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 100, 150));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_HORZ, CommandContract.COMMAND_MOVE, 127, 0));
                 log("Adding Commands. Queue size: " + commandQueue.size());
             }
             return true;
         case SHAKE:
             synchronized (commandQueue) {
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 175, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 100, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 175, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 100, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 175, 300));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 100, 150));
-                commandQueue.add(new Command((byte) 0x2, (byte) 0x11, 127, 0));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 100, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 175, 300));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 100, 150));
+                commandQueue.add(new Command(CommandContract.SERVO_HEAD_VERT, CommandContract.COMMAND_MOVE, 127, 0));
                 log("Adding Commands. Queue size: " + commandQueue.size());
             }
             break;
@@ -302,7 +303,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         public int val;
         public int delay;
         
-        public Command(final byte cmd, final byte tar, final int val, final int delay) {
+        public Command(final byte tar, final byte cmd, final int val, final int delay) {
             this.cmd = cmd;
             this.tar = tar;
             this.val = val;

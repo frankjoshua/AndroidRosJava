@@ -1,11 +1,7 @@
 #include <Servo.h>
+#include <EasyTransfer.h>
 #include <Usb.h>
 #include <AndroidAccessory.h>
-
-#define  SERVO1         11
-#define  SERVO2         12
-#define  SERVO3         13
-
 
 AndroidAccessory acc("Google, Inc.",
 		     "DemoKit",
@@ -13,64 +9,48 @@ AndroidAccessory acc("Google, Inc.",
 		     "1.0",
 		     "http://www.android.com",
 		     "0000000012345678");
-Servo servos[3];
 
-void setup();
-void loop();
+EasyTransfer etData; 
+
+struct COM_DATA_STRUCTURE{
+  //put your variable definitions here for the data you want to receive
+  //THIS MUST BE EXACTLY THE SAME ON THE OTHER ARDUINO
+  int tar;
+  int cmd;
+  int val;
+  int dur;
+};
+
+//give a name to the group of data
+COM_DATA_STRUCTURE dataStruct;
 
 void setup()
 {
-	Serial.begin(115200);
-	Serial.print("\r\nStart");
-
-
-	servos[0].attach(SERVO1);
-	servos[0].write(90);
-	servos[1].attach(SERVO2);
-	servos[1].write(90);
-	servos[2].attach(SERVO3);
-	servos[2].write(90);
-
-
-	acc.powerOn();
+  initCom();
+  acc.powerOn();
 }
 
 void loop()
 {
-	byte err;
-	byte idle;
-	static byte count = 0;
-	byte msg[3];
-	long touchcount;
 
 	if (acc.isConnected()) {
+                byte msg[3];
 		int len = acc.read(msg, sizeof(msg), 1);
-		int i;
-		byte b;
-		uint16_t val;
-		int x, y;
-		char c0;
 
 		if (len > 0) {
-			// assumes only one command per packet
-			if (msg[0] == 0x2) {
-                                if (msg[1] == 0x10)
-					servos[0].write(map(msg[2], 0, 255, 0, 180));
-				else if (msg[1] == 0x11)
-					servos[1].write(map(msg[2], 0, 255, 0, 180));
-				else if (msg[1] == 0x12)
-					servos[2].write(map(msg[2], 0, 255, 0, 180));
-			} 
+                    dataStruct.tar = msg[0];
+                    dataStruct.cmd = msg[1];
+                    dataStruct.val = msg[2];
+                    dataStruct.dur = 0;
+	            etData.sendData();
 		}
-
-
-	} else {
-		// reset outputs to default values on disconnect
-		servos[0].write(90);
-		servos[1].write(90);
-		servos[2].write(90);
-	}
+	} 
 
 	delay(10);
 }
 
+void initCom(){
+  Serial.begin(9600);
+  //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
+  etData.begin(details(dataStruct), &Serial); 
+}
