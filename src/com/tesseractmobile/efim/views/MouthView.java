@@ -1,6 +1,7 @@
 package com.tesseractmobile.efim.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -15,6 +16,7 @@ public class MouthView extends TextView {
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         setTextSize(40);
+        setTextColor(Color.rgb(100, 0, 255));
         setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
     }
 
