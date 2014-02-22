@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include <EasyTransfer.h>
+#include <SoftwareSerial.h>
 
 //SErvo Control Pins
 #define  SERVO1         11
@@ -22,6 +23,8 @@ struct COM_DATA_STRUCTURE{
 
 //give a name to the group of data
 COM_DATA_STRUCTURE dataStruct;
+
+SoftwareSerial serial(2, 3);
 
 Servo servos[2];
  

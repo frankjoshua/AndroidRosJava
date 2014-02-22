@@ -50,7 +50,7 @@ void loop()
 }
 
 void initCom(){
-  Serial.begin(9600);
+  Serial1.begin(9600);
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  etData.begin(details(dataStruct), &Serial); 
+  etData.begin(details(dataStruct), &Serial1); 
 }
