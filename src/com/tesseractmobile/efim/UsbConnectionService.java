@@ -160,8 +160,8 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
     }
 
     @Override
-    public boolean sendCommand(final byte command, final byte target, int value) {
-        final byte[] buffer = new byte[3];
+    public boolean sendCommand(final byte command, final byte target, int value, final int time) {
+        final byte[] buffer = new byte[4];
 
         if (value > 255)
             value = 255;
@@ -169,10 +169,11 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         buffer[0] = target;
         buffer[1] = command;
         buffer[2] = (byte) value;
+        buffer[3] = (byte) time;
         if (mOutputStream != null && buffer[1] != -1) {
             try {
                 mOutputStream.write(buffer);
-                log("CMD: " + command + " TAR: " + target + " VAL:" + value);
+                log("CMD: " + command + " TAR: " + target + " VAL: " + value + " TIME: " + time);
                 return true;
             } catch (final IOException e) {
                 log("write failed:" + e.getMessage());
@@ -276,7 +277,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
                 if (commandQueue.isEmpty() == false) {
                     //log("Running Commands");
                     final Command command = commandQueue.peek();
-                    sendCommand(command.cmd, command.tar, command.val);
+                    sendCommand(command.cmd, command.tar, command.val, command.delay);
                     if (command.delay <= 0) {
                         commandQueue.poll();
                     } else {

@@ -9,7 +9,7 @@ public interface RobotCommandInterface {
      * @param value
      * @return
      */
-    public boolean sendCommand(final byte command, final byte target, int value);
+    public boolean sendCommand(final byte command, final byte target, final int value, final int time);
     /**
      * Return true if successful
      * @param command
