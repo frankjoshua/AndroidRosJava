@@ -161,7 +161,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
 
     @Override
     public boolean sendCommand(final byte command, final byte target, int value, final int time) {
-        final byte[] buffer = new byte[4];
+        final byte[] buffer = new byte[3];
 
         if (value > 255)
             value = 255;
@@ -169,7 +169,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         buffer[0] = target;
         buffer[1] = command;
         buffer[2] = (byte) value;
-        buffer[3] = (byte) time;
+       // buffer[3] = (byte) time;
         if (mOutputStream != null && buffer[1] != -1) {
             try {
                 mOutputStream.write(buffer);
@@ -247,6 +247,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
 
     @Override
     public void reconnectRobot() {
+        closeAccessory();
         connectAccessory();
     }
 

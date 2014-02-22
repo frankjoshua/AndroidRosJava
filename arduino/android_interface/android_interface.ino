@@ -28,22 +28,28 @@ void setup()
 {
   initCom();
   acc.powerOn();
+  pinMode(13, OUTPUT);
 }
 
 void loop()
 {
-
+  //Loop through each input
+  //Route to correct output
 	if (acc.isConnected()) {
                 byte msg[3];
 		int len = acc.read(msg, sizeof(msg), 1);
 
 		if (len > 0) {
-                    dataStruct.tar = msg[0];
-                    dataStruct.cmd = msg[1];
-                    dataStruct.val = msg[2];
-                    dataStruct.dur = 0;
-	            etData.sendData();
+                  dataStruct.tar = msg[0];
+                  dataStruct.cmd = msg[1];
+                  dataStruct.val = msg[2];
+                  dataStruct.dur = 0;
+                  digitalWrite(13, LOW);
+    	          etData.sendData();
+                  delay(100);
+                  digitalWrite(13, HIGH);
 		}
+
 	} 
 
 	delay(10);
@@ -54,3 +60,10 @@ void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
   etData.begin(details(dataStruct), &Serial1); 
 }
+
+class Listener {
+  public:
+    uint8_t location;
+    uint8_t messageType;  
+};
+
