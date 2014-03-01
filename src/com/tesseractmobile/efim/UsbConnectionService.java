@@ -173,7 +173,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         if (mOutputStream != null && buffer[1] != -1) {
             try {
                 mOutputStream.write(buffer);
-                log("CMD: " + command + " TAR: " + target + " VAL: " + value + " TIME: " + time);
+                log("Command: " + command + " Target: " + target + " Value: " + value);
                 return true;
             } catch (final IOException e) {
                 log("write failed:" + e.getMessage());
