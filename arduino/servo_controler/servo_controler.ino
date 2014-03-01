@@ -32,9 +32,22 @@ void setup()
 { 
   initCom();
   initServos();
+  
+  //Register as Listener
+  dataStruct.tar = 1;
+  dataStruct.cmd = 10;
+  dataStruct.val = 1;
+  dataStruct.dur = 0;
+  etData.sendData();
+  delay(100);
+  dataStruct.tar = 1;
+  dataStruct.cmd = 11;
+  dataStruct.val = 1;
+  dataStruct.dur = 0;
+  etData.sendData();
 } 
  
- 
+ int pos = 0;
 void loop() 
 { 
   delay(10);

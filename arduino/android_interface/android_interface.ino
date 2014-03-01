@@ -3,6 +3,19 @@
 #include <Usb.h>
 #include <AndroidAccessory.h>
 
+#define REGISTER 1
+#define UNREGISTER 2
+#define REGISTRATION 1
+
+class Listener {
+  public:
+    int targets[32];
+    int pointer;
+    void registerTarget(int target);
+    void unregisterTarget(int target);
+    boolean isTarget(int target);
+};
+
 AndroidAccessory acc("Google, Inc.",
 		     "DemoKit",
 		     "DemoKit Arduino Board",
@@ -10,7 +23,14 @@ AndroidAccessory acc("Google, Inc.",
 		     "http://www.android.com",
 		     "0000000012345678");
 
-EasyTransfer etData; 
+const int DATA_CHANNELS = 4;
+EasyTransfer etData[DATA_CHANNELS];
+
+//Listeners 
+//0-3 = Serial Ports
+//4 USB
+const int DATA_LISTENERS = 5;
+Listener listeners[DATA_LISTENERS];
 
 struct COM_DATA_STRUCTURE{
   //put your variable definitions here for the data you want to receive
@@ -34,36 +54,92 @@ void setup()
 void loop()
 {
   //Loop through each input
-  //Route to correct output
-	if (acc.isConnected()) {
-                byte msg[3];
-		int len = acc.read(msg, sizeof(msg), 1);
+  for(int dataLine = 0; dataLine < DATA_CHANNELS; dataLine++){
+    if(etData[dataLine].receiveData()){
+      int tar = dataStruct.tar;
+      int val = dataStruct.val;
+      int cmd = dataStruct.cmd;
+      //Check for registration request
+      if(tar == REGISTRATION){
+        if(val == REGISTER){
+          //Register Listener
+          listeners[dataLine].registerTarget(cmd);
+          //Respond that registration was successful
+          etData[dataLine].sendData();
+        } else if(val == UNREGISTER){
+          //Register Listener
+          listeners[dataLine].unregisterTarget(cmd);
+        }
+      } else {
+        //Route to correct output
+        routeData();
+      }
+    }
+  }
 
-		if (len > 0) {
-                  dataStruct.tar = msg[0];
-                  dataStruct.cmd = msg[1];
-                  dataStruct.val = msg[2];
-                  dataStruct.dur = 0;
-                  digitalWrite(13, LOW);
-    	          etData.sendData();
-                  delay(100);
-                  digitalWrite(13, HIGH);
-		}
+  //Read from connected Android device
+  if (acc.isConnected()) {
+    byte msg[3];
+    int len = acc.read(msg, sizeof(msg), 1);
 
-	} 
+    if (len > 0) {
+      dataStruct.tar = msg[0];
+      dataStruct.cmd = msg[1];
+      dataStruct.val = msg[2];
+      dataStruct.dur = 0;
+      routeData();
+    }
+  } 
 
-	delay(10);
+  delay(10);
+}
+
+void routeData(){
+  for(int l = 0; l < DATA_LISTENERS; l++){
+     if(listeners[l].isTarget(dataStruct.tar)){
+        etData[l].sendData();
+     }
+  }
 }
 
 void initCom(){
-  Serial1.begin(9600);
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  etData.begin(details(dataStruct), &Serial1); 
+  Serial.begin(9600);
+  etData[0].begin(details(dataStruct), &Serial); 
+  Serial1.begin(9600);
+  etData[1].begin(details(dataStruct), &Serial1);
+  Serial2.begin(9600);
+  etData[2].begin(details(dataStruct), &Serial2); 
+  Serial3.begin(9600);
+  etData[3].begin(details(dataStruct), &Serial3);  
 }
 
-class Listener {
-  public:
-    uint8_t location;
-    uint8_t messageType;  
-};
+void Listener::registerTarget(int target){
+  //First unregister target if registered
+  unregisterTarget(target);
+  //Add to list of registered targets
+  targets[pointer] = target;
+  pointer++;
+  //Reset pointer if too large
+  if(pointer > 31){
+     pointer = 0; 
+  }
+}
+
+void Listener::unregisterTarget(int target){
+  for(int i = 0; i < 32; i++){
+     if(targets[i] == target){
+        targets[i] = 0;
+     } 
+  }
+}
+
+boolean Listener::isTarget(int target){
+  for(int i = 0; i < 32; i++){
+     if(targets[i] == target){
+        return true;
+     } 
+  }
+  return false;
+}
 
