@@ -2,10 +2,14 @@
 #include <EasyTransfer.h>
 #include <Usb.h>
 #include <AndroidAccessory.h>
+#include <Adafruit_NeoPixel.h>
 
 #define REGISTER 1
 #define UNREGISTER 2
 #define REGISTRATION 1
+#define PIXEL_PIN            13
+
+Adafruit_NeoPixel pixel = Adafruit_NeoPixel(60, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 class Listener {
   public:
@@ -46,6 +50,7 @@ COM_DATA_STRUCTURE dataStruct;
 
 void setup()
 {
+  initPixel();
   initCom();
   acc.powerOn();
   pinMode(13, OUTPUT);
@@ -53,6 +58,8 @@ void setup()
 
 void loop()
 {
+  delay(10);
+  
   //Loop through each input
   for(int dataLine = 0; dataLine < DATA_CHANNELS; dataLine++){
     if(etData[dataLine].receiveData()){
@@ -65,7 +72,10 @@ void loop()
           //Register Listener
           listeners[dataLine].registerTarget(cmd);
           //Respond that registration was successful
+          delay(20);
           etData[dataLine].sendData();
+          //Mark line as connected
+          setPixelColor(dataLine, 75,0,255);
         } else if(val == UNREGISTER){
           //Register Listener
           listeners[dataLine].unregisterTarget(cmd);
@@ -91,14 +101,18 @@ void loop()
     }
   } 
 
-  delay(10);
+  
 }
 
 void routeData(){
-  for(int l = 0; l < DATA_LISTENERS; l++){
-     if(listeners[l].isTarget(dataStruct.tar)){
-        etData[l].sendData();
-     }
+  int target = dataStruct.tar;
+  for(int listener = 0; listener < DATA_LISTENERS; listener++){
+     setPixelColor(12 - listener, 0,255,50);
+     if(listeners[listener].isTarget(target)){
+       etData[listener].sendData();
+     } else {
+      setPixelColor(12 - listener, 0,0,0);
+     } 
   }
 }
 
@@ -111,7 +125,23 @@ void initCom(){
   Serial2.begin(9600);
   etData[2].begin(details(dataStruct), &Serial2); 
   Serial3.begin(9600);
-  etData[3].begin(details(dataStruct), &Serial3);  
+  etData[3].begin(details(dataStruct), &Serial3);
+  //Set initial pixel colors for data lines
+  setPixelColor(0,255,0,100);
+  setPixelColor(1,255,0,100);
+  setPixelColor(2,255,0,100);
+  setPixelColor(3,255,0,100);
+}
+
+void initPixel(){
+  pixel.begin();
+  pixel.setBrightness(50);
+  pixel.show();
+}
+
+void setPixelColor(int pixelNum, int red, int green, int blue){
+  pixel.setPixelColor(pixelNum, red, green, blue);
+  pixel.show();
 }
 
 void Listener::registerTarget(int target){
