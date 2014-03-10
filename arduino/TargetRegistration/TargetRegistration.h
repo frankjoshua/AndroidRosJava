@@ -1,0 +1,44 @@
+#ifndef TargetRegistration_h
+#define TargetRegistration_h
+#include "Stream.h"
+#include <EasyTransfer.h>
+#include <Adafruit_NeoPixel.h>
+
+//Led Colors
+#define COLOR_REGISTRATION 255,0,100
+#define COLOR_ERROR 255,0,0
+#define COLOR_OK 75,0,255
+#define COLOR_ACTIVE 0,255,255
+
+//Communication values
+#define COM_REGISTRATION 1
+#define REGISTER 1
+#define UNREGISTER 2
+
+//States of distance
+#define DISTANCE_TOUCHING 1
+#define DISTANCE_NEAR 2
+#define DISTANCE_FAR 3
+
+//TARGETS
+#define TARGET_PING_CENTER 50
+
+#define PIN            13
+
+class ClientTarget {
+public:
+void begin(int pin, Stream *theStream);
+void setPixelColor(int red, int green, int blue);
+void registerListener(int target);
+bool receiveData();
+void sendData(int tar, int cmd, int val, int dur);
+int getTarget();
+int getCommand();
+int getValue();
+int getDuration();
+private:
+void initPixel();
+};
+
+#endif
+
