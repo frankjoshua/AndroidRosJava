@@ -48,4 +48,5 @@ public class MouthView extends TextView implements OnInitListener {
         isTalkReady = true;
     }
 
+    
 }

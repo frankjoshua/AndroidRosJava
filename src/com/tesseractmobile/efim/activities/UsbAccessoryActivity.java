@@ -1,6 +1,5 @@
-package com.tesseractmobile.efim;
+package com.tesseractmobile.efim.activities;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -9,19 +8,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
-import android.view.View.OnClickListener;
 
+import com.tesseractmobile.efim.R;
+import com.tesseractmobile.efim.UsbConnectionService;
 import com.tesseractmobile.efim.UsbConnectionService.LocalBinder;
 import com.tesseractmobile.efim.robot.RobotCommand;
 import com.tesseractmobile.efim.robot.RobotCommand.RobotCommandType;
 import com.tesseractmobile.efim.robot.RobotCommandInterface;
 import com.tesseractmobile.efim.robot.RobotEvent;
 import com.tesseractmobile.efim.robot.RobotEventListener;
-import com.tesseractmobile.efim.views.MouthView;
 
-public class UsbAccessoryActivity extends Activity implements OnClickListener, RobotEventListener {
+public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEventListener {
 
-    private MouthView               textView;
+    
 
     private RobotCommandInterface   robotCommandInterface;
     private final ServiceConnection conn = new ServiceConnection() {
@@ -45,13 +44,9 @@ public class UsbAccessoryActivity extends Activity implements OnClickListener, R
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.robot_face);
+        
 
-        textView = (MouthView) findViewById(R.id.mouthView);
-
-        findViewById(R.id.eyeViewLeft).setOnClickListener(this);
-        findViewById(R.id.eyeViewRight).setOnClickListener(this);
-        findViewById(R.id.mouthView).setOnClickListener(this);
+        
     }
 
     @Override
@@ -68,13 +63,15 @@ public class UsbAccessoryActivity extends Activity implements OnClickListener, R
     }
 
     private boolean flipFlop;
+    
     @Override
     public void onClick(final View v) {
+        super.onClick(v);
+        
         final int viewId = v.getId();
 
         switch (viewId) {
         case R.id.eyeViewLeft:
-            textView.setText("Ouch!!");
             if(flipFlop){
                 final RobotCommand robotCommand = new RobotCommand(RobotCommandType.NOD);
                 robotCommandInterface.sendCommand(robotCommand);
@@ -103,7 +100,7 @@ public class UsbAccessoryActivity extends Activity implements OnClickListener, R
             public void run() {
                 switch (robotEvent.getEventType()) {
                 case ERROR:
-                    textView.setText(robotEvent.getMessage());
+                    getMouthView().setText(robotEvent.getMessage());
                     break;
                 case DISCONNECT:
                     finish();
