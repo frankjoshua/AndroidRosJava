@@ -8,6 +8,9 @@
 
 #define SPEED 50
 
+#define LEFT 2
+#define RIGHT 1
+
 ClientTarget clientTarget;
 
 SoftwareSerial SWSerial(NOT_A_PIN, 11); // RX on no pin (unused), TX on pin 11 (to S1).
@@ -22,10 +25,14 @@ void setup()
 
   
   //Register as Listener
-  clientTarget.registerListener(TARGET_PING_CENTER);
+//  clientTarget.registerListener(TARGET_PING_CENTER);
+//  clientTarget.registerListener(TARGET_PING_LEFT);
+//  clientTarget.registerListener(TARGET_PING_RIGHT);
+clientTarget.registerListener(TARGET_MOTOR_RIGHT);
+clientTarget.registerListener(TARGET_MOTOR_LEFT);
   
-  ST.motor(1, SPEED);
-  ST.motor(2, SPEED);
+//  ST.motor(1, SPEED);
+//  ST.motor(2, SPEED);
 } 
  
 void loop() 
@@ -33,32 +40,13 @@ void loop()
   delay(10);
   
     if(clientTarget.receiveData()){
-      int powerR = 0;
-      int powerL = 0;
-    switch(clientTarget.getValue()){
-       case DISTANCE_TOUCHING:
-         clientTarget.setPixelColor(255,0,0);
-         powerR = -SPEED;
-         powerL = -SPEED;
-       break;
-       case DISTANCE_NEAR:
-         clientTarget.setPixelColor(255,255,0);
-         powerR = SPEED;
-         powerL = -SPEED;
-       break;
-       case DISTANCE_FAR:
-         clientTarget.setPixelColor(0,255,0);
-         powerR = SPEED;
-         powerL = SPEED;
-       break;
+      if(clientTarget.getTarget() == TARGET_MOTOR_RIGHT){
+        ST.motor(RIGHT, clientTarget.getValue());
+      } else if (clientTarget.getTarget() == TARGET_MOTOR_LEFT){
+        ST.motor(LEFT, clientTarget.getValue());
+      }
     }
-     ST.motor(1, powerR);
-     ST.motor(2, powerL);
-
-  }
   
- 
-
 } 
 
 

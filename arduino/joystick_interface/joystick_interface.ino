@@ -3,6 +3,11 @@
 #define DOWN true;
 #define UP false;
 
+#define MIN_SPEED -127
+#define MAX_SPEED 127
+#define MIN_INPUT 0
+#define MAX_OUTPUT 1024
+
 // Store the Arduino pin associated with each input
 const byte PIN_BUTTON_SELECT = 2; // Select button is triggered when joystick is pressed
 
@@ -50,8 +55,19 @@ void loop() {
   
   readValues();
 
-  if(left == true){
+  if(right == false){
+    int mSpeed = map(y, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
+    int dir = map(x, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
+    int powerR = mSpeed + dir;
+    int powerL = mSpeed - dir;
     
+    //Send data
+    dataStruct.tar = 20;
+    dataStruct.val = powerR;
+    etData.sendData();
+    dataStruct.tar = 21;
+    dataStruct.val = powerL;
+    etData.sendData();
   }
 
 }
