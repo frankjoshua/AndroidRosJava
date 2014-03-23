@@ -10,17 +10,15 @@ void setup()
 { 
   Serial.begin(9600);
   clientTarget.begin(NEO_PIN, &Serial);
-
   
   //Register as Listener
-  clientTarget.registerListener(10);
-  clientTarget.registerListener(11);
+  clientTarget.registerListener(TARGET_SERVO_HEAD_VERT);
+  clientTarget.registerListener(TARGET_SERVO_HEAD_HORZ);
 } 
  
 void loop() 
 { 
-  delay(10);
-  
+
   if(clientTarget.receiveData()){
     clientTarget.setPixelColor(COLOR_ACTIVE);
   } else {

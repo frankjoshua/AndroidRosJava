@@ -68,6 +68,17 @@ void loop() {
     dataStruct.tar = 21;
     dataStruct.val = powerL;
     etData.sendData();
+  } else if (up == false){
+    int hPos = map(y, MIN_INPUT, MAX_OUTPUT, 0, 180);
+    int vPos = map(x, MIN_INPUT, MAX_OUTPUT, 0, 180);
+    
+    //Send data
+    dataStruct.tar = 10;
+    dataStruct.val = hPos;
+    etData.sendData();
+    dataStruct.tar = 11;
+    dataStruct.val = vPos;
+    etData.sendData();
   }
 
 }
