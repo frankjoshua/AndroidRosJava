@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/efim/efim/ros_ws/devel/setup.sh

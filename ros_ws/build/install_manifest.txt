@@ -1,0 +1,9 @@
+/home/efim/efim/ros_ws/install/.catkin
+/home/efim/efim/ros_ws/install/_setup_util.py
+/home/efim/efim/ros_ws/install/env.sh
+/home/efim/efim/ros_ws/install/setup.bash
+/home/efim/efim/ros_ws/install/setup.sh
+/home/efim/efim/ros_ws/install/setup.zsh
+/home/efim/efim/ros_ws/install/.rosinstall
+/home/efim/efim/ros_ws/install/etc/catkin/profile.d/05.catkin_make.bash
+/home/efim/efim/ros_ws/install/etc/catkin/profile.d/05.catkin_make_isolated.bash
