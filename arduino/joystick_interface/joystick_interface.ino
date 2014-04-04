@@ -50,12 +50,15 @@ boolean select;
 int x;
 int y;
 
+boolean laserOn = false;
+
 void loop() {
   delay(10);
   
   readValues();
 
   if(right == false){
+    //Motors
     int mSpeed = map(y, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
     int dir = map(x, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
     int powerR = mSpeed + dir;
@@ -68,17 +71,52 @@ void loop() {
     dataStruct.tar = 21;
     dataStruct.val = powerL;
     etData.sendData();
-  } else if (up == false){
+  } 
+  
+  if (up == false){
+    //Servos
     int hPos = map(y, MIN_INPUT, MAX_OUTPUT, 0, 180);
     int vPos = map(x, MIN_INPUT, MAX_OUTPUT, 0, 180);
     
     //Send data
     dataStruct.tar = 10;
+    dataStruct.cmd = 1;
     dataStruct.val = hPos;
     etData.sendData();
     dataStruct.tar = 11;
+    dataStruct.cmd = 1;
     dataStruct.val = vPos;
     etData.sendData();
+  }
+  
+  if (down == false){
+    //Servos
+    int hPos = map(y, MIN_INPUT, MAX_OUTPUT, -10, 10);
+    int vPos = map(x, MIN_INPUT, MAX_OUTPUT, -10, 10);
+    
+    //Send data
+    dataStruct.tar = 10;
+    dataStruct.cmd = 2;
+    dataStruct.val = hPos;
+    etData.sendData();
+    dataStruct.tar = 11;
+    dataStruct.cmd = 2;
+    dataStruct.val = vPos;
+    etData.sendData();
+  }
+  
+  if(left == false){
+    //Laser
+    //Send data
+    dataStruct.tar = 90;
+    if(laserOn){
+      dataStruct.cmd = 1;
+    } else {
+      dataStruct.cmd = 2;
+    }
+    laserOn = !laserOn;
+    etData.sendData();
+    delay(100);
   }
 
 }

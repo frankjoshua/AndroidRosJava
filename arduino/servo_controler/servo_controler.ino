@@ -5,6 +5,8 @@
 
 #define NEO_PIN 13
 
+#define LASER_PIN 7
+
 //Servo Control Pins
 #define  SERVO1         11
 #define  SERVO2         12
@@ -12,9 +14,12 @@
 ClientTarget clientTarget;
 
 Servo servos[2];
+int servoPos[2];
  
 void setup() 
 { 
+  pinMode(LASER_PIN, OUTPUT);
+  
   initServos();
   
   Serial.begin(9600);
@@ -23,14 +28,35 @@ void setup()
   //Register as Listener
   clientTarget.registerListener(TARGET_SERVO_HEAD_VERT);
   clientTarget.registerListener(TARGET_SERVO_HEAD_HORZ);  
+  clientTarget.registerListener(TARGET_LASER_HEAD);
 } 
  
 void loop() 
 { 
 
   if(clientTarget.receiveData()){
-    Servo servo = getServo(clientTarget.getTarget());
-    servo.write(clientTarget.getValue()); 
+    int target = clientTarget.getTarget();
+    int cmd = clientTarget.getCommand();
+    switch(target){
+       case TARGET_SERVO_HEAD_VERT:
+       case TARGET_SERVO_HEAD_HORZ:
+       {
+         if(cmd == CMD_SERVO_SET){
+           setServo(target, clientTarget.getValue());
+         } else {
+           moveServo(target, clientTarget.getValue());
+         }
+         break;
+       }
+       case TARGET_LASER_HEAD:
+          
+          if(cmd == CMD_LASER_ON){
+            digitalWrite(LASER_PIN, HIGH);
+          } else {
+            digitalWrite(LASER_PIN, LOW);
+          }
+       break; 
+    }
   }
 
 } 
@@ -49,8 +75,18 @@ Servo getServo(int target){
 
 void initServos(){
   servos[0].attach(SERVO1);
-  servos[0].write(90);
+  setServo(TARGET_SERVO_HEAD_VERT, 90);
   servos[1].attach(SERVO2);
-  servos[1].write(90);
+  setServo(TARGET_SERVO_HEAD_HORZ, 90);
+}
+
+void setServo(int servo, int pos){
+   getServo(servo).write(pos);
+   servoPos[servo] = pos; 
+}
+
+void moveServo(int servo, int dest){
+   int pos = servoPos[servo] + dest;
+   setServo(servo, pos);
 }
 
