@@ -83,13 +83,23 @@ void loop()
       } else {
         //Route to correct output
         routeData();
+        //Send data to Android device if connected
+        if (acc.isConnected()) {
+          byte msg[3];
+          msg[0] = tar;
+          msg[1] = cmd;
+          msg[2] = val;
+          acc.write(msg, 3);
+        }
       }
     }
   }
 
-  //Read from connected Android device
+  //Check if Android device is connected
   if (acc.isConnected()) {
     byte msg[3];
+    
+    //Read from connected Android device
     int len = acc.read(msg, sizeof(msg), 1);
 
     if (len > 0) {
