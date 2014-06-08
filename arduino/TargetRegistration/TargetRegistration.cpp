@@ -19,7 +19,7 @@ COM_DATA_STRUCTURE dataStruct;
 void ClientTarget::begin(int pin, Stream *theStream){
   initPixel();
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  etData.begin(details(dataStruct), &Serial);
+  etData.begin(details(dataStruct), theStream);
 };
 
 void ClientTarget::initPixel(){

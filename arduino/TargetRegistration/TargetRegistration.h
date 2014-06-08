@@ -22,6 +22,8 @@
 
 //TARGETS
 #define TARGET_PING_CENTER 50
+#define TARGET_MOTOR_LEFT 20
+#define TARGET_MOTOR_RIGHT 21
 
 #define PIN            13
 
