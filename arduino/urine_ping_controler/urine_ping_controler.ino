@@ -23,6 +23,7 @@
 #include <NewPing.h>
 #include <SoftwareSerial.h>
 #include <SabertoothSimplified.h>
+#include <Servo.h> 
 
 #define NEO_PIN 13
 
@@ -30,6 +31,10 @@
 #define LEFT 1
 #define RIGHT 2
 #define BACK 3
+
+#define PIN_SERVO_CENTER 2
+#define PIN_SERVO_RIGHT 1
+#define PIN_SERVO_LEFT 3
 
 #define LEFT_MOTOR 2
 #define RIGHT_MOTOR 1
@@ -42,6 +47,9 @@
 #define SONAR_NUM     4 // Number or sensors.
 #define MAX_DISTANCE 400 // Max distance in cm.
 #define PING_INTERVAL 33 // Milliseconds between pings.
+
+#define FACE_FORWARD 65
+#define FACE_DOWN 110
 
 ClientTarget clientTarget;
 
@@ -60,7 +68,9 @@ NewPing sonar[SONAR_NUM] = { // Sensor object array.
   NewPing(7, 8, MAX_DISTANCE), //Right
   NewPing(5, 6, MAX_DISTANCE) //Back
 };
- 
+
+Servo servos[3];
+
 void setup() {
   Serial.begin(9600);
   initCom();
@@ -73,14 +83,25 @@ void setup() {
   
   //Init ping sensors
   initSensors();
+  initServos();
   
   SWSerial.begin(9600);
   ST.motor(RIGHT_MOTOR, SPEED);
   ST.motor(LEFT_MOTOR, SPEED);
 }
- 
+
+boolean flip = true;
 void loop() {
-  readSensors(); 
+  readSensors();
+ 
+  flip = !flip;
+  if(flip){
+    servos[CENTER].write(FACE_FORWARD);
+    servos[LEFT].write(FACE_FORWARD);
+  } else {
+    servos[CENTER].write(FACE_DOWN);
+    servos[LEFT].write(FACE_DOWN);
+  }
 }
 
 
@@ -160,3 +181,11 @@ void initSensors(){
     pingTimer[i] = pingTimer[i - 1] + PING_INTERVAL;
   }
 }
+
+void initServos(){
+  servos[CENTER].attach(PIN_SERVO_CENTER);
+  servos[LEFT].attach(PIN_SERVO_LEFT);
+  
+  servos[CENTER].write(FACE_FORWARD);
+  servos[LEFT].write(FACE_FORWARD);
+  }

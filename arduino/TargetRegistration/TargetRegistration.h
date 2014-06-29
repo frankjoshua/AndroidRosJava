@@ -25,7 +25,7 @@
 #define TARGET_MOTOR_LEFT 20
 #define TARGET_MOTOR_RIGHT 21
 
-#define PIN            13
+#define NEO_PIN            13
 
 class ClientTarget {
 public:

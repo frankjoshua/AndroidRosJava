@@ -3,8 +3,9 @@
 #include <Adafruit_NeoPixel.h>
 #include <SoftwareSerial.h>
 #include <SabertoothSimplified.h>
+#include <Encoder.h>
 
-#define NEO_PIN 13
+#define NEO_PIN 12
 
 #define SPEED 50
 
@@ -25,6 +26,7 @@ ClientTarget clientTarget;
 SoftwareSerial SWSerial(NOT_A_PIN, MOTOR_PIN); // RX on no pin (unused), TX on pin 11 (to S1).
 SoftwareSerial SWSerial2(6, 7); // RX on no pin (unused), TX on pin 11 (to S1).
 SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
+Encoder myEnc(2, encoder0PinA);
 
 void setup() 
 { 
@@ -40,13 +42,13 @@ void setup()
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
   clientTarget.registerListener(TARGET_MOTOR_LEFT);
   
-  pinMode(encoder0PinA, INPUT); 
-  pinMode(encoder0PinB, INPUT);
+//  pinMode(encoder0PinA, INPUT); 
+//  pinMode(encoder0PinB, INPUT);
  
  // encoder pin on interrupt 0 (pin 2)
- attachInterrupt(0, rightCounter, RISING);
+// attachInterrupt(0, rightCounter, RISING);
 // encoder pin on interrupt 1 (pin 3)
- attachInterrupt(1, leftCounter, RISING);  
+// attachInterrupt(1, leftCounter, RISING);  
 } 
  
 void loop() 
@@ -64,9 +66,9 @@ void loop()
     }
   }
   
-  Serial.print(left, DEC);
+  Serial.print(myEnc.read(), DEC);
   Serial.print(" ** ");
-  Serial.println(right, DEC);
+  Serial.println(myEnc.read(), DEC);
 } 
 
 void leftCounter(){

@@ -1,6 +1,6 @@
 #include "TargetRegistration.h"
 
-Adafruit_NeoPixel pixel = Adafruit_NeoPixel(60, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel* pixel = NULL;
 
 EasyTransfer etData; 
 
@@ -17,21 +17,22 @@ struct COM_DATA_STRUCTURE{
 COM_DATA_STRUCTURE dataStruct;
 
 void ClientTarget::begin(int pin, Stream *theStream){
+  pixel = new Adafruit_NeoPixel(60, pin, NEO_GRB + NEO_KHZ800);
   initPixel();
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
   etData.begin(details(dataStruct), theStream);
 };
 
 void ClientTarget::initPixel(){
-  pixel.begin();
-  pixel.setBrightness(50);
-  pixel.show();
+  pixel->begin();
+  pixel->setBrightness(50);
+  pixel->show();
   setPixelColor(COLOR_REGISTRATION);
 }
 
 void ClientTarget::setPixelColor(int red, int green, int blue){
-  pixel.setPixelColor(0, red, green, blue);
-  pixel.show();
+  pixel->setPixelColor(0, red, green, blue);
+  pixel->show();
 }
 
 void ClientTarget::registerListener(int target){
