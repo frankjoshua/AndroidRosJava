@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="activities.UsbAccessoryActivity"
+            android:name=".activities.UsbAccessoryActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape"
             android:taskAffinity=""

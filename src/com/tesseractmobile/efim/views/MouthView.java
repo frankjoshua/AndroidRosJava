@@ -48,5 +48,12 @@ public class MouthView extends TextView implements OnInitListener {
         isTalkReady = true;
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        mTts.stop();
+        mTts.shutdown();
+        super.onDetachedFromWindow();
+    }
+
     
 }
