@@ -53,6 +53,7 @@
 
 ClientTarget clientTarget;
 
+SoftwareSerial lcdSerial = SoftwareSerial(255, 22);
 SoftwareSerial SWSerial(NOT_A_PIN, 4); // RX on no pin (unused), TX on pin 11 (to S1).
 SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
 
@@ -72,8 +73,11 @@ NewPing sonar[SONAR_NUM] = { // Sensor object array.
 Servo servos[3];
 
 void setup() {
-  Serial.begin(9600);
+  
   initCom();
+  
+  initLCD();
+
   
   //Register as Listener
 //  clientTarget.registerListener(TARGET_PING_CENTER);
@@ -96,16 +100,24 @@ void loop() {
  
   flip = !flip;
   if(flip){
-    servos[CENTER].write(FACE_FORWARD);
-    servos[LEFT].write(FACE_FORWARD);
+    //servos[CENTER].write(FACE_FORWARD);
+    //servos[LEFT].write(FACE_FORWARD);
   } else {
-    servos[CENTER].write(FACE_DOWN);
-    servos[LEFT].write(FACE_DOWN);
+    //servos[CENTER].write(FACE_DOWN);
+    //servos[LEFT].write(FACE_DOWN);
   }
 }
 
-
+/**
+* Called when the state of any sensors change
+*/
 void stateChange(){
+  //Print states to LCD
+  lcdSerial.write(12);                 // Clear
+  lcdSerial.print("C: "); lcdSerial.print(stateList[CENTER]);
+  //lcdSerial.write(13); //Line return
+  lcdSerial.print(" L: "); lcdSerial.print(stateList[LEFT]);
+  lcdSerial.print(" R: "); lcdSerial.print(stateList[RIGHT]);
   //Choose direction to move
   if(stateList[CENTER] != DISTANCE_FAR || stateList[RIGHT] != DISTANCE_FAR){
     ST.motor(RIGHT_MOTOR, SPEED);
@@ -140,6 +152,7 @@ void echoCheck() { // If ping echo, set distance to array.
 }
  
 void oneSensorCycle() { // Do something with the results.
+
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     int curState = 0;
     if(cm[i] > FAR){
@@ -149,18 +162,12 @@ void oneSensorCycle() { // Do something with the results.
     } else {
       curState = DISTANCE_TOUCHING;
     } 
-    Serial.print(cm[i]);
    
-    
     if(setState(i, curState)){
-      stateChange();
       //Report state change
-      Serial.print(" ");
-      Serial.print(curState);
+      stateChange();
     } 
-     Serial.print(" ** ");
   }
-  Serial.print("\n");
 }
 
 boolean setState(int sensor, int newState){
@@ -169,6 +176,14 @@ boolean setState(int sensor, int newState){
   return change;
 }
 
+void initLCD(){
+   lcdSerial.begin(9600);
+  delay(100);
+  lcdSerial.write(12);                 // Clear             
+  lcdSerial.write(17);                 // Turn backlight on
+  delay(5);                           // Required delay
+  lcdSerial.print("Ready..."); 
+}
 
 void initCom(){
   clientTarget.begin(NEO_PIN, &Serial);
