@@ -90,6 +90,9 @@ void setup() {
   initServos();
   
   SWSerial.begin(9600);
+  
+  delay(500);
+  
   ST.motor(RIGHT_MOTOR, SPEED);
   ST.motor(LEFT_MOTOR, SPEED);
 }
