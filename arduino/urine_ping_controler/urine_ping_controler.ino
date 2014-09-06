@@ -33,14 +33,14 @@
 #define BACK 3
 
 #define PIN_SERVO_CENTER 2
-#define PIN_SERVO_RIGHT 1
+#define PIN_SERVO_RIGHT 24
 #define PIN_SERVO_LEFT 3
 
 #define LEFT_MOTOR 2
 #define RIGHT_MOTOR 1
 
-#define FAR 10
-#define NEAR 5
+#define FAR 20
+#define NEAR 10
 
 #define SPEED 127
  
@@ -49,7 +49,7 @@
 #define PING_INTERVAL 33 // Milliseconds between pings.
 
 #define FACE_FORWARD 65
-#define FACE_DOWN 110
+#define FACE_DOWN 90
 
 ClientTarget clientTarget;
 
@@ -71,6 +71,9 @@ NewPing sonar[SONAR_NUM] = { // Sensor object array.
 };
 
 Servo servos[3];
+
+int botState = 0;
+unsigned long timeLastUpdate, timeElapsed;
 
 void setup() {
   
@@ -100,27 +103,42 @@ void setup() {
 boolean flip = true;
 void loop() {
   readSensors();
- 
-  flip = !flip;
-  if(flip){
-    //servos[CENTER].write(FACE_FORWARD);
-    //servos[LEFT].write(FACE_FORWARD);
-  } else {
-    //servos[CENTER].write(FACE_DOWN);
-    //servos[LEFT].write(FACE_DOWN);
-  }
+  updateState();
+  
+}
+
+void updateDisplay(){
+   //Print states to LCD
+  lcdSerial.write(12);                 // Clear
+  lcdSerial.print("C:"); lcdSerial.print(cm[CENTER]);
+  //lcdSerial.write(13); //Line return
+  lcdSerial.print(" L:"); lcdSerial.print(cm[LEFT]);
+  lcdSerial.print(" R:"); lcdSerial.print(cm[RIGHT]); 
+}
+
+void updateState(){
+    if(botState == 0){
+      return;  
+    }
+    
+    if(millis() - timeLastUpdate > 100){
+       botState = 0; 
+    }
 }
 
 /**
 * Called when the state of any sensors change
 */
 void stateChange(){
-  //Print states to LCD
-  lcdSerial.write(12);                 // Clear
-  lcdSerial.print("C: "); lcdSerial.print(stateList[CENTER]);
-  //lcdSerial.write(13); //Line return
-  lcdSerial.print(" L: "); lcdSerial.print(stateList[LEFT]);
-  lcdSerial.print(" R: "); lcdSerial.print(stateList[RIGHT]);
+  
+  if(botState != 0){
+     //Don't change state
+     return; 
+  }
+  
+  timeLastUpdate = millis();
+  botState = 1;
+  
   //Choose direction to move
   if(stateList[CENTER] != DISTANCE_FAR || stateList[RIGHT] != DISTANCE_FAR){
     ST.motor(RIGHT_MOTOR, SPEED);
@@ -132,6 +150,20 @@ void stateChange(){
     ST.motor(RIGHT_MOTOR, SPEED);
     ST.motor(LEFT_MOTOR, SPEED);
   }
+  
+  updateDisplay();
+//  flip = !flip;
+//  if(flip){
+//    servos[CENTER].write(FACE_FORWARD);
+//    servos[LEFT].write(FACE_FORWARD);
+//    servos[RIGHT].write(FACE_FORWARD);
+//  } else {
+//    servos[CENTER].write(FACE_DOWN);
+//    servos[LEFT].write(FACE_DOWN);
+//    servos[RIGHT].write(FACE_DOWN);
+//  }
+  
+  
 }
 
 
@@ -203,7 +235,9 @@ void initSensors(){
 void initServos(){
   servos[CENTER].attach(PIN_SERVO_CENTER);
   servos[LEFT].attach(PIN_SERVO_LEFT);
+  servos[RIGHT].attach(PIN_SERVO_RIGHT);
   
   servos[CENTER].write(FACE_FORWARD);
   servos[LEFT].write(FACE_FORWARD);
-  }
+  servos[RIGHT].write(FACE_FORWARD);
+}
