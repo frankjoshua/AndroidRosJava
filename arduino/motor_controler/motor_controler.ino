@@ -41,7 +41,7 @@ void setup()
   //Begin Target Registration
   Serial.begin(9600);
   SWSerial2.begin(9600);
-  clientTarget.begin(NEO_PIN, &SWSerial2);
+  clientTarget.begin(NEO_PIN, &SWSerial2);b
 
   //Register as Listener
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
