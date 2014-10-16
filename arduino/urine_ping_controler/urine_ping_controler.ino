@@ -54,7 +54,7 @@
 ClientTarget clientTarget;
 
 SoftwareSerial lcdSerial = SoftwareSerial(255, 22);
-SoftwareSerial SWSerial(NOT_A_PIN, 4); // RX on no pin (unused), TX on pin 11 (to S1).
+SoftwareSerial SWSerial(NOT_A_PIN, 8); // RX on no pin (unused), TX on pin 11 (to S1).
 SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
 
 int stateList[SONAR_NUM];
@@ -66,11 +66,22 @@ uint8_t currentSensor = 0; // Which sensor is active.
 NewPing sonar[SONAR_NUM] = { // Sensor object array.
   NewPing(11, 12, MAX_DISTANCE), //Center
   NewPing(9, 10, MAX_DISTANCE), //Left
-  NewPing(7, 8, MAX_DISTANCE), //Right
-  NewPing(5, 6, MAX_DISTANCE) //Back
+  NewPing(6, 7, MAX_DISTANCE), //Right
+  NewPing(4, 5, MAX_DISTANCE) //Back
 };
 
 Servo servos[3];
+
+unsigned long lastChangeTime;
+unsigned long timeToStayInState;
+unsigned long lastUpdate;
+
+//Motor speeds
+int targetSpeedRight;
+int targetSpeedLeft;
+int speedRight;
+int speedLeft;
+const float changeSpeed = SPEED / 250.0;
 
 void setup() {
   
@@ -87,51 +98,112 @@ void setup() {
   
   //Init ping sensors
   initSensors();
-  initServos();
+  //initServos();
   
   SWSerial.begin(9600);
   
   delay(500);
   
-  ST.motor(RIGHT_MOTOR, SPEED);
-  ST.motor(LEFT_MOTOR, SPEED);
+  speedRight = SPEED;
+  speedLeft = SPEED;
+  ST.motor(RIGHT_MOTOR, speedRight);
+  ST.motor(LEFT_MOTOR, speedLeft);
+  
+  //Initalize last change time
+  lastChangeTime = millis();
+  lastUpdate = lastChangeTime;
 }
 
-boolean flip = true;
+boolean update = true;
 void loop() {
   readSensors();
- 
-  flip = !flip;
-  if(flip){
-    //servos[CENTER].write(FACE_FORWARD);
-    //servos[LEFT].write(FACE_FORWARD);
-  } else {
-    //servos[CENTER].write(FACE_DOWN);
-    //servos[LEFT].write(FACE_DOWN);
+  long newTime = millis();
+  long timeElapsed = newTime - lastUpdate;
+  lastUpdate = newTime;
+  //Set to ture when the display needs to be updated
+  boolean refreshDisplay = false;
+  //Wait a few mills before updating direct to prevent studder
+  if(update && newTime - lastChangeTime > timeToStayInState){
+    update = false;
+    //Choose direction to move
+    if(stateList[BACK] != DISTANCE_FAR){
+      setRightTargetSpeed(SPEED);
+      setLeftTargetSpeed(SPEED);
+      timeToStayInState = 200;
+    } else if (stateList[CENTER] != DISTANCE_FAR || stateList[RIGHT] != DISTANCE_FAR || stateList[LEFT] != DISTANCE_FAR) {
+      setRightTargetSpeed(SPEED);
+      setLeftTargetSpeed(-SPEED);
+      timeToStayInState = 5;
+    } else {
+      setRightTargetSpeed(SPEED / 2);
+      setLeftTargetSpeed(SPEED / 2);
+      timeToStayInState = 5;
+    }
+    refreshDisplay = true;
+  } 
+  
+  //Update motor speeds if needed
+  if(speedRight != targetSpeedRight){
+    speedRight = newSpeed(targetSpeedRight, speedRight, timeElapsed);
+    ST.motor(RIGHT_MOTOR, speedRight);
+    refreshDisplay = true;
   }
+  if(speedLeft != targetSpeedLeft){
+    speedLeft = newSpeed(targetSpeedLeft, speedLeft, timeElapsed);
+    ST.motor(LEFT_MOTOR, speedLeft);
+    refreshDisplay = true;
+  }
+  
+  if(refreshDisplay){
+     updateDisplay(); 
+  }
+}
+
+/**
+* Returns new speed based on time passed
+* tSpeed is target, cSpeed is current
+*/
+int newSpeed(int tSpeed, int cSpeed, long timeElapsed){
+  int speedDiff = tSpeed - cSpeed;
+  if(speedDiff > 5){
+    return cSpeed += changeSpeed * timeElapsed;  
+  } else if(speedDiff < -5){
+    return cSpeed -= changeSpeed * timeElapsed;
+  } else {
+    return tSpeed;
+  }
+}
+
+void setRightTargetSpeed(int target){
+  targetSpeedRight = target;  
+}
+
+void setLeftTargetSpeed(int target){
+  targetSpeedLeft = target;
+}
+
+void updateDisplay(){
+   //Print states to LCD
+  lcdSerial.write(12);                 // Clear
+  //lcdSerial.print("V: "); lcdSerial.print(changeSpeed);
+  lcdSerial.print("LS:"); lcdSerial.print(speedLeft);
+  lcdSerial.print(" RS:"); lcdSerial.print(speedRight);
+  //lcdSerial.print(" LT:"); lcdSerial.print(targetSpeedLeft);
+  lcdSerial.write(13); //Line return
+  lcdSerial.print("C:"); lcdSerial.print(stateList[CENTER]);
+  lcdSerial.print("R:"); lcdSerial.print(stateList[RIGHT]);
+  lcdSerial.print("L:"); lcdSerial.print(stateList[LEFT]);
+  lcdSerial.print("B:"); lcdSerial.print(stateList[BACK]);
+  //lcdSerial.print(" RT:"); lcdSerial.print(targetSpeedRight);
 }
 
 /**
 * Called when the state of any sensors change
 */
 void stateChange(){
-  //Print states to LCD
-  lcdSerial.write(12);                 // Clear
-  lcdSerial.print("C: "); lcdSerial.print(stateList[CENTER]);
-  //lcdSerial.write(13); //Line return
-  lcdSerial.print(" L: "); lcdSerial.print(stateList[LEFT]);
-  lcdSerial.print(" R: "); lcdSerial.print(stateList[RIGHT]);
-  //Choose direction to move
-  if(stateList[CENTER] != DISTANCE_FAR || stateList[RIGHT] != DISTANCE_FAR){
-    ST.motor(RIGHT_MOTOR, SPEED);
-    ST.motor(LEFT_MOTOR, -SPEED);
-  } else if (stateList[LEFT] != DISTANCE_FAR){
-    ST.motor(RIGHT_MOTOR, -SPEED);
-    ST.motor(LEFT_MOTOR, SPEED);
-  } else {
-    ST.motor(RIGHT_MOTOR, SPEED);
-    ST.motor(LEFT_MOTOR, SPEED);
-  }
+  lastChangeTime = millis();
+  update = true;
+  updateDisplay();
 }
 
 
