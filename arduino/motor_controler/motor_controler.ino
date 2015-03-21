@@ -5,9 +5,9 @@
 #include <SabertoothSimplified.h>
 #include <SPI.h>
 
-#define NEO_PIN 3
+#define NEO_PIN 13
 
-#define SPEED 50
+
 
 #define LEFT 2
 #define RIGHT 1
@@ -35,20 +35,21 @@ signed long encoder2count = 0;
 
 void setup() 
 { 
+
   //Used for Motor Controler
   SWSerial.begin(9600);
   
   //Begin Target Registration
   Serial.begin(9600);
   SWSerial2.begin(9600);
-  clientTarget.begin(NEO_PIN, &SWSerial2);b
+  clientTarget.begin(NEO_PIN, &SWSerial2);
 
   //Register as Listener
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
   clientTarget.registerListener(TARGET_MOTOR_LEFT);
   
-  initEncoders(); 
-  clearEncoderCount();
+  //initEncoders(); 
+  //clearEncoderCount();
 } 
  
 void loop() 
@@ -68,10 +69,10 @@ void loop()
   }
 
 // Retrieve current encoder counters
- encoder1count = readEncoder(1); 
- encoder2count = readEncoder(2);
+ //encoder1count = readEncoder(1); ,
+ //encoder2count = readEncoder(2);
  
- Serial.println(encoder1count * CM_PER_PULSE);
+ //Serial.println(encoder1count * CM_PER_PULSE);
 } 
 
 void initEncoders() {
