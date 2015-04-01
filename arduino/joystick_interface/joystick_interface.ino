@@ -6,7 +6,7 @@
 #define MIN_SPEED -127
 #define MAX_SPEED 127
 #define MIN_INPUT 0
-#define MAX_OUTPUT 1024
+#define MAX_OUTPUT 1023
 
 // Store the Arduino pin associated with each input
 const byte PIN_BUTTON_SELECT = 2; // Select button is triggered when joystick is pressed
@@ -106,17 +106,30 @@ void loop() {
   }
   
   if(left == false){
+    //Motors
+    int mSpeed = map(y, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
+    int dir = map(x, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
+    int powerR = mSpeed + dir;
+    int powerL = mSpeed - dir;
+    
+    //Send data
+    dataStruct.tar = 20;
+    dataStruct.val = powerR / 4;
+    etData.sendData();
+    dataStruct.tar = 21;
+    dataStruct.val = powerL / 4;
+    etData.sendData();
     //Laser
     //Send data
-    dataStruct.tar = 90;
-    if(laserOn){
-      dataStruct.cmd = 1;
-    } else {
-      dataStruct.cmd = 2;
-    }
-    laserOn = !laserOn;
-    etData.sendData();
-    delay(100);
+//    dataStruct.tar = 90;
+//    if(laserOn){
+//      dataStruct.cmd = 1;
+//    } else {
+//      dataStruct.cmd = 2;
+//    }
+//    laserOn = !laserOn;
+//    etData.sendData();
+//    delay(100);
   }
 
 }
