@@ -40,7 +40,10 @@ int stateList[SONAR_NUM];
 unsigned long pingTimer[SONAR_NUM]; // When each pings.
 unsigned int cm[SONAR_NUM]; // Store ping distances.
 uint8_t currentSensor = 0; // Which sensor is active.
- 
+
+//Echo BLUE
+//Trigger YELLOW
+//NewPing(Trigger, Echo, MAX_DISTANCE)
 NewPing sonar[SONAR_NUM] = { // Sensor object array.
   NewPing(11, 12, MAX_DISTANCE),
   NewPing(9, 10, MAX_DISTANCE),
@@ -104,9 +107,9 @@ void echoCheck() { // If ping echo, set distance to array.
 void oneSensorCycle() { // Do something with the results.
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     int curState = 0;
-    if(cm[i] > 10){
+    if(cm[i] > 100){
       curState = DISTANCE_FAR;
-    } else if(cm[i] > 4) {
+    } else if(cm[i] > 50) {
       curState = DISTANCE_NEAR;
     } else {
       curState = DISTANCE_TOUCHING;

@@ -54,12 +54,14 @@ void loop() {
   int powerL = mSpeed - dir;
   
   //Send data
-  dataStruct.tar = 20;
-  dataStruct.val = powerR;
-  etData.sendData();
-  dataStruct.tar = 21;
-  dataStruct.val = powerL;
-  etData.sendData();
+  if(channels[CH5] > 1500){
+    dataStruct.tar = 20;
+    dataStruct.val = powerR;
+    etData.sendData();
+    dataStruct.tar = 21;
+    dataStruct.val = powerL;
+    etData.sendData();
+  }
   
 }
 

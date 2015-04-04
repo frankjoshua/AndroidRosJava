@@ -1,8 +1,8 @@
 @echo on
 
-rem if [~%ARDUINO_HOME%]==[] goto ERROR
+if [%ARDUINO_HOME%]==[] goto ERROR
 
-copy .\TargetRegistration\*.* "%ARDUINO_HOME%\libraries\"
+copy .\TargetRegistration\*.* "%ARDUINO_HOME%\libraries\TargetRegistration\"
 
 goto EXIT
 

@@ -12,8 +12,8 @@ void setup()
   clientTarget.begin(NEO_PIN, &Serial);
   
   //Register as Listener
-  clientTarget.registerListener(TARGET_SERVO_HEAD_VERT);
-  clientTarget.registerListener(TARGET_SERVO_HEAD_HORZ);
+  clientTarget.registerListener(TARGET_MOTOR_LEFT);
+  clientTarget.registerListener(TARGET_MOTOR_RIGHT);
 } 
  
 void loop() 

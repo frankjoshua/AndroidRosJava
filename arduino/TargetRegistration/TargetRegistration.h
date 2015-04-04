@@ -11,6 +11,7 @@
 #define COLOR_ACTIVE 0,255,255
 
 //Communication values
+#define COM_SPEED 9600
 #define COM_REGISTRATION 1
 #define REGISTER 1
 #define UNREGISTER 2
@@ -22,6 +23,9 @@
 
 //TARGETS
 #define TARGET_PING_CENTER 50
+#define TARGET_PING_LEFT 51
+#define TARGET_PING_RIGHT 52
+#define TARGET_PING_BACK 53
 #define TARGET_MOTOR_LEFT 20
 #define TARGET_MOTOR_RIGHT 21
 
