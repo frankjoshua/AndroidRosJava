@@ -17,6 +17,8 @@ struct COM_DATA_STRUCTURE{
 COM_DATA_STRUCTURE dataStruct;
 
 void ClientTarget::begin(int pin, Stream *theStream){
+  //Give controller time to start
+  delay(500);
   pixel = new Adafruit_NeoPixel(60, pin, NEO_GRB + NEO_KHZ800);
   initPixel();
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
@@ -47,7 +49,7 @@ void ClientTarget::registerListener(int target){
     etData.sendData();
 	//Clear cmd to verify registration
 	dataStruct.cmd = 0;
-	delay(10);
+	delay(250);
     //Check if received acknowledgement
     if(etData.receiveData()){
       if(dataStruct.cmd == target){

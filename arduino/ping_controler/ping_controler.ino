@@ -58,7 +58,7 @@ void setup() {
   clientTarget.registerListener(TARGET_PING_CENTER);
   clientTarget.registerListener(TARGET_PING_LEFT);
   clientTarget.registerListener(TARGET_PING_RIGHT);
-  clientTarget.registerListener(TARGET_PING_BACK);
+  //clientTarget.registerListener(TARGET_PING_BACK);
   
   //Init ping sensors
   initSensors();
@@ -107,9 +107,9 @@ void echoCheck() { // If ping echo, set distance to array.
 void oneSensorCycle() { // Do something with the results.
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     int curState = 0;
-    if(cm[i] > 100){
+    if(cm[i] > 50){
       curState = DISTANCE_FAR;
-    } else if(cm[i] > 50) {
+    } else if(cm[i] > 30) {
       curState = DISTANCE_NEAR;
     } else {
       curState = DISTANCE_TOUCHING;

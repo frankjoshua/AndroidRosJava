@@ -35,23 +35,30 @@ signed long encoder2count = 0;
 
 void setup() 
 { 
-
+  Serial.begin(9600);
   //Used for Motor Controler
   SWSerial.begin(9600);
   
   //Begin Target Registration
-  Serial.begin(9600);
-  SWSerial2.begin(9600);
+  SWSerial2.begin(COM_SPEED);
   clientTarget.begin(NEO_PIN, &SWSerial2);
 
   //Register as Listener
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
   clientTarget.registerListener(TARGET_MOTOR_LEFT);
-  
+  //clientTarget.registerListener(TARGET_PING_CENTER);
+  clientTarget.registerListener(TARGET_PING_LEFT);
+  clientTarget.registerListener(TARGET_PING_RIGHT);
+
   //initEncoders(); 
   //clearEncoderCount();
 } 
- 
+
+int rightSpeed = 0;
+int leftSpeed = 0;
+float rightSpeedAdjust = 1;
+float leftSpeedAdjust = 1;
+
 void loop() 
 { 
   delay(10);
@@ -60,12 +67,49 @@ void loop()
   //Check for recieved data
   if(clientTarget.receiveData()){
     //clearEncoderCount();
-    //Direct to motor
+
     if(clientTarget.getTarget() == TARGET_MOTOR_RIGHT){
-      ST.motor(RIGHT, clientTarget.getValue());
+      rightSpeed = clientTarget.getValue();
     } else if (clientTarget.getTarget() == TARGET_MOTOR_LEFT){
-      ST.motor(LEFT, clientTarget.getValue());
+      leftSpeed = clientTarget.getValue();
+    } else if (clientTarget.getTarget() == TARGET_PING_CENTER || clientTarget.getTarget() == TARGET_PING_LEFT){
+      //Adjust speed right
+      switch(clientTarget.getValue()){
+         case DISTANCE_TOUCHING:
+             rightSpeedAdjust = 0.25;
+         break;
+         case DISTANCE_NEAR:
+             rightSpeedAdjust = 0.5;
+         break;
+         case DISTANCE_FAR:
+            rightSpeedAdjust = 1;
+         break;
+      }
+    } else if (clientTarget.getTarget() == TARGET_PING_RIGHT){
+      //Adjust speed left
+      switch(clientTarget.getValue()){
+         case DISTANCE_TOUCHING:
+             leftSpeedAdjust = 0.25;
+             break;
+         case DISTANCE_NEAR:
+             leftSpeedAdjust = 0.5;
+         break;
+         case DISTANCE_FAR:
+            leftSpeedAdjust = 1;
+         break;
+      }
     }
+    
+    //Send values to the motor controler
+    int rightAdjusted = constrain(rightSpeed * rightSpeedAdjust, -127, 127);
+    int leftAdjusted = constrain(leftSpeed * leftSpeedAdjust, -127, 127);
+    ST.motor(RIGHT, rightSpeed);
+    ST.motor(LEFT, leftAdjusted);
+    
+    Serial.print("R:");
+    Serial.print(rightAdjusted);
+    Serial.print("    L:");
+    Serial.println(leftAdjusted);
   }
 
 // Retrieve current encoder counters
