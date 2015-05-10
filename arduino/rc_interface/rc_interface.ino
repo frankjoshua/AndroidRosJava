@@ -76,7 +76,7 @@ void readRc(){
 
 void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  Serial.begin(9600);
+  Serial.begin(115200);
   etData.begin(details(dataStruct), &Serial); 
 }
 

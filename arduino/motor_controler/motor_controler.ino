@@ -35,12 +35,12 @@ signed long encoder2count = 0;
 
 void setup() 
 { 
-  Serial.begin(9600);
+  Serial.begin(COM_SPEED);
   //Used for Motor Controler
   SWSerial.begin(9600);
   
   //Begin Target Registration
-  SWSerial2.begin(COM_SPEED);
+  SWSerial2.begin(115200);
   clientTarget.begin(NEO_PIN, &SWSerial2);
 
   //Register as Listener

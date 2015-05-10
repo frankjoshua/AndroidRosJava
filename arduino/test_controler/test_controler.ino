@@ -8,7 +8,7 @@ ClientTarget clientTarget;
 
 void setup() 
 { 
-  Serial.begin(9600);
+  Serial.begin(COM_SPEED);
   clientTarget.begin(NEO_PIN, &Serial);
   
   //Register as Listener

@@ -52,7 +52,7 @@ void setup()
 {
   initPixel();
   initCom();
-  acc.powerOn();
+  //acc.powerOn();
   pinMode(13, OUTPUT);
 }
 
@@ -128,13 +128,13 @@ void routeData(){
 
 void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  Serial.begin(9600);
+  Serial.begin(115200);
   etData[0].begin(details(dataStruct), &Serial); 
-  Serial1.begin(9600);
+  Serial1.begin(115200);
   etData[1].begin(details(dataStruct), &Serial1);
-  Serial2.begin(9600);
+  Serial2.begin(115200);
   etData[2].begin(details(dataStruct), &Serial2); 
-  Serial3.begin(9600);
+  Serial3.begin(115200);
   etData[3].begin(details(dataStruct), &Serial3);
   //Set initial pixel colors for data lines
   setPixelColor(0,255,0,100);

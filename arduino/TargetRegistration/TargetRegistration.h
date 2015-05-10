@@ -11,7 +11,7 @@
 #define COLOR_ACTIVE 0,255,255
 
 //Communication values
-#define COM_SPEED 9600
+#define COM_SPEED 115200
 #define COM_REGISTRATION 1
 #define REGISTER 1
 #define UNREGISTER 2
