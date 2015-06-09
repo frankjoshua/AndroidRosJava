@@ -8,8 +8,9 @@
 #define UNREGISTER 2
 #define REGISTRATION 1
 #define PIXEL_PIN            13
+#define NUM_OF_PIXELS 12
 
-Adafruit_NeoPixel pixel = Adafruit_NeoPixel(60, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixel = Adafruit_NeoPixel(NUM_OF_PIXELS, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 class Listener {
   public:
@@ -48,17 +49,60 @@ struct COM_DATA_STRUCTURE{
 //give a name to the group of data
 COM_DATA_STRUCTURE dataStruct;
 
+//Used for rotating the ring pixels
+struct Color{
+   int red;
+   int green;
+   int blue; 
+};
+int offset = 0;
+unsigned long lastRotate = 0;
+Color colors[NUM_OF_PIXELS];
+
 void setup()
 {
+  //Set all colors off by default
+  for(int i = 0; i < NUM_OF_PIXELS; i++){
+    setPixelColor(i,50,0,0);
+  }
+  
   initPixel();
   initCom();
   //acc.powerOn();
-  pinMode(13, OUTPUT);
+  pinMode(PIXEL_PIN, OUTPUT);
+  //Set start time
+  lastRotate = millis();
 }
 
 void loop()
 {
-  delay(10);
+  delay(5);
+  //Rotate
+  if(millis() > lastRotate + 200){
+    lastRotate = millis();
+    offset++;
+    if(offset > NUM_OF_PIXELS){
+      offset = 0; 
+    }
+    //Update the pixels
+    for(int pixelPosition = 0; pixelPosition < NUM_OF_PIXELS; pixelPosition++){
+        //Set the pixel color
+        int red = colors[pixelPosition].red;
+        int green = colors[pixelPosition].green;
+        int blue = colors[pixelPosition].blue;
+        
+        //Rotate the pixel
+        int pixelNum = pixelPosition + offset;
+        //Loop back to start if needed
+        if(pixelNum > NUM_OF_PIXELS){
+           pixelNum -= NUM_OF_PIXELS; 
+        }
+        //Display the color
+        pixel.setPixelColor(pixelNum - 1, red, green, blue);
+    }
+    pixel.show();
+  }
+  
   
   //Loop through each input
   for(int dataLine = 0; dataLine < DATA_CHANNELS; dataLine++){
@@ -83,47 +127,49 @@ void loop()
       } else {
         //Route to correct output
         routeData();
-        //Send data to Android device if connected
-        if (acc.isConnected()) {
-          byte msg[3];
-          msg[0] = tar;
-          msg[1] = cmd;
-          msg[2] = val;
-          acc.write(msg, 3);
-        }
       }
     }
   }
 
   //Check if Android device is connected
-  if (acc.isConnected()) {
-    byte msg[3];
-    
-    //Read from connected Android device
-    int len = acc.read(msg, sizeof(msg), 1);
-
-    if (len > 0) {
-      dataStruct.tar = msg[0];
-      dataStruct.cmd = msg[1];
-      dataStruct.val = msg[2];
-      dataStruct.dur = 0;
-      routeData();
-    }
-  } 
+//  if (acc.isConnected()) {
+//    byte msg[3];
+//    
+//    //Read from connected Android device
+//    int len = acc.read(msg, sizeof(msg), 1);
+//
+//    if (len > 0) {
+//      dataStruct.tar = msg[0];
+//      dataStruct.cmd = msg[1];
+//      dataStruct.val = msg[2];
+//      dataStruct.dur = 0;
+//      routeData();
+//    }
+//  } 
 
   
 }
 
+
 void routeData(){
   int target = dataStruct.tar;
   for(int listener = 0; listener < DATA_LISTENERS; listener++){
-     setPixelColor(12 - listener, 0,255,50);
      if(listeners[listener].isTarget(target)){
        etData[listener].sendData();
+       lastRotate -= 150;
+       setPixelColor(listener + 4, 0,255,50);
      } else {
-      setPixelColor(12 - listener, 0,0,0);
-     } 
-  }
+       setPixelColor(listener + 4, 0,50,0);
+     }
+  } 
+          //Send data to Android device if connected
+//        if (acc.isConnected()) {
+//          byte msg[3];
+//          msg[0] = tar;
+//          msg[1] = cmd;
+//          msg[2] = val;
+//          acc.write(msg, 3);
+//        }
 }
 
 void initCom(){
@@ -149,9 +195,14 @@ void initPixel(){
   pixel.show();
 }
 
+/**
+* Records the pix color to set into a single int
+*/
 void setPixelColor(int pixelNum, int red, int green, int blue){
-  pixel.setPixelColor(pixelNum, red, green, blue);
-  pixel.show();
+  //Save the color
+  colors[pixelNum].red = red;
+  colors[pixelNum].green = green;
+  colors[pixelNum].blue = blue;
 }
 
 void Listener::registerTarget(int target){
