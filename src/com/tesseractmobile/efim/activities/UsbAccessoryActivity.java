@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
+import android.widget.Toast;
 
 import com.tesseractmobile.efim.R;
 import com.tesseractmobile.efim.UsbConnectionService;
@@ -44,9 +45,7 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        
-
-        
+        Toast.makeText(this, "USB connection detected", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -66,7 +65,7 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
     
     @Override
     public void onClick(final View v) {
-        super.onClick(v);
+        //super.onClick(v);
         
         final int viewId = v.getId();
 
@@ -86,7 +85,7 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
             robotCommandInterface.reconnectRobot();
             break;
         case R.id.mouthView:
-            finish();
+            super.onClick(v);
             break;
         }
 
@@ -100,10 +99,17 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
             public void run() {
                 switch (robotEvent.getEventType()) {
                 case ERROR:
-                    getMouthView().setText(robotEvent.getMessage());
+                    say(robotEvent.getMessage());
                     break;
                 case DISCONNECT:
-                    finish();
+                    say("Disconnect command recieved");
+                    handler.postDelayed(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    }, 3000);
                     break;
                 }
             }

@@ -21,12 +21,12 @@ class Listener {
     boolean isTarget(int target);
 };
 
-AndroidAccessory acc("Google, Inc.",
-		     "DemoKit",
-		     "DemoKit Arduino Board",
-		     "1.0",
-		     "http://www.android.com",
-		     "0000000012345678");
+//AndroidAccessory acc("Google, Inc.",
+//		     "DemoKit",
+//		     "DemoKit Arduino Board",
+//		     "1.0",
+//		     "http://www.android.com",
+//		     "0000000012345678");
 
 const int DATA_CHANNELS = 4;
 EasyTransfer etData[DATA_CHANNELS];
@@ -127,6 +127,14 @@ void loop()
       } else {
         //Route to correct output
         routeData();
+        //Send data to Android device if connected
+//        if (acc.isConnected()) {
+//          byte msg[3];
+//          msg[0] = tar;
+//          msg[1] = cmd;
+//          msg[2] = val;
+//          acc.write(msg, 3);
+//        }
       }
     }
   }
@@ -145,8 +153,7 @@ void loop()
 //      dataStruct.dur = 0;
 //      routeData();
 //    }
-//  } 
-
+//  }
   
 }
 
@@ -162,14 +169,6 @@ void routeData(){
        setPixelColor(listener + 4, 0,50,0);
      }
   } 
-          //Send data to Android device if connected
-//        if (acc.isConnected()) {
-//          byte msg[3];
-//          msg[0] = tar;
-//          msg[1] = cmd;
-//          msg[2] = val;
-//          acc.write(msg, 3);
-//        }
 }
 
 void initCom(){

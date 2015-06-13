@@ -48,9 +48,18 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
                                                               @Override
                                                               public void onReceive(final Context context, final Intent intent) {
                                                                   final String action = intent.getAction();
-                                                                  log(action);
+                                                                  //log(action);
                                                                   if (ACTION_USB_PERMISSION.equals(action)) {
-                                                                     // view.setBackgroundColor(Color.CYAN);
+                                                                      final UsbAccessory accessory = (UsbAccessory) intent.getParcelableExtra(UsbManager.EXTRA_ACCESSORY);
+
+                                                                      if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                                                                          if(accessory != null){
+                                                                              //call method to set up accessory communication
+                                                                              log("Accessor null");
+                                                                          }
+                                                                      } else {
+                                                                          log("Permission denied");
+                                                                      }
                                                                   } else {
                                                                      if(robotEventListener != null){
                                                                          robotEventListener.onRobotEvent(RobotEvent.createDisconectEvent());
@@ -160,11 +169,14 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
     }
 
     @Override
-    public boolean sendCommand(final byte command, final byte target, int value, final int time) {
+    public boolean sendCommand(final byte command, final byte target, final int value, final int time) {
         final byte[] buffer = new byte[3];
 
-        if (value > 255)
-            value = 255;
+        if (value > 255 || value < 0){
+            log("Value out of range " + value);
+            return false;
+        }
+        
 
         buffer[0] = target;
         buffer[1] = command;
@@ -218,31 +230,57 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
     public boolean sendCommand(final RobotCommand robotCommand) {
         switch (robotCommand.getCommandType()) {
         case NOD:
-            synchronized (commandQueue) {
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 150));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 127, 0));
-                log("Adding Commands. Queue size: " + commandQueue.size());
-            }
+            //nod();
+            backup();
             return true;
         case SHAKE:
-            synchronized (commandQueue) {
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 150));
-                commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 127, 0));
-                log("Adding Commands. Queue size: " + commandQueue.size());
-            }
+            //shake();
+            backup();
             break;
         }
         return false;
+    }
+
+    private void backup() {
+        synchronized (commandQueue) {
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_MOVE, 25, 20));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_MOVE, 25, 500));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_MOVE, 0, 20));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_MOVE, 0, 20));
+            log("Adding Commands. Queue size: " + commandQueue.size());
+        }
+    }
+
+    /**
+     * 
+     */
+    private void shake() {
+        synchronized (commandQueue) {
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 150));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 127, 0));
+            log("Adding Commands. Queue size: " + commandQueue.size());
+        }
+    }
+
+    /**
+     * 
+     */
+    private void nod() {
+        synchronized (commandQueue) {
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 150));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 127, 0));
+            log("Adding Commands. Queue size: " + commandQueue.size());
+        }
     }
 
     @Override

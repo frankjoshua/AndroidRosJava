@@ -55,21 +55,29 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        checkVoiceRecognition();
-        
-        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        mSpeechRecognizer.setRecognitionListener(this);
+        if(checkVoiceRecognition()){
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+            mSpeechRecognizer.setRecognitionListener(this);
+        }
     }
 
-    private void checkVoiceRecognition() {
+    private boolean checkVoiceRecognition() {
         // Check if voice recognition is present
         final PackageManager pm = getPackageManager();
         final List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         if (activities.size() == 0) {
             getMouthView().setEnabled(false);
-            getMouthView().setText("Voice recognizer not present");
+            say("Voice recognizer not present");
             Toast.makeText(this, "Voice recognizer not present", Toast.LENGTH_SHORT).show();
+            return false;
         }
+        
+        if(SpeechRecognizer.isRecognitionAvailable(this) == false){
+            say("I have no voice recognization service available");
+            return false;
+        }
+        
+        return true;
     }
 
     @Override
@@ -138,7 +146,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         return mouthView;
     }
 
-    public void listen() {
+    private void listen() {
         setEmotion(Emotion.SUPRISED);
         final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
@@ -146,7 +154,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
 
         // Display an hint to the user about what he should say.
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "How can I help you?");
+        //intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "How can I help you?");
 
         // Given an hint to the recognizer about what the user is going to say
         // There are two form of language model available
@@ -159,8 +167,9 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // sorted where the first result is the one with higher confidence.
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
         // Start the Voice recognizer activity for the result.
-        //startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
-        mSpeechRecognizer.startListening(intent);
+        startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+        //mSpeechRecognizer.startListening(intent);
+        //say("I'm Listening");
         //Uncomment for test speech
         //new BotTask().execute("Are you listening?");
     }
@@ -177,14 +186,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     @Override
     public void onRmsChanged(final float rmsdB) {
-        // TODO Auto-generated method stub
-        
+        //say("Sound levels changed to " + rmsdB + " decibals");
     }
 
     @Override
     public void onBufferReceived(final byte[] buffer) {
-        // TODO Auto-generated method stub
-        
+        say("I hear something");
     }
 
     @Override
@@ -194,7 +201,13 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     @Override
     public void onError(final int error) {
-        getMouthView().setText("Error, Pardon?");
+        say("Error, Pardon? " + error);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -203,25 +216,23 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         if(data != null && data.size() > 0){
             final String responce = data.get(0);
             if(responce != null){
-                getMouthView().setText(responce);
+                say(responce);
                 new BotTask().execute(responce);
             } else {
                 //Something went wrong
-                getMouthView().setText("Pardon?");
+                say("Pardon?");
             }
         }
     }
 
     @Override
     public void onPartialResults(final Bundle partialResults) {
-        // TODO Auto-generated method stub
-        
+        say("I only heard a little of what you said");
     }
 
     @Override
     public void onEvent(final int eventType, final Bundle params) {
-        // TODO Auto-generated method stub
-        
+        say("Event " + eventType);
     }
     
     private class BotTask extends AsyncTask<String, Void, Void> {

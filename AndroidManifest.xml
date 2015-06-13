@@ -3,6 +3,8 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
+    <uses-feature android:name="android.hardware.usb.accessory" />
+    
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="15" />
