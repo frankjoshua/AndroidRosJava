@@ -18,7 +18,6 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activities.FaceDemo"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

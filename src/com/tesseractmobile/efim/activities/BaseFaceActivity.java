@@ -31,11 +31,15 @@ import com.tesseractmobile.efim.views.MouthView;
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
 
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 0;
+    
+    private static final boolean HIDE_VOICE_PROMPT = true;
+    
     private MouthView        mouthView;
     private EyeView          mLeftEye;
     private EyeView          mRightEye;
     private SpeechRecognizer mSpeechRecognizer;
     private final Handler mHandler = new Handler();
+    private boolean mHideVoicePrompt;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -55,6 +59,9 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        //Load settings
+        mHideVoicePrompt = HIDE_VOICE_PROMPT;
+        
         if(checkVoiceRecognition()){
             mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
             mSpeechRecognizer.setRecognitionListener(this);
@@ -167,8 +174,11 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // sorted where the first result is the one with higher confidence.
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
         // Start the Voice recognizer activity for the result.
-        startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
-        //mSpeechRecognizer.startListening(intent);
+        if(mHideVoicePrompt){
+            mSpeechRecognizer.startListening(intent);
+        } else {
+            startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+        }
         //say("I'm Listening");
         //Uncomment for test speech
         //new BotTask().execute("Are you listening?");
@@ -201,18 +211,41 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     @Override
     public void onError(final int error) {
-        say("Error, Pardon? " + error);
+        switch (error) {
+        case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+            say("I didn't hear you.");
+            break;
+        case SpeechRecognizer.ERROR_NO_MATCH:
+            say("I'm sorry, I could not understand you.");
+            break;
+        default:
+            say("Unkown error in speech system " + error);
+            break;
+        }
+        
     }
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        // TODO Auto-generated method stub
+        if(requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK){
+            proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
+        } else {
+            say("I had an unhandled error.");
+        }
+        
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onResults(final Bundle results) {
         final ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        proccessSpeech(data);
+    }
+
+    /**
+     * @param data
+     */
+    public void proccessSpeech(final ArrayList<String> data) {
         if(data != null && data.size() > 0){
             final String responce = data.get(0);
             if(responce != null){
@@ -222,6 +255,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                 //Something went wrong
                 say("Pardon?");
             }
+        } else {
+            say("No data recieved.");
         }
     }
 
