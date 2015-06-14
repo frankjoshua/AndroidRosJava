@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +31,8 @@ import com.tesseractmobile.efim.views.EyeView;
 import com.tesseractmobile.efim.views.MouthView;
 
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
+
+    private static final String SPEECH_INSTRUTIONS = "Touch my mouth if you want to say something";
 
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 0;
     
@@ -63,7 +67,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         mHideVoicePrompt = HIDE_VOICE_PROMPT;
         
         if(checkVoiceRecognition()){
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
             mSpeechRecognizer.setRecognitionListener(this);
         }
     }
@@ -213,10 +217,10 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     public void onError(final int error) {
         switch (error) {
         case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-            say("I didn't hear you.");
+            say("I didn't hear you. " + SPEECH_INSTRUTIONS);
             break;
         case SpeechRecognizer.ERROR_NO_MATCH:
-            say("I'm sorry, I could not understand you.");
+            say("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
             break;
         default:
             say("Unkown error in speech system " + error);
@@ -227,8 +231,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if(requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK){
-            proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
+        if(requestCode == VOICE_RECOGNITION_REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
+            } else {
+                onError(resultCode);
+            }
         } else {
             say("I had an unhandled error.");
         }
@@ -249,11 +257,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         if(data != null && data.size() > 0){
             final String responce = data.get(0);
             if(responce != null){
-                say(responce);
+                //say(responce);
+                //Send text to the chat bot                
                 new BotTask().execute(responce);
             } else {
                 //Something went wrong
-                say("Pardon?");
+                say("Pardon? " + SPEECH_INSTRUTIONS);
             }
         } else {
             say("No data recieved.");
@@ -302,9 +311,11 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                     }
                     if(response == null){
                         //No emotions use words
-                        response = responseThought.getText();
+                        //Strip HTML
+                        final String cleanedResponce = Html.fromHtml(responseThought.getText()).toString();
+                        response = cleanedResponce;
                     } else {
-                        response = "I feel somthing. It migh be " + response + ".";
+                        response = "I feel somthing. It might be " + response + ".";
                     }
                 } catch (final Exception e){
                     //Tell user what went wrong

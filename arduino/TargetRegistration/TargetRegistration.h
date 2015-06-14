@@ -29,6 +29,12 @@
 #define TARGET_MOTOR_LEFT 20
 #define TARGET_MOTOR_RIGHT 21
 
+//COMMANDS
+#define COMMAND_FORWARD 10
+#define COMMAND_BACKWARD 11
+#define COMMAND_LEFT 12
+#define COMMAND_RIGHT 13
+
 #define NEO_PIN            13
 
 class ClientTarget {

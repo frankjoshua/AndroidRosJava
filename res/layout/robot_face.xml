@@ -29,6 +29,7 @@
             android:id="@+id/mouthView"
             android:layout_width="@dimen/width_mouth"
             android:layout_height="@dimen/height_mouth"
+            android:textSize="@dimen/text_size_mouth"
             android:layout_below="@+id/eyeViewLeft"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/margin_top_mouth"

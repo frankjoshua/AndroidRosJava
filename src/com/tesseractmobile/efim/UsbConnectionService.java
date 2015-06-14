@@ -243,10 +243,9 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
 
     private void backup() {
         synchronized (commandQueue) {
-            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_MOVE, 25, 20));
-            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_MOVE, 25, 500));
-            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_MOVE, 0, 20));
-            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_MOVE, 0, 20));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_BACKWARD, 30, 50));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_PAUSE, 0, 500));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_FORWARD, 0, 50));
             log("Adding Commands. Queue size: " + commandQueue.size());
         }
     }
@@ -316,18 +315,19 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
                 if (commandQueue.isEmpty() == false) {
                     //log("Running Commands");
                     final Command command = commandQueue.peek();
-                    sendCommand(command.cmd, command.tar, command.val, command.delay);
-                    if (command.delay <= 0) {
+                    if(command.cmd != CommandContract.CMD_PAUSE){
+                        sendCommand(command.cmd, command.tar, command.val, command.delay);
+                    }
+                    command.delay -= timeElapsed;
+                    if (command.delay <= 0) {   
                         commandQueue.poll();
-                    } else {
-                        command.delay -= timeElapsed;
                     }
                 } else {
                     //log("No Commands");
                 }
             }
             try {
-                Thread.sleep(10);
+                Thread.sleep(1);
             } catch (final InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

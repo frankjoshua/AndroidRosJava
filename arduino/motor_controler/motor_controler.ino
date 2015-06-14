@@ -40,7 +40,7 @@ void setup()
   SWSerial.begin(9600);
   
   //Begin Target Registration
-  SWSerial2.begin(115200);
+  SWSerial2.begin(COM_SPEED);
   clientTarget.begin(NEO_PIN, &SWSerial2);
 
   //Register as Listener
@@ -67,14 +67,24 @@ void loop()
   //Check for recieved data
   if(clientTarget.receiveData()){
     //clearEncoderCount();
-
-    if(clientTarget.getTarget() == TARGET_MOTOR_RIGHT){
-      rightSpeed = clientTarget.getValue();
-    } else if (clientTarget.getTarget() == TARGET_MOTOR_LEFT){
-      leftSpeed = clientTarget.getValue();
-    } else if (clientTarget.getTarget() == TARGET_PING_CENTER || clientTarget.getTarget() == TARGET_PING_LEFT){
+    int tar = clientTarget.getTarget();
+    int val = clientTarget.getValue();
+    int cmd = clientTarget.getCommand();
+    if(cmd == COMMAND_FORWARD){
+        //Forward
+       rightSpeed = val;
+       leftSpeed = val;
+    } else if(cmd == COMMAND_BACKWARD){
+       //Backward
+       rightSpeed = -val;
+       leftSpeed = -val;
+    } else if(tar == TARGET_MOTOR_RIGHT){
+      rightSpeed = val;
+    } else if (tar == TARGET_MOTOR_LEFT){
+      leftSpeed = val;
+    } else if (tar == TARGET_PING_CENTER || tar == TARGET_PING_LEFT){
       //Adjust speed right
-      switch(clientTarget.getValue()){
+      switch(val){
          case DISTANCE_TOUCHING:
              rightSpeedAdjust = 0.25;
          break;

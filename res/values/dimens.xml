@@ -6,4 +6,5 @@
 	<dimen name="width_mouth">300dp</dimen>
 	<dimen name="height_mouth">50dp</dimen>
 	<dimen name="margin_top_mouth">42dp</dimen>
+	<dimen name="text_size_mouth">18dp</dimen>
 </resources>
