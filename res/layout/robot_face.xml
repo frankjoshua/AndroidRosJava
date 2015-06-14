@@ -14,16 +14,14 @@
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
             android:layout_alignLeft="@+id/mouthView"
-            android:layout_alignTop="@+id/eyeViewRight"
-            android:background="@drawable/eye_open" />
+            android:layout_alignTop="@+id/eyeViewRight" />
 
         <com.tesseractmobile.efim.views.EyeView
             android:id="@+id/eyeViewRight"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/mouthView"
-            android:background="@drawable/eye_open" />
+            android:layout_alignRight="@+id/mouthView" />
 
         <com.tesseractmobile.efim.views.MouthView
             android:id="@+id/mouthView"
