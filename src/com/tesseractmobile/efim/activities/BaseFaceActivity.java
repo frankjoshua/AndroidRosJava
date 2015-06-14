@@ -259,7 +259,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             if(responce != null){
                 //say(responce);
                 //Send text to the chat bot                
-                new BotTask().execute(responce);
+                onTextInput(responce);
             } else {
                 //Something went wrong
                 say("Pardon? " + SPEECH_INSTRUTIONS);
@@ -267,6 +267,13 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         } else {
             say("No data recieved.");
         }
+    }
+
+    /**
+     * @param input
+     */
+    protected void onTextInput(final String input) {
+        new BotTask().execute(input);
     }
 
     @Override

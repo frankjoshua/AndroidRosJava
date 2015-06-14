@@ -118,4 +118,15 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
         
     }
 
+    @Override
+    protected void onTextInput(final String input) {
+        if(input.equalsIgnoreCase("move back")){
+            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.NOD);
+            robotCommandInterface.sendCommand(robotCommand);
+        } else {
+            super.onTextInput(input);
+        }
+    }
+
+    
 }
