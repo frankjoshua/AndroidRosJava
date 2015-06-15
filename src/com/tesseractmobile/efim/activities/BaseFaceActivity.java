@@ -98,10 +98,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         switch (viewId) {
         case R.id.eyeViewLeft:
             say("Ouch");
-            finish();
+            fear();
+            //finish();
             break;
         case R.id.eyeViewRight:
             say("I'm going to kill you in my sleep... Oh wait, your sleep");
+            anger();
             break;
         case R.id.mouthView:
             listen();
@@ -112,6 +114,22 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             // new BotTask().execute();
             break;
         }
+    }
+
+    /**
+     * Set look to fearful
+     */
+    private void fear() {
+        mLeftEye.squintLeft();
+        mRightEye.squintRight();
+    }
+
+    /**
+     * Set look to angry
+     */
+    private void anger() {
+        mLeftEye.squintRight();
+        mRightEye.squintLeft();
     }
 
     /**

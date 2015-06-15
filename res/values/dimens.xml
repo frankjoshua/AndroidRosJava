@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Defaults -->
-	<dimen name="width_eye">100dp</dimen>
-	<dimen name="height_eye">100dp</dimen>
-	<dimen name="width_mouth">300dp</dimen>
-	<dimen name="height_mouth">50dp</dimen>
-	<dimen name="margin_top_mouth">42dp</dimen>
+	<dimen name="width_eye">125dp</dimen>
+	<dimen name="height_eye">125dp</dimen>
+	<dimen name="width_mouth">320dp</dimen>
+	<dimen name="height_mouth">100dp</dimen>
+	<dimen name="margin_top_mouth">75dp</dimen>
 	<dimen name="text_size_mouth">18dp</dimen>
 </resources>

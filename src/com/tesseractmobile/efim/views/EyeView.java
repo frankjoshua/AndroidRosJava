@@ -30,6 +30,12 @@ public class EyeView extends View {
     private final Rect mLowerEyelidRectDest = new Rect();
     private final Rect mUpperEyelidRectSrc = new Rect();
     private final Rect mLowerEyelidRectSrc = new Rect();
+    private int mUpperEyeRotation = 0;
+    private int mLowerEyeRotation = 0;
+    private int mUpperEyeRotationDest = 0;
+    private int mLowerEyeRotationDest = 0;
+    private int mUpperEyeRotationSrc = 0;
+    private int mLowerEyeRotationSrc = 0;
     private final Canvas mEyeCanvas;
     private final Paint mEyeLidPaint;
     private float mAnimationPercent;
@@ -66,25 +72,38 @@ public class EyeView extends View {
         //Update Top Eyelid
         final int bottom = updateValue(mUpperEyelidRectSrc.bottom, mUpperEyelidRectDest.bottom, mAnimationPercent);
         mUpperEyelidRect.set(mUpperEyelidRectDest.left, mUpperEyelidRectDest.top, mUpperEyelidRectDest.right, bottom);
+        mUpperEyeRotation = updateValue(mUpperEyeRotationSrc, mUpperEyeRotationDest, mAnimationPercent);
         //Update Lower EyeLid
         final int top = updateValue(mLowerEyelidRectSrc.top, mLowerEyelidRectDest.top, mAnimationPercent);
         mLowerEyelidRect.set(mLowerEyelidRectDest.left, top, mLowerEyelidRectDest.right, mLowerEyelidRectDest.bottom);
+        mLowerEyeRotation = updateValue(mLowerEyeRotationSrc, mLowerEyeRotationDest, mAnimationPercent);
         //Redraw main eye
         mEyeCanvas.drawBitmap(mEyeOpen, 0, 0, null);
         //Draw eye lids
+        final int xCenter = mEyeCanvas.getWidth() / 2;
+        final int yCenter = mEyeCanvas.getHeight() / 2;
+        mEyeCanvas.rotate(mUpperEyeRotation, xCenter, yCenter);
         mEyeCanvas.drawRect(mUpperEyelidRect, mEyeLidPaint);
+        mEyeCanvas.rotate(mLowerEyeRotation - mUpperEyeRotation, xCenter, yCenter);
         mEyeCanvas.drawRect(mLowerEyelidRect, mEyeLidPaint);
+        mEyeCanvas.rotate(-mLowerEyeRotation, xCenter, yCenter);
     }
  
+    /**
+     * Transform a value between a source and destination
+     * @param srcValue
+     * @param dstValue
+     * @param percent
+     * @return
+     */
     final int updateValue(final int srcValue, final int dstValue, final float percent){
         return Math.round(srcValue + (dstValue - srcValue) * percent);
     }
     
     @Override
     protected void onDraw(final Canvas canvas) {
-        
+        //Draw the eye
         canvas.drawBitmap(mEye, null, mEyeRect, null);
-        //super.onDraw(canvas);
     }
 
     @Override
@@ -92,13 +111,13 @@ public class EyeView extends View {
         final int action = event.getAction();
         switch (action) {
         case MotionEvent.ACTION_DOWN:
-            squint();
+            //squint();
             break;
         case MotionEvent.ACTION_MOVE:
             //blink();
             break;
         case MotionEvent.ACTION_UP:
-            blink();
+            //blink();
             break;
         default:
             break;
@@ -118,18 +137,26 @@ public class EyeView extends View {
             public void run() {
                 open();
             }
-        }, 2000);
+        }, 250);
     }
     
     public void close(){
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() / 2);
-        mLowerEyelidRectDest.set(0, mEyeCanvas.getHeight() / 2, mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        final int center = (int) (mEyeCanvas.getHeight() * .6);
+        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), center);
+        mLowerEyelidRectDest.set(0, center, mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
         //Create animation
+        startAnimation(250);
+    }
+
+    /**
+     * 
+     */
+    public void startAnimation(final int duration) {
         final ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.setDuration(1000);
+        animation.setDuration(duration);
         animation.addUpdateListener(new AnimatorUpdateListener() {
             
             @Override
@@ -142,11 +169,13 @@ public class EyeView extends View {
     }
 
     /**
-     * 
+     * Saves the current positions to use in transforms
      */
     public void saveCurrentEyeLids() {
         mUpperEyelidRectSrc.set(mUpperEyelidRect);
         mLowerEyelidRectSrc.set(mLowerEyelidRect);
+        mUpperEyeRotationSrc = mUpperEyeRotation;
+        mLowerEyeRotationSrc = mLowerEyeRotation;
     }
     
     /**
@@ -158,17 +187,10 @@ public class EyeView extends View {
         //Set destination position
         mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() / 10);
         mLowerEyelidRectDest.set(0, (int) (mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
-        final ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.setDuration(1000);
-        animation.addUpdateListener(new AnimatorUpdateListener() {
-            
-            @Override
-            public void onAnimationUpdate(final ValueAnimator animation) {
-                mAnimationPercent = (Float) animation.getAnimatedValue();
-                invalidate();
-            }
-        });
-        animation.start();
+        mUpperEyeRotationDest = 0;
+        mLowerEyeRotationDest = 0;
+        //Create an animation
+        startAnimation(250);
     }
     
     /**
@@ -177,20 +199,30 @@ public class EyeView extends View {
     public void squint() {
         saveCurrentEyeLids();
         mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), ((mEyeCanvas.getHeight() / 4)));
-        mLowerEyelidRectDest.set(0, (int) (mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
-        final ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.setDuration(1000);
-        animation.addUpdateListener(new AnimatorUpdateListener() {
-            
-            @Override
-            public void onAnimationUpdate(final ValueAnimator animation) {
-                mAnimationPercent = (Float) animation.getAnimatedValue();
-                invalidate();
-            }
-        });
-        animation.start();
+        mLowerEyelidRectDest.set(0, (int) Math.round(mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mUpperEyeRotationDest = 0;
+        mLowerEyeRotationDest = 0;
+        startAnimation(1000);
     }
 
+    public void squintRight() {
+        saveCurrentEyeLids();
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 4;
+        mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .8);
+        mUpperEyeRotationDest = 30;
+        mLowerEyeRotationDest = 0;
+        startAnimation(500);
+    }
+
+    public void squintLeft() {
+        saveCurrentEyeLids();
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 4;
+        mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .8);
+        mUpperEyeRotationDest = -30;
+        mLowerEyeRotationDest = 0;
+        startAnimation(500);
+    }
+    
     @Override
     public void invalidate() {
         updateEye();
@@ -209,5 +241,7 @@ public class EyeView extends View {
             }
         }, delay);
     }
+
+    
 
 }
