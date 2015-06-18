@@ -8,7 +8,6 @@
 #define NEO_PIN 13
 
 
-
 #define LEFT 2
 #define RIGHT 1
 

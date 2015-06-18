@@ -62,7 +62,7 @@ void loop() {
     dataStruct.val = powerL;
     etData.sendData();
   }
-  
+  //Serial.println(channels[CH2]);
 }
 
 void readRc(){
