@@ -54,7 +54,7 @@ public class EyeView extends View {
     public EyeView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         final BitmapFactory.Options options = new Options();
-        options.inMutable = true;
+        //options.inMutable = true;
         mEyeOpen = BitmapFactory.decodeResource(getResources(), R.drawable.eye_open, options);
         mEye = BitmapFactory.decodeResource(getResources(), R.drawable.eye_open, options);
         mEyeCanvas = new Canvas(mEye);
