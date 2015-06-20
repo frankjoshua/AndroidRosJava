@@ -32,18 +32,20 @@ import com.tesseractmobile.efim.views.MouthView;
 
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
 
-    private static final String SPEECH_INSTRUTIONS = "Touch my mouth if you want to say something";
+    private static final String  SPEECH_INSTRUTIONS             = "Touch my mouth if you want to say something";
 
-    private static final int VOICE_RECOGNITION_REQUEST_CODE = 0;
-    
-    private static final boolean HIDE_VOICE_PROMPT = true;
-    
-    private MouthView        mouthView;
-    private EyeView          mLeftEye;
-    private EyeView          mRightEye;
-    private SpeechRecognizer mSpeechRecognizer;
-    private final Handler mHandler = new Handler();
-    private boolean mHideVoicePrompt;
+    private static final int     VOICE_RECOGNITION_REQUEST_CODE = 0;
+
+    private static final boolean HIDE_VOICE_PROMPT              = true;
+
+    private MouthView            mouthView;
+    private EyeView              mLeftEye;
+    private EyeView              mRightEye;
+    private SpeechRecognizer     mSpeechRecognizer;
+    private final Handler        mHandler                       = new Handler();
+    private boolean              mHideVoicePrompt;
+
+    private Emotion              mEmotion;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -63,10 +65,10 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        //Load settings
+        // Load settings
         mHideVoicePrompt = HIDE_VOICE_PROMPT;
-        
-        if(checkVoiceRecognition()){
+
+        if (checkVoiceRecognition()) {
             mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
             mSpeechRecognizer.setRecognitionListener(this);
         }
@@ -82,12 +84,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             Toast.makeText(this, "Voice recognizer not present", Toast.LENGTH_SHORT).show();
             return false;
         }
-        
-        if(SpeechRecognizer.isRecognitionAvailable(this) == false){
+
+        if (SpeechRecognizer.isRecognitionAvailable(this) == false) {
             say("I have no voice recognization service available");
             return false;
         }
-        
+
         return true;
     }
 
@@ -99,7 +101,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         case R.id.eyeViewLeft:
             say("Ouch");
             fear();
-            //finish();
+            // finish();
             break;
         case R.id.eyeViewRight:
             say("I'm going to kill you in my sleep... Oh wait, your sleep");
@@ -134,34 +136,62 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     /**
      * Set the face to mimic the emotional state
+     * 
      * @param emotion
      */
-    public void setEmotion(final Emotion emotion){
-        switch (emotion) {
-        case ACCEPTED:
-            mLeftEye.squint();
-            mRightEye.squint();
-            break;
-        case SUPRISED:
-            mLeftEye.open();
-            mRightEye.open();
-            mLeftEye.blink();
-            mRightEye.blink();
-            break;
-        case AWARE:
-            mLeftEye.open();
-            mRightEye.squint();
-            break;
-        case JOY:
-            mLeftEye.open();
-            mRightEye.open();
-            break;
-        default:
-            mLeftEye.squint();
-            mRightEye.squint();
-            say("I don't under stand the emotion " + emotion + ".");
-            break;
+    public void setEmotion(final Emotion emotion) {
+        if (mEmotion != emotion) {
+            mEmotion = emotion;
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    switch (emotion) {
+                    case ACCEPTED:
+                        mLeftEye.squint();
+                        mRightEye.squint();
+                        break;
+                    case SUPRISED:
+                        mLeftEye.open();
+                        mRightEye.open();
+                        mLeftEye.blink();
+                        mRightEye.blink();
+                        break;
+                    case AWARE:
+                        mLeftEye.open();
+                        mRightEye.squint();
+                        break;
+                    case JOY:
+                        mLeftEye.wideOpenLeft();
+                        mRightEye.wideOpenRight();
+                        break;
+                    case FEAR:
+                        fear();
+                        break;
+                    case ANGER:
+                        anger();
+                        break;
+                    default:
+                        mLeftEye.squint();
+                        mRightEye.squint();
+                        say("I don't under stand the emotion " + emotion + ".");
+                        break;
+                    }
+                }
+            });
         }
+    }
+
+    protected void look(final float x, final float y){
+        mHandler.post(new Runnable() {
+            
+            @Override
+            public void run() {
+                mLeftEye.look(x, y);
+                mRightEye.look(x, y);
+            }
+        });
+
     }
     
     /**
@@ -183,7 +213,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
 
         // Display an hint to the user about what he should say.
-        //intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "How can I help you?");
+        // intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+        // "How can I help you?");
 
         // Given an hint to the recognizer about what the user is going to say
         // There are two form of language model available
@@ -196,14 +227,14 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // sorted where the first result is the one with higher confidence.
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
         // Start the Voice recognizer activity for the result.
-        if(mHideVoicePrompt){
+        if (mHideVoicePrompt) {
             mSpeechRecognizer.startListening(intent);
         } else {
             startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
         }
-        //say("I'm Listening");
-        //Uncomment for test speech
-        //new BotTask().execute("Are you listening?");
+        // say("I'm Listening");
+        // Uncomment for test speech
+        // new BotTask().execute("Are you listening?");
     }
 
     @Override
@@ -213,12 +244,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     @Override
     public void onBeginningOfSpeech() {
-       setEmotion(Emotion.AWARE);
+        setEmotion(Emotion.AWARE);
     }
 
     @Override
     public void onRmsChanged(final float rmsdB) {
-        //say("Sound levels changed to " + rmsdB + " decibals");
+        // say("Sound levels changed to " + rmsdB + " decibals");
     }
 
     @Override
@@ -244,13 +275,13 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             say("Unkown error in speech system " + error);
             break;
         }
-        
+
     }
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if(requestCode == VOICE_RECOGNITION_REQUEST_CODE){
-            if(resultCode == RESULT_OK){
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
                 proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
             } else {
                 onError(resultCode);
@@ -258,7 +289,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         } else {
             say("I had an unhandled error.");
         }
-        
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -272,14 +303,14 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
      * @param data
      */
     public void proccessSpeech(final ArrayList<String> data) {
-        if(data != null && data.size() > 0){
+        if (data != null && data.size() > 0) {
             final String responce = data.get(0);
-            if(responce != null){
-                //say(responce);
-                //Send text to the chat bot                
+            if (responce != null) {
+                // say(responce);
+                // Send text to the chat bot
                 onTextInput(responce);
             } else {
-                //Something went wrong
+                // Something went wrong
                 say("Pardon? " + SPEECH_INSTRUTIONS);
             }
         } else {
@@ -303,78 +334,80 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     public void onEvent(final int eventType, final Bundle params) {
         say("Event " + eventType);
     }
-    
+
     private class BotTask extends AsyncTask<String, Void, Void> {
 
         @Override
         protected Void doInBackground(final String... params) {
 
-                //Create a chat bot
-                final ChatterBotFactory factory = new ChatterBotFactory();
-                ChatterBot bot1;
-                try {
-                    // final ChatterBot bot2 =
-                    bot1 = factory.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
-                    //bot1 = factory.create(ChatterBotType.CLEVERBOT);
-                    //bot1 = factory.create(ChatterBotType.JABBERWACKY);
-                } catch (final Exception e) {
-                    say("There was an error loading ChatterBotFactory()");
-                    return null;
+            // Create a chat bot
+            final ChatterBotFactory factory = new ChatterBotFactory();
+            ChatterBot bot1;
+            try {
+                // final ChatterBot bot2 =
+                bot1 = factory.create(ChatterBotType.PANDORABOTS, "b0dafd24ee35a477");
+                // bot1 = factory.create(ChatterBotType.CLEVERBOT);
+                // bot1 = factory.create(ChatterBotType.JABBERWACKY);
+            } catch (final Exception e) {
+                say("There was an error loading ChatterBotFactory()");
+                return null;
+            }
+            final ChatterBotSession bot1session = bot1.createSession();
+            String response = null;
+            try {
+                // Get the response from the chat bot
+                final ChatterBotThought chatterBotThought = new ChatterBotThought();
+                chatterBotThought.setText(params[0]);
+                chatterBotThought.setEmotions(new String[] { "Happy" });
+                final ChatterBotThought responseThought = bot1session.think(chatterBotThought);
+                // Check for emotions
+                final String[] emotions = responseThought.getEmotions();
+                if (emotions != null) {
+                    response = emotions[0];
                 }
-                final ChatterBotSession bot1session = bot1.createSession();
-                String response = null;
-                try {
-                    //Get the response from the chat bot
-                    final ChatterBotThought chatterBotThought = new ChatterBotThought();
-                    chatterBotThought.setText(params[0]);
-                    chatterBotThought.setEmotions(new String[]{"Happy"});
-                    final ChatterBotThought responseThought = bot1session.think(chatterBotThought);
-                    //Check for emotions
-                    final String[] emotions = responseThought.getEmotions();
-                    if(emotions != null){
-                        response = emotions[0];
-                    }
-                    if(response == null){
-                        //No emotions use words
-                        //Strip HTML
-                        final String cleanedResponce = Html.fromHtml(responseThought.getText()).toString();
-                        response = cleanedResponce;
-                    } else {
-                        response = "I feel somthing. It might be " + response + ".";
-                    }
-                } catch (final Exception e){
-                    //Tell user what went wrong
-                    say("Error in BotTask.doInBackground");
-                    Log.e("BotTask", e.toString());
-                    return null;
-                }
-                if(response.length() != 0){
-                    say(response);
-                    //TODO: This should use a callback from the MouthView when the text is stopped
-                    //Delay for every character
-                    final int delayMillis = response.length() * 88 + 1000;
-                    mHandler.postDelayed(new Runnable() {
-                        
-                        @Override
-                        public void run() {
-                            listen();
-                        }
-                    }, delayMillis);
-                    
+                if (response == null) {
+                    // No emotions use words
+                    // Strip HTML
+                    final String cleanedResponce = Html.fromHtml(responseThought.getText()).toString();
+                    response = cleanedResponce;
                 } else {
-                   say("I can't think of anything to say.");
+                    response = "I feel somthing. It might be " + response + ".";
                 }
+            } catch (final Exception e) {
+                // Tell user what went wrong
+                say("Error in BotTask.doInBackground");
+                Log.e("BotTask", e.toString());
+                return null;
+            }
+            if (response.length() != 0) {
+                say(response);
+                // TODO: This should use a callback from the MouthView when the
+                // text is stopped
+                // Delay for every character
+                final int delayMillis = response.length() * 88 + 1000;
+                mHandler.postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        listen();
+                    }
+                }, delayMillis);
+
+            } else {
+                say("I can't think of anything to say.");
+            }
 
             return null;
         }
 
         /**
          * Updates the text on the UI Thread
+         * 
          * @param text
          */
-        private void say(final String text){
+        private void say(final String text) {
             runOnUiThread(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     getMouthView().setText(text);
@@ -382,8 +415,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             });
         }
     }
-    
+
     enum Emotion {
-        JOY, ACCEPTED, AWARE, ANGRY, SADNESS, REJECTED, SUPRISED
+        JOY, ACCEPTED, AWARE, ANGER, SADNESS, REJECTED, SUPRISED, FEAR
     }
 }
