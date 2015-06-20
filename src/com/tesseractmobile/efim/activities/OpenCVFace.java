@@ -179,9 +179,10 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
             final double rectHeight = br.y - tl.y;
             final double rectCenterX = tl.x + rectWidth / 2;
             final double rectCenterY = tl.y + rectHeight / 2;
-            final float x = (float) (mGray.width() / 2 / rectCenterX);
+            final float x = (float) ((mGray.width() / 2) / rectCenterX);
             final float y = (float) rectCenterY / (mGray.height() / 2);
-            look(x, y); 
+            look((x - 1) * 0.5f + 1, (y - 1) * 0.5f + 1); 
+            //look(x,y); 
         }
         
         if(emotionChanged == false){

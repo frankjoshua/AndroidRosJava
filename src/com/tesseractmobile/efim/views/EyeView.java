@@ -8,10 +8,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -42,13 +44,16 @@ public class EyeView extends View {
     private final Paint mCenterPaint;
     private final Paint mInnerRingPaint;
     private final Paint mIrisPaint;
-    private final Paint mPuplePaint;
+    private final Paint mPupilPaint;
     private float mCenterEyeX = 1.0f;
     private float mCenterEyeXSrc;
     private float mCenterEyeXDest;
     private float mCenterEyeYDest;
     private float mCenterEyeYSrc;
     private float mCenterEyeY = 1.0f;
+    private float mPupilSize = .26f;
+    private float mPupilSizeDst;
+    private float mPupilSizeSrc;
     
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
@@ -57,9 +62,14 @@ public class EyeView extends View {
         //Start with the eyes closed
         final int halfHeight = mEyeCanvas.getHeight() / 2;
         mUpperEyelidRect.set(0, -halfHeight, mEyeCanvas.getWidth(), halfHeight);
-        mLowerEyelidRect.set(0, halfHeight, mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mLowerEyelidRect.set(0, halfHeight, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() + halfHeight);
         mUpperEyelidRectDest.set(mUpperEyelidRect);
         mLowerEyelidRectDest.set(mLowerEyelidRect);
+        //Setup gradients
+        final Shader shader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
+        mPupilPaint.setShader(shader);
+        //Open the eyes
+        
         open();
     }
 
@@ -69,7 +79,7 @@ public class EyeView extends View {
         options.inMutable = true;
         mEye = BitmapFactory.decodeResource(getResources(), R.drawable.eye_open, options);
         mEyeCanvas = new Canvas(mEye);
-        //mEyeCanvas.drawColor(Color.RED);
+
         mEyeLidPaint = new Paint();
         mEyeLidPaint.setColor(Color.BLACK);
         mEyeLidPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
@@ -85,9 +95,9 @@ public class EyeView extends View {
         mIrisPaint.setColor(Color.argb(255, 137, 223, 255));
         mIrisPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
   
-        mPuplePaint = new Paint();
-        mPuplePaint.setColor(Color.argb(255, 80, 80, 80)); //Color.argb(255, 0, 0, 0) -45 degree
-        mPuplePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mPupilPaint = new Paint();
+        mPupilPaint.setColor(Color.argb(255, 80, 80, 80)); //Color.argb(255, 0, 0, 0) -45 degree
+        mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         
     }
 
@@ -106,14 +116,15 @@ public class EyeView extends View {
         //Update pupil
         mCenterEyeX = updateValue(mCenterEyeXSrc, mCenterEyeXDest, mAnimationPercent);
         mCenterEyeY = updateValue(mCenterEyeYSrc, mCenterEyeYDest, mAnimationPercent);
+        mPupilSize = updateValue(mPupilSizeSrc, mPupilSizeDst, mAnimationPercent);
         //Redraw main eye
-        //mEyeCanvas.drawBitmap(mEyeOpen, 0, 0, null);
+        //mEyeCanvas.drawColor(Color.RED);
         final int cx = mEyeCanvas.getWidth() / 2;
         final int cy = mEyeCanvas.getHeight() / 2;
         mEyeCanvas.drawCircle(cx, cy, mEyeCanvas.getWidth() * 0.5f, mCenterPaint);
         mEyeCanvas.drawCircle(cx * mCenterEyeX, cy * mCenterEyeY, mEyeCanvas.getWidth() * 0.44f, mInnerRingPaint);
         mEyeCanvas.drawCircle(cx * mCenterEyeX, cy * mCenterEyeY, mEyeCanvas.getWidth() * 0.35f, mIrisPaint);
-        mEyeCanvas.drawCircle(cx * mCenterEyeX, cy * mCenterEyeY, mEyeCanvas.getWidth() * 0.26f, mPuplePaint);
+        mEyeCanvas.drawCircle(cx * mCenterEyeX, cy * mCenterEyeY, mEyeCanvas.getWidth() * mPupilSize, mPupilPaint);
         //Draw eye lids
         final int xCenter = cy;
         final int yCenter = cx;
@@ -224,6 +235,7 @@ public class EyeView extends View {
         mLowerEyeRotationSrc = mLowerEyeRotation;
         mCenterEyeXSrc = mCenterEyeX;
         mCenterEyeYSrc = mCenterEyeY;
+        mPupilSizeSrc = mPupilSize;
     }
     
     /**
@@ -233,8 +245,8 @@ public class EyeView extends View {
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() / 10);
-        mLowerEyelidRectDest.set(0, (int) (mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 10;
+        mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = 0;
         mLowerEyeRotationDest = 0;
         //Create an animation
@@ -246,8 +258,8 @@ public class EyeView extends View {
      */
     public void squint() {
         saveCurrentEyeLids();
-        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), ((mEyeCanvas.getHeight() / 4)));
-        mLowerEyelidRectDest.set(0, (int) Math.round(mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 4;
+        mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = 0;
         mLowerEyeRotationDest = 0;
         startAnimation(1000);
@@ -259,6 +271,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .8);
         mUpperEyeRotationDest = 30;
         mLowerEyeRotationDest = 0;
+        mPupilSizeDst = 0.1f;
         startAnimation(500);
     }
 
@@ -268,6 +281,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .8);
         mUpperEyeRotationDest = -30;
         mLowerEyeRotationDest = 0;
+        mPupilSizeDst = 0.1f;
         startAnimation(500);
     }
     
@@ -275,10 +289,11 @@ public class EyeView extends View {
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() / 10);
-        mLowerEyelidRectDest.set(0, (int) (mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 10;
+        mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = -10;
         mLowerEyeRotationDest = 10;
+        mPupilSizeDst = 0.3f;
         //Create an animation
         startAnimation(250);
     }
@@ -287,18 +302,19 @@ public class EyeView extends View {
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() / 10);
-        mLowerEyelidRectDest.set(0, (int) (mEyeCanvas.getHeight() * .9), mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 10;
+        mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = 10;
         mLowerEyeRotationDest = -10;
+        mPupilSizeDst = 0.3f;
         //Create an animation
         startAnimation(250);
     }
     
     public void look(final float x, final float y){
         saveCurrentEyeLids();
-        mCenterEyeXDest = x;
-        mCenterEyeYDest = y;
+        mCenterEyeXDest = Math.max(Math.min(x, 1.5f), 0.5f);
+        mCenterEyeYDest = Math.max(Math.min(y, 1.5f), 0.5f);
         startAnimation(50);
     }
     
