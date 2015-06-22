@@ -237,8 +237,33 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
             //shake();
             backup();
             break;
+        case LEFT:
+            left();
+            break;
+        case RIGHT:
+            right();
+            break;
         }
         return false;
+    }
+
+
+    private void right() {
+        synchronized (commandQueue) {
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_RIGHT, 30, 50));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_PAUSE, 0, 50));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_FORWARD, 0, 50));
+            log("Adding Commands. Queue size: " + commandQueue.size());
+        }
+    }
+
+    private void left() {
+        synchronized (commandQueue) {
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_LEFT, 30, 50));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_PAUSE, 0, 50));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_FORWARD, 0, 50));
+            log("Adding Commands. Queue size: " + commandQueue.size());
+        }
     }
 
     private void backup() {

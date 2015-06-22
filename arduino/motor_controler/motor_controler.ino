@@ -44,7 +44,7 @@ void setup()
 
   //Register as Listener
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
-  //clientTarget.registerListener(TARGET_MOTOR_LEFT);
+  clientTarget.registerListener(TARGET_MOTOR_LEFT);
   //clientTarget.registerListener(TARGET_PING_CENTER);
   //clientTarget.registerListener(TARGET_PING_LEFT);
   //clientTarget.registerListener(TARGET_PING_RIGHT);
@@ -83,6 +83,14 @@ void loop()
        //Backward
        rightSpeed = -val;
        leftSpeed = -val;
+    } else if(cmd == COMMAND_LEFT){
+      //Left
+      rightSpeed = -val;
+      leftSpeed = val;
+    } else if(cmd == COMMAND_RIGHT){
+      //Right
+      rightSpeed = -val;
+      leftSpeed = val;
     } else if(tar == TARGET_MOTOR_RIGHT){
       rightSpeed = val;
     } else if (tar == TARGET_MOTOR_LEFT){

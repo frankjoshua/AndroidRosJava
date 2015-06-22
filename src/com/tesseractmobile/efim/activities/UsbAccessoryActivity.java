@@ -19,7 +19,7 @@ import com.tesseractmobile.efim.robot.RobotCommandInterface;
 import com.tesseractmobile.efim.robot.RobotEvent;
 import com.tesseractmobile.efim.robot.RobotEventListener;
 
-public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEventListener {
+public class UsbAccessoryActivity extends OpenCVFace implements RobotEventListener {
 
     
 
@@ -49,6 +49,18 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
     }
 
     @Override
+    protected void look(final float x, final float y) {
+        if(x > 1.25f) {
+            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.LEFT);
+            robotCommandInterface.sendCommand(robotCommand);
+        } else if(x < 0.75f){
+            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.RIGHT);
+            robotCommandInterface.sendCommand(robotCommand);
+        }
+        super.look(x, y);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         final Intent bindIntent = new Intent(this, UsbConnectionService.class);
@@ -65,7 +77,7 @@ public class UsbAccessoryActivity extends BaseFaceActivity implements RobotEvent
     
     @Override
     public void onClick(final View v) {
-        //super.onClick(v);
+        super.onClick(v);
         
         final int viewId = v.getId();
 

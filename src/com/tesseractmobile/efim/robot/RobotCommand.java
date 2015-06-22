@@ -3,7 +3,7 @@ package com.tesseractmobile.efim.robot;
 public class RobotCommand {
 
     public enum RobotCommandType {
-        NOD, SHAKE
+        NOD, SHAKE, LEFT, RIGHT
     }
 
     final private RobotCommandType robotCommandType;
