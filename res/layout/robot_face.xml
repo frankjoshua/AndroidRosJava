@@ -12,8 +12,9 @@
         <com.tesseractmobile.opencv.views.FixedJavaCameraView
             xmlns:CameraBridgeViewBase="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fd_activity_surface_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="320dp"
+            android:layout_height="240dp"
+            android:layout_centerHorizontal="true"
             CameraBridgeViewBase:camera_id="front"
             CameraBridgeViewBase:show_fps="true" />
         

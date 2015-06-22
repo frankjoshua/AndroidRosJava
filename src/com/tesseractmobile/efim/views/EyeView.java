@@ -15,6 +15,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader;
 import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +24,14 @@ import com.tesseractmobile.efim.R;
 
 public class EyeView extends View {
     
-    private final Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(){
+
+        @Override
+        public void handleMessage(final Message msg) {
+            animation.start();
+        }
+        
+    };
     private final Rect mEyeRect = new Rect();
     private final Rect mUpperEyelidRect = new Rect();
     private final Rect mLowerEyelidRect = new Rect();
@@ -54,6 +62,7 @@ public class EyeView extends View {
     private float mPupilSize = .26f;
     private float mPupilSizeDst;
     private float mPupilSizeSrc;
+    private final ValueAnimator animation;
     
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
@@ -99,6 +108,15 @@ public class EyeView extends View {
         mPupilPaint.setColor(Color.argb(255, 80, 80, 80)); //Color.argb(255, 0, 0, 0) -45 degree
         mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         
+        animation = ValueAnimator.ofFloat(0f, 1f);
+        animation.addUpdateListener(new AnimatorUpdateListener() {
+            
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                mAnimationPercent = (Float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
     }
 
     /**
@@ -212,17 +230,8 @@ public class EyeView extends View {
      * 
      */
     public void startAnimation(final int duration) {
-        final ValueAnimator animation = ValueAnimator.ofFloat(0f, 1f);
         animation.setDuration(duration);
-        animation.addUpdateListener(new AnimatorUpdateListener() {
-            
-            @Override
-            public void onAnimationUpdate(final ValueAnimator animation) {
-                mAnimationPercent = (Float) animation.getAnimatedValue();
-                invalidate();
-            }
-        });
-        animation.start();
+        mHandler.sendEmptyMessage(0);
     }
 
     /**
@@ -293,7 +302,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = -10;
         mLowerEyeRotationDest = 10;
-        mPupilSizeDst = 0.3f;
+        mPupilSizeDst = 0.2f;
         //Create an animation
         startAnimation(250);
     }
@@ -306,16 +315,21 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = 10;
         mLowerEyeRotationDest = -10;
-        mPupilSizeDst = 0.3f;
+        mPupilSizeDst = 0.2f;
         //Create an animation
         startAnimation(250);
     }
     
     public void look(final float x, final float y){
-        saveCurrentEyeLids();
-        mCenterEyeXDest = Math.max(Math.min(x, 1.5f), 0.5f);
-        mCenterEyeYDest = Math.max(Math.min(y, 1.5f), 0.5f);
-        startAnimation(50);
+        final float xDest = Math.max(Math.min(x, 1.5f), 0.5f);
+        final float yDest = Math.max(Math.min(y, 1.5f), 0.5f);
+        //Don't update for small changes
+        if(Math.abs(yDest - mCenterEyeYDest) > .05f || Math.abs(xDest - mCenterEyeXDest) > .05f){
+            saveCurrentEyeLids();
+            mCenterEyeXDest = xDest;
+            mCenterEyeYDest = yDest;
+            startAnimation(50);
+        }
     }
     
     

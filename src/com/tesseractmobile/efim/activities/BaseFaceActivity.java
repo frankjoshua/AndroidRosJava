@@ -183,15 +183,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     }
 
     protected void look(final float x, final float y){
-        mHandler.post(new Runnable() {
-            
-            @Override
-            public void run() {
-                mLeftEye.look(x, y);
-                mRightEye.look(x, y);
-            }
-        });
-
+        mLeftEye.look(x, y);
+        mRightEye.look(x, y);
     }
     
     /**

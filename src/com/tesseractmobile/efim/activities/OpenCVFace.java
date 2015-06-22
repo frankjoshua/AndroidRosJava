@@ -147,17 +147,14 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         
     }
 
-    boolean mSkip = false;
     @Override
     public Mat onCameraFrame(final CvCameraViewFrame inputFrame) {
-        mSkip = !mSkip;
-        if(mSkip){
-            return null;
-        }
-        final Mat mRgba = inputFrame.rgba();
+        //final Mat mRgba = inputFrame.rgba();
         final Mat mGray = inputFrame.gray();
-
-
+//        final Mat mGrayT = mGray.t();
+//        Core.flip(mGray.t(), mGrayT, 0);
+//        Imgproc.resize(mGrayT, mGrayT, mGray.size());
+        
         final int height = mGray.rows();
         int mAbsoluteFaceSize = 0;
         if (Math.round(height * 0.2f) > 0) {
@@ -171,16 +168,16 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         if (mNativeDetector != null)
             mNativeDetector.detect(mGray, faces);
 
-        boolean emotionChanged = false;
+        final boolean emotionChanged = false;
         final Rect[] facesArray = faces.toArray();
         for (int i = 0; i < facesArray.length; i++){
             final Point tl = facesArray[i].tl();
             final Point br = facesArray[i].br();
-            Imgproc.rectangle(mRgba, tl, facesArray[i].br(), FACE_RECT_COLOR, 3);
-            if(tl.y < 100){
-                setEmotion(Emotion.ANGER);
-                emotionChanged = true;
-            }
+            Imgproc.rectangle(mGray, tl, facesArray[i].br(), FACE_RECT_COLOR, 3);
+//            if(tl.y < 100){
+//                setEmotion(Emotion.ANGER);
+//                emotionChanged = true;
+//            }
             final double rectWidth = br.x - tl.x;
             final double rectHeight = br.y - tl.y;
             final double rectCenterX = tl.x + rectWidth / 2;
@@ -197,10 +194,9 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
             } else {
                 setEmotion(Emotion.FEAR);
             }
-            //look(mGray.width() / 2, mGray.height() / 2);
         }
         
-        return mRgba;
+        return mGray;
     }
 
 
