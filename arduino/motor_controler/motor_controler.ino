@@ -40,14 +40,14 @@ void setup()
   
   //Begin Target Registration
   SWSerial2.begin(COM_SPEED);
-  clientTarget.begin(NEO_PIN, &SWSerial2);
+  clientTarget.begin(-1, &SWSerial2);
 
   //Register as Listener
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
-  clientTarget.registerListener(TARGET_MOTOR_LEFT);
+  //clientTarget.registerListener(TARGET_MOTOR_LEFT);
   //clientTarget.registerListener(TARGET_PING_CENTER);
-  clientTarget.registerListener(TARGET_PING_LEFT);
-  clientTarget.registerListener(TARGET_PING_RIGHT);
+  //clientTarget.registerListener(TARGET_PING_LEFT);
+  //clientTarget.registerListener(TARGET_PING_RIGHT);
 
   //initEncoders(); 
   //clearEncoderCount();
@@ -55,8 +55,8 @@ void setup()
 
 int rightSpeed = 0;
 int leftSpeed = 0;
-float rightSpeedAdjust = 1;
-float leftSpeedAdjust = 1;
+float rightSpeedAdjust = 1.0f;
+float leftSpeedAdjust = 1.0f;
 
 void loop() 
 { 
@@ -69,6 +69,12 @@ void loop()
     int tar = clientTarget.getTarget();
     int val = clientTarget.getValue();
     int cmd = clientTarget.getCommand();
+    Serial.print(" target: ");
+    Serial.print(tar);
+    Serial.print(" value: ");
+    Serial.print(val);
+    Serial.print(" command: ");
+    Serial.println(cmd);
     if(cmd == COMMAND_FORWARD){
         //Forward
        rightSpeed = val;
@@ -112,13 +118,13 @@ void loop()
     //Send values to the motor controler
     int rightAdjusted = constrain(rightSpeed * rightSpeedAdjust, -127, 127);
     int leftAdjusted = constrain(leftSpeed * leftSpeedAdjust, -127, 127);
-    ST.motor(RIGHT, rightSpeed);
+    ST.motor(RIGHT, rightAdjusted);
     ST.motor(LEFT, leftAdjusted);
     
     Serial.print("R:");
-    Serial.print(rightAdjusted);
+    Serial.print(rightSpeed);
     Serial.print("    L:");
-    Serial.println(leftAdjusted);
+    Serial.println(leftSpeed);
   }
 
 // Retrieve current encoder counters

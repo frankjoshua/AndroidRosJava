@@ -9,6 +9,20 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
 
+        <com.tesseractmobile.opencv.views.FixedJavaCameraView
+            xmlns:CameraBridgeViewBase="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/fd_activity_surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            CameraBridgeViewBase:camera_id="front"
+            CameraBridgeViewBase:show_fps="true" />
+        
+        <View
+            android:id="@+id/viewCameraBlocker"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background"/>
+        
         <com.tesseractmobile.efim.views.EyeView
             android:id="@+id/eyeViewLeft"
             android:layout_width="@dimen/width_eye"
@@ -33,15 +47,7 @@
             android:background="@drawable/mouth_static"
             android:textSize="@dimen/text_size_mouth" />
 
-        <org.opencv.android.JavaCameraView
-            xmlns:CameraBridgeViewBase="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/fd_activity_surface_view"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_above="@+id/mouthView"
-            android:layout_centerHorizontal="true"
-            CameraBridgeViewBase:camera_id="front"
-            CameraBridgeViewBase:show_fps="true" />
+        
     </RelativeLayout>
 
 </RelativeLayout>

@@ -23,7 +23,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 
 import com.tesseractmobile.efim.R;
 
@@ -86,6 +85,7 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
             }
         }
     };
+    private View mViewBlocker;
     
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -93,19 +93,25 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
-        mOpenCvCameraView.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(final View v) {
-                if(mOpenCvCameraView.getVisibility() != View.INVISIBLE){
-                    mOpenCvCameraView.setVisibility(View.INVISIBLE);
-                } else {
-                    mOpenCvCameraView.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        mOpenCvCameraView.setOnClickListener(this);
+        mViewBlocker = findViewById(R.id.viewCameraBlocker);      
+        mViewBlocker.setOnClickListener(this);        
     }
     
+    
+    
+    @Override
+    public void onClick(final View v) {
+        if(mViewBlocker.getVisibility() != View.INVISIBLE){
+            mViewBlocker.setVisibility(View.INVISIBLE);
+        } else {
+            mViewBlocker.setVisibility(View.VISIBLE);
+        }
+        super.onClick(v);
+    }
+
+
+
     @Override
     public void onPause()
     {
