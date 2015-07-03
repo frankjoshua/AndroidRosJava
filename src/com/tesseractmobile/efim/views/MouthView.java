@@ -5,6 +5,11 @@ import java.util.HashMap;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.graphics.Path;
+import android.media.audiofx.Visualizer;
+import android.media.audiofx.Visualizer.OnDataCaptureListener;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
@@ -16,14 +21,17 @@ import android.widget.TextView;
 
 import com.tesseractmobile.efim.R;
 
-public class MouthView extends TextView implements OnInitListener{
+public class MouthView extends TextView implements OnInitListener, OnDataCaptureListener{
 
     final Handler handler = new Handler();
     private final TextToSpeech mTts;
     private boolean isTalkReady;
     private State mState;
     private int mLastAnimation;
-    private long mLastChange;
+    private final long mLastChange;
+    private final Path mPath;
+    private final Paint mPaint;
+    private final Path mWavePath;
     
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -48,23 +56,69 @@ public class MouthView extends TextView implements OnInitListener{
                 setmState(State.NOT_TALKING);
             }
         });
+
         mLastChange = SystemClock.uptimeMillis();
+        
+        mPath = new Path();
+        mWavePath = new Path();
+        mPaint = new Paint();
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStrokeWidth(10);
+        mPaint.setStyle(Style.STROKE);
+        
+
+        final Visualizer mVisualizer = new Visualizer(0);
+        mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
+        mVisualizer.setEnabled(true);
     }
 
     
     @Override
     protected void onDraw(final Canvas canvas) {
-        if(mState == State.TALKING){
-            final long uptimeMillis = SystemClock.uptimeMillis();
-            if(uptimeMillis - mLastChange > 70){
-                mLastChange = uptimeMillis;
-                setNextMouth();
-            }
-            invalidate();
-        } else {
-            setBackgroundResource(R.drawable.mouth_static);
-        }
+        canvas.drawColor(Color.WHITE);
+        
+
+        canvas.drawPath(mPath, mPaint);
+        //canvas.drawPath(mWavePath, mPaint);
+//        if(mState == State.TALKING){
+//            final long uptimeMillis = SystemClock.uptimeMillis();
+//            if(uptimeMillis - mLastChange > 70){
+//                mLastChange = uptimeMillis;
+//                setNextMouth();
+//            }
+//            invalidate();
+//        } else {
+//            setBackgroundResource(R.drawable.mouth_static);
+//        }
+        //Draw text
         super.onDraw(canvas);
+    }
+
+
+    @Override
+    protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        drawMouth(w, h);
+    }
+
+
+    /**
+     * @param w
+     * @param h
+     */
+    protected void drawMouth(final int w, final int h) {
+        mPath.reset();
+        mPath.moveTo(0, h / 2);
+        //mPath.lineTo(w, h / 2);
+//        mPath.quadTo(w / 2, h, w, h/2);
+//        //mPath.lineTo(0, h / 2);
+//        mPath.quadTo(w / 2, (float) (h *.75), 0, h/2);
+        
+        //Draw vertical lines
+        for(int line = 1; line < 5; line++){
+            mPath.moveTo((w / 5) * line, 0);
+            mPath.lineTo((w / 5) * line, h);
+        }
     }
 
 
@@ -110,6 +164,7 @@ public class MouthView extends TextView implements OnInitListener{
                 final HashMap<String, String> map = new HashMap<String, String>();
                 map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
                 mTts.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, map);
+                
             }
         }
         super.setText(text, type);
@@ -144,6 +199,40 @@ public class MouthView extends TextView implements OnInitListener{
 
     private enum State {
         TALKING, NOT_TALKING
+    }
+
+    @Override
+    public void onWaveFormDataCapture(final Visualizer visualizer, final byte[] waveform, final int samplingRate) {
+        //Log.d("wave", Arrays.toString(waveform));
+        drawMouth(getWidth(), getHeight());
+        final int waveWidth = getWidth() / 10;
+        final int centerY = getHeight() / 2;
+        mPath.moveTo(0, centerY);
+        int x = 0;
+        int sum = 0;
+        int count = 0;
+        for(int i = 0; i < waveform.length && x < getWidth(); i ++){
+            count++;
+            final byte wave = waveform[i];
+            sum += wave;
+            if(i % 100 == 0){
+                //mPath.lineTo(x, getHeight() / 2 + wave);
+                final int waveHeight = sum / count;
+                mPath.quadTo(x + waveWidth / 2, centerY + waveHeight * 2, x + waveWidth, centerY);
+                x += waveWidth;
+                count = 0;
+                sum = 0;
+            }
+            
+        }
+        invalidate();
+    }
+
+
+    @Override
+    public void onFftDataCapture(final Visualizer visualizer, final byte[] fft, final int samplingRate) {
+        // TODO Auto-generated method stub
+        
     }
     
 }

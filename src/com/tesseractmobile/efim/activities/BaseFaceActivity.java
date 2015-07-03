@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -65,6 +66,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        
         // Load settings
         mHideVoicePrompt = HIDE_VOICE_PROMPT;
 

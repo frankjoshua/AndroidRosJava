@@ -12,6 +12,7 @@
 #define RIGHT 1
 
 #define MOTOR_PIN 6
+#define MOTOR_PIN2 7
 
 //47.8523 cm diameter wheels
 //63500 Pulses per revolution
@@ -20,8 +21,10 @@
 ClientTarget clientTarget;
 
 SoftwareSerial SWSerial(NOT_A_PIN, MOTOR_PIN); // RX on no pin (unused), TX on pin 11 (to S1).
+SoftwareSerial SWSerial3(NOT_A_PIN, MOTOR_PIN2); // RX on no pin (unused), TX on pin 11 (to S1).
 SoftwareSerial SWSerial2(4, 5); // RX on no pin (unused), TX on pin 11 (to S1).
 SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
+SabertoothSimplified STFront(SWSerial3); // Use SWSerial as the serial port.
 
 // Slave Select pins for encoders 1 and 2
 // Feel free to reallocate these pins to best suit your circuit
@@ -128,11 +131,13 @@ void loop()
     int leftAdjusted = constrain(leftSpeed * leftSpeedAdjust, -127, 127);
     ST.motor(RIGHT, rightAdjusted);
     ST.motor(LEFT, leftAdjusted);
-    
+    STFront.motor(RIGHT, rightAdjusted);
+    STFront.motor(LEFT, leftAdjusted);
+
     Serial.print("R:");
-    Serial.print(rightSpeed);
+    Serial.print(rightAdjusted);
     Serial.print("    L:");
-    Serial.println(leftSpeed);
+    Serial.println(leftAdjusted);
   }
 
 // Retrieve current encoder counters
