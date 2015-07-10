@@ -4,15 +4,6 @@ Adafruit_NeoPixel* pixel = NULL;
 
 EasyTransfer etData; 
 
-struct COM_DATA_STRUCTURE{
-  //put your variable definitions here for the data you want to receive
-  //THIS MUST BE EXACTLY THE SAME ON THE OTHER ARDUINO
-  int tar;
-  int cmd;
-  int val;
-  int dur;
-};
-
 //give a name to the group of data
 COM_DATA_STRUCTURE dataStruct;
 
@@ -42,7 +33,13 @@ void ClientTarget::registerListener(int target){
   setPixelColor(COLOR_REGISTRATION);
   //Loop until registered
   bool registered = false;
+  int count = 0;
   while(registered == false){
+	count++;
+	if(count > 10){
+		setPixelColor(COLOR_OK);
+		break;
+	}
 	delay(250);
 	//Send command
 	sendData(COM_REGISTRATION, target, REGISTER, 0);
@@ -55,11 +52,11 @@ void ClientTarget::registerListener(int target){
       if(dataStruct.cmd == target){
         registered = true; 
 		setPixelColor(COLOR_OK);
-      } else {
+      }
+    } else {
 		//Set error color
 		setPixelColor(COLOR_ERROR);
-	  }
-    }
+	}
   } 
 }
 

@@ -280,13 +280,13 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
      */
     private void shake() {
         synchronized (commandQueue) {
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 175, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 100, 150));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_VERT, CommandContract.CMD_MOVE, 127, 0));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 100, 150));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 127, 0));
             log("Adding Commands. Queue size: " + commandQueue.size());
         }
     }
@@ -296,13 +296,13 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
      */
     private void nod() {
         synchronized (commandQueue) {
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 175, 300));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 100, 150));
-            commandQueue.add(new Command(CommandContract.TAR_SERVO_HEAD_HORZ, CommandContract.CMD_MOVE, 127, 0));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 100, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 175, 300));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 100, 150));
+            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 127, 0));
             log("Adding Commands. Queue size: " + commandQueue.size());
         }
     }

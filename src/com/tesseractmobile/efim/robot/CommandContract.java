@@ -8,16 +8,28 @@ package com.tesseractmobile.efim.robot;
  */
 public class CommandContract {
     // Targets
-    public final static byte TAR_SERVO_HEAD_HORZ = (byte) 0xa;    // 10
-    public final static byte TAR_SERVO_HEAD_VERT = (byte) 0xb;    // 11
-    public static final byte TAR_MOTOR_LEFT      = (byte) 0x14;   // 20
-    public static final byte TAR_MOTOR_RIGHT     = (byte) 0x15;   // 21
+    public final static byte TAR_SERVO_PAN           = (byte) 0xa;    // 10
+    public final static byte TAR_SERVO_TILT          = (byte) 0xb;    // 11
+    public static final byte TARGET_PING_CENTER      = (byte) 0x32;    // 50
+    public static final byte TARGET_PING_LEFT        = (byte) 0x33;    // 51
+    public static final byte TARGET_PING_RIGHT       = (byte) 0x34;    // 52
+    public static final byte TARGET_PING_BACK        = (byte) 0x34;    // 53
+    public static final byte TAR_MOTOR_LEFT          = (byte) 0x14;   // 20
+    public static final byte TAR_MOTOR_RIGHT         = (byte) 0x15;   // 21
+    public static final byte TARGET_GPS              = (byte) 0x5A;    // 90
+
     // Commands
-    public static final byte CMD_MOVE            = (byte) 0x2;
-    public static final byte CMD_PAUSE           = Byte.MIN_VALUE;
-    public static final byte CMD_FORWARD         = (byte) 0xa;    // 10
-    public static final byte CMD_BACKWARD        = (byte) 0xb;    // 11
-    public static final byte CMD_LEFT            = (byte) 0xc;    // 12
-    public static final byte CMD_RIGHT           = (byte) 0xd;    // 13
+    public static final byte CMD_PAUSE               = Byte.MIN_VALUE; //Not part of TargetRegistration.h
+    public static final byte CMD_FORWARD             = (byte) 0xa;    // 10
+    public static final byte CMD_BACKWARD            = (byte) 0xb;    // 11
+    public static final byte CMD_LEFT                = (byte) 0xc;    // 12
+    public static final byte CMD_RIGHT               = (byte) 0xd;    // 13
+    public static final byte COMMAND_SET_WAYPOINT    = (byte) 0x15;   // 21
+    public static final byte COMMAND_REMOVE_WAYPOINT = (byte) 0x16;   // 22
+    public static final byte COMMAND_NEXT_WAYPOINT   = (byte) 0x17;   // 23
+    public static final byte COMMAND_LAST_WAYPOINT   = (byte) 0x18;   // 24
+    public static final byte COMMAND_GPS_LOCATION    = (byte) 0x5B;   // 91
+    public static final byte COMMAND_GPS_HEADING     = (byte) 0x5C;   // 92
+    public static final byte COMMAND_GPS_COMPASS     = (byte) 0x5D;   // 92
 
 }
