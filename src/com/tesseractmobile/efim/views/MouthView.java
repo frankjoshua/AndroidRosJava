@@ -71,9 +71,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         mMouthPaint = new Paint();
         mMouthPaint.setColor(Color.WHITE);
 
-        final Visualizer mVisualizer = new Visualizer(0);
-        mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
-        mVisualizer.setEnabled(true);
+        
     }
 
     
@@ -105,6 +103,9 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         drawMouth(w, h);
+        final Visualizer mVisualizer = new Visualizer(0);
+        mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
+        mVisualizer.setEnabled(true);
     }
 
 
