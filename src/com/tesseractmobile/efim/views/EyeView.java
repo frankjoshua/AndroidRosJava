@@ -78,8 +78,9 @@ public class EyeView extends View {
         final Shader shader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
         mPupilPaint.setShader(shader);
         //Open the eyes
-        
         open();
+        //Look straight ahead
+        look(1.0f,1.0f);
     }
 
     public EyeView(final Context context, final AttributeSet attrs) {

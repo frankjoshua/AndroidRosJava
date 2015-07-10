@@ -71,10 +71,6 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         // Load settings
         mHideVoicePrompt = HIDE_VOICE_PROMPT;
 
-        if (checkVoiceRecognition()) {
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
-            mSpeechRecognizer.setRecognitionListener(this);
-        }
     }
 
     private boolean checkVoiceRecognition() {
@@ -94,6 +90,27 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         }
 
         return true;
+    }
+    
+    
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSpeechRecognizer.cancel();
+        mSpeechRecognizer.destroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Set initial state
+        setEmotion(Emotion.ANGER);
+        
+        if (checkVoiceRecognition()) {
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
+            mSpeechRecognizer.setRecognitionListener(this);
+        }
     }
 
     @Override
@@ -267,8 +284,11 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         case SpeechRecognizer.ERROR_NO_MATCH:
             say("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
             break;
+        case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+            say("I'm sorry, but my speech recognizer is busy. Who ever programed me probally forgot to close the service properly.");
+            break;
         default:
-            say("Unkown error in speech system " + error);
+            say("I had and unkown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
             break;
         }
 

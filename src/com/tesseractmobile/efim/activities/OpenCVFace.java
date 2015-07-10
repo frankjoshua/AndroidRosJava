@@ -192,7 +192,7 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
             if(facesArray.length > 0){
                 setEmotion(Emotion.JOY);
             } else {
-                setEmotion(Emotion.FEAR);
+                setEmotion(Emotion.ANGER);
             }
         }
         
