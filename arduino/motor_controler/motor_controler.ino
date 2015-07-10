@@ -35,6 +35,8 @@ const int slaveSelectEnc2 = 8;
 signed long encoder1count = 0;
 signed long encoder2count = 0;
 
+unsigned long mLastUpdate;
+
 void setup() 
 { 
   Serial.begin(COM_SPEED);
@@ -43,7 +45,7 @@ void setup()
   
   //Begin Target Registration
   SWSerial2.begin(COM_SPEED);
-  clientTarget.begin(-1, &SWSerial2);
+  clientTarget.begin(13, &SWSerial2);
 
   //Register as Listener
   clientTarget.registerListener(TARGET_MOTOR_RIGHT);
@@ -54,17 +56,43 @@ void setup()
 
   //initEncoders(); 
   //clearEncoderCount();
+  mLastUpdate = millis();
 } 
 
 int rightSpeed = 0;
 int leftSpeed = 0;
 float rightSpeedAdjust = 1.0f;
 float leftSpeedAdjust = 1.0f;
+int mCurrentRightSpeed = 0;
+int mCurrentLeftSpeed = 0;
+//mills / change
+const float CHANGE_SPEED = 1000 / 127;
 
 void loop() 
 { 
   delay(10);
-
+  int timeElapsed = millis() - mLastUpdate;
+  mLastUpdate = millis();
+  int change = 1;
+  if(mCurrentRightSpeed > rightSpeed){
+    mCurrentRightSpeed -= change; 
+  } else if(mCurrentRightSpeed < rightSpeed){
+    mCurrentRightSpeed += change; 
+  }
+  if(mCurrentLeftSpeed > leftSpeed){
+    mCurrentLeftSpeed -= change; 
+  } else if(mCurrentLeftSpeed < leftSpeed){
+    mCurrentLeftSpeed += change; 
+  }
+  Serial.print("R:");
+  Serial.print(mCurrentRightSpeed);
+  Serial.print("    L:");
+  Serial.println(mCurrentLeftSpeed);
+  ST.motor(RIGHT, rightSpeed);
+  ST.motor(LEFT, leftSpeed);
+  STFront.motor(RIGHT, rightSpeed);
+  STFront.motor(LEFT, leftSpeed);
+  
   
   //Check for recieved data
   if(clientTarget.receiveData()){
@@ -78,66 +106,62 @@ void loop()
     Serial.print(val);
     Serial.print(" command: ");
     Serial.println(cmd);
-    if(cmd == COMMAND_FORWARD){
-        //Forward
-       rightSpeed = val;
-       leftSpeed = val;
-    } else if(cmd == COMMAND_BACKWARD){
-       //Backward
-       rightSpeed = -val;
-       leftSpeed = -val;
-    } else if(cmd == COMMAND_LEFT){
-      //Left
-      rightSpeed = -val;
-      leftSpeed = val;
-    } else if(cmd == COMMAND_RIGHT){
-      //Right
-      rightSpeed = -val;
-      leftSpeed = val;
-    } else if(tar == TARGET_MOTOR_RIGHT){
-      rightSpeed = val;
-    } else if (tar == TARGET_MOTOR_LEFT){
-      leftSpeed = val;
-    } else if (tar == TARGET_PING_CENTER || tar == TARGET_PING_LEFT){
-      //Adjust speed right
-      switch(val){
-         case DISTANCE_TOUCHING:
-             rightSpeedAdjust = 0.25;
-         break;
-         case DISTANCE_NEAR:
-             rightSpeedAdjust = 0.5;
-         break;
-         case DISTANCE_FAR:
-            rightSpeedAdjust = 1;
-         break;
-      }
-    } else if (clientTarget.getTarget() == TARGET_PING_RIGHT){
-      //Adjust speed left
-      switch(clientTarget.getValue()){
-         case DISTANCE_TOUCHING:
-             leftSpeedAdjust = 0.25;
-             break;
-         case DISTANCE_NEAR:
-             leftSpeedAdjust = 0.5;
-         break;
-         case DISTANCE_FAR:
-            leftSpeedAdjust = 1;
-         break;
-      }
+    //Validate value
+    if(val >= -127 && val <= 127){
+      if(cmd == COMMAND_FORWARD){
+          //Forward
+         rightSpeed = val;
+         leftSpeed = val;
+      } else if(cmd == COMMAND_BACKWARD){
+         //Backward
+         rightSpeed = -val;
+         leftSpeed = -val;
+      } else if(cmd == COMMAND_LEFT){
+        //Left
+        rightSpeed = -val;
+        leftSpeed = val;
+      } else if(cmd == COMMAND_RIGHT){
+        //Right
+        rightSpeed = -val;
+        leftSpeed = val;
+      } else if(tar == TARGET_MOTOR_RIGHT){
+        rightSpeed = val;
+      } else if (tar == TARGET_MOTOR_LEFT){
+        leftSpeed = val;
+      } else if (tar == TARGET_PING_CENTER || tar == TARGET_PING_LEFT){
+        //Adjust speed right
+        switch(val){
+           case DISTANCE_TOUCHING:
+               rightSpeedAdjust = 0.25;
+           break;
+           case DISTANCE_NEAR:
+               rightSpeedAdjust = 0.5;
+           break;
+           case DISTANCE_FAR:
+              rightSpeedAdjust = 1;
+           break;
+        }
+      } else if (clientTarget.getTarget() == TARGET_PING_RIGHT){
+        //Adjust speed left
+        switch(clientTarget.getValue()){
+           case DISTANCE_TOUCHING:
+               leftSpeedAdjust = 0.25;
+               break;
+           case DISTANCE_NEAR:
+               leftSpeedAdjust = 0.5;
+           break;
+           case DISTANCE_FAR:
+              leftSpeedAdjust = 1;
+           break;
+        }
+    }
     }
     
     //Send values to the motor controler
-    int rightAdjusted = constrain(rightSpeed * rightSpeedAdjust, -127, 127);
-    int leftAdjusted = constrain(leftSpeed * leftSpeedAdjust, -127, 127);
-    ST.motor(RIGHT, rightAdjusted);
-    ST.motor(LEFT, leftAdjusted);
-    STFront.motor(RIGHT, rightAdjusted);
-    STFront.motor(LEFT, leftAdjusted);
+    rightSpeed = constrain(rightSpeed * rightSpeedAdjust, -127, 127);
+    leftSpeed = constrain(leftSpeed * leftSpeedAdjust, -127, 127);
+    
 
-    Serial.print("R:");
-    Serial.print(rightAdjusted);
-    Serial.print("    L:");
-    Serial.println(leftAdjusted);
   }
 
 // Retrieve current encoder counters

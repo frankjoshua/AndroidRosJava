@@ -5,6 +5,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
 #include <EasyTransferI2C.h>
+#include <SoftwareSerial.h>
 
 #define REGISTER 1
 #define UNREGISTER 2
@@ -23,10 +24,11 @@ class Listener {
     boolean isTarget(int target);
 };
 
-const int DATA_CHANNELS = 3;
+const int DATA_CHANNELS = 4;
 EasyTransfer etData[DATA_CHANNELS];
 #define I2C_SLAVE_ADDRESS 9
 EasyTransferI2C etI2Cdata;
+SoftwareSerial SWSerial(50, 51);
 
 //Listeners 
 //0-2 = Serial Ports
@@ -131,8 +133,10 @@ void readData(int dataLine){
         //Respond that registration was successful
         delay(20);
         if(dataLine > DATA_CHANNELS - 1){
+           //Send using I2C
            etI2Cdata.sendData(dataLine);
         } else {
+           //Send using Serial
            etData[dataLine].sendData();
         }
         //Mark line as connected
@@ -162,9 +166,9 @@ void routeData(){
          etData[listener].sendData();
        }
        lastRotate -= 150;
-       setPixelColor(listener + 4, 0,255,50);
+       setPixelColor(listener + DATA_LISTENERS, 0,255,50);
      } else {
-       setPixelColor(listener + 4, 0,50,0);
+       setPixelColor(listener + DATA_LISTENERS, 0,50,0);
      }
   } 
 }
@@ -179,6 +183,8 @@ void initCom(){
   etData[1].begin(details(dataStruct), &Serial2); 
   Serial3.begin(115200);
   etData[2].begin(details(dataStruct), &Serial3);
+  SWSerial.begin(115200);
+  etData[3].begin(details(dataStruct), &SWSerial);
   //Set I2C
   Wire.begin(I2C_SLAVE_ADDRESS);
   etI2Cdata.begin(details(dataStruct), &Wire);
@@ -190,10 +196,9 @@ void initPixel(){
   pixel.begin();
   pixel.setBrightness(50);
   //Set initial pixel colors for data lines
-  setPixelColor(0,255,0,100);
-  setPixelColor(1,255,0,100);
-  setPixelColor(2,255,0,100);
-  setPixelColor(3,255,0,100);
+  for(int i = 0; i < DATA_LISTENERS; i++){
+    setPixelColor(i,255,0,100);
+  }
   pixel.show();
 }
 
