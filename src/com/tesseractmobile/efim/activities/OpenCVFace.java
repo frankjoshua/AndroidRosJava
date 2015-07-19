@@ -30,6 +30,7 @@ import com.tesseractmobile.efim.R;
 
 public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener2{
 
+  
     private static final String TAG = "OpenCVFace";
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(0, 255, 0, 255);
     private CameraBridgeViewBase mOpenCvCameraView;
