@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -30,6 +31,7 @@ import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.efim.R;
 import com.tesseractmobile.efim.views.EyeView;
 import com.tesseractmobile.efim.views.MouthView;
+import com.tesseractmobile.efim.views.MouthView.SpeechCompleteListener;
 
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
 
@@ -128,12 +130,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             anger();
             break;
         case R.id.mouthView:
-            listen();
-            // final SpeechRecognizer speechRecognizer =
-            // SpeechRecognizer.createSpeechRecognizer(this);
-            //
-            // speechRecognizer.startListening(new Intent());
-            // new BotTask().execute();
+            listen(null);
             break;
         }
     }
@@ -159,7 +156,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
      * 
      * @param emotion
      */
-    public void setEmotion(final Emotion emotion) {
+    final public void setEmotion(final Emotion emotion) {
         if (mEmotion != emotion) {
             mEmotion = emotion;
             mHandler.post(new Runnable() {
@@ -210,24 +207,81 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     /**
      * Speak the text
      */
-    protected void say(final String text) {
-        getMouthView().setText(text);
+    final protected void say(final String text) {
+        //Check if we are on the UI thread
+        if(Looper.myLooper() == Looper.getMainLooper()){
+            getMouthView().setText(text);
+        } else {
+            //If not post a runnable on th UI thread
+            runOnUiThread(new Runnable() {
+                
+                @Override
+                public void run() {
+                    getMouthView().setText(text);
+                }
+            });
+        }
     }
 
     protected final MouthView getMouthView() {
         return mouthView;
     }
 
-    private void listen() {
+    final protected void listen(final String prompt) {
+        if(Looper.myLooper() == Looper.getMainLooper()){
+            startListening(prompt);
+        } else {
+            runOnUiThread(new Runnable() {
+                
+                @Override
+                public void run() {
+                    startListening(prompt);
+                }
+            });
+        }
+    }
+
+    /**
+     * Must be run on the UI thread
+     * @param prompt
+     */
+    private void startListening(final String prompt) {
         setEmotion(Emotion.SUPRISED);
+        if(prompt != null){
+            getMouthView().setOnSpeechCompleteListener(new SpeechCompleteListener(){
+
+                @Override
+                public void onSpeechComplete() {
+                    mHandler.postDelayed(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            lauchListeningIntent(prompt);
+                        }
+                    }, 250);
+                }
+                
+            });
+            say(prompt);
+        } else {
+            lauchListeningIntent(prompt);
+        }
+        
+    }
+
+    /**
+     * @param prompt
+     */
+    public void lauchListeningIntent(final String prompt) {
         final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
         // Specify the calling package to identify your application
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
 
         // Display an hint to the user about what he should say.
-        // intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-        // "How can I help you?");
+        if(prompt != null){
+             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, prompt);
+        }
 
         // Given an hint to the recognizer about what the user is going to say
         // There are two form of language model available
@@ -338,7 +392,14 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
      * @param input
      */
     protected void onTextInput(final String input) {
-        new BotTask().execute(input);
+        if(input.contains("game")){
+            say("My favorite game is solitaire");
+            final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
+            startActivity(launchIntent);
+        } else {
+            new BotTask().execute(input);
+        }
+        
     }
 
     @Override
@@ -396,19 +457,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                 return null;
             }
             if (response.length() != 0) {
-                say(response);
-                // TODO: This should use a callback from the MouthView when the
-                // text is stopped
-                // Delay for every character
-                final int delayMillis = response.length() * 88 + 1000;
-                mHandler.postDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        listen();
-                    }
-                }, delayMillis);
-
+                //Speak the text and listen for a response
+                listen(response);
             } else {
                 say("I can't think of anything to say.");
             }

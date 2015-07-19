@@ -21,6 +21,7 @@ import org.opencv.samples.facedetect.DetectionBasedTracker;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
@@ -86,6 +87,7 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         }
     };
     private View mViewBlocker;
+    private long mLastHumanSpoted;
     
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -190,6 +192,7 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         
         if(emotionChanged == false){
             if(facesArray.length > 0){
+                humanSpoted();
                 setEmotion(Emotion.JOY);
             } else {
                 setEmotion(Emotion.ANGER);
@@ -197,6 +200,17 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         }
         
         return mGray;
+    }
+
+
+
+    private void humanSpoted() {
+        final long uptimeMillis = SystemClock.uptimeMillis();
+        //Check if no human has been spotted for 10 seconds
+        if(uptimeMillis - mLastHumanSpoted > 10000){ 
+            listen("Hello human.");
+        }
+        mLastHumanSpoted = uptimeMillis;
     }
 
 
