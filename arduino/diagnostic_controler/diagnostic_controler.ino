@@ -22,6 +22,7 @@ int mDur = 0;
 int mDelay = 0;
 int mGpsHeading = -1;
 int mCompassHeading = -1;
+int mWaypoint = -1;
 
 void setup() 
 { 
@@ -88,10 +89,18 @@ void processData(int tar, int cmd, int val, int dur){
       break;
       case TARGET_GPS:
         if(cmd == COMMAND_GPS_HEADING){
-         mGpsHeading = val; 
-         mCompassHeading = dur;
+          if(abs(mGpsHeading - val) > 20 ){
+            mDelay += 1000; 
+          }
+          mGpsHeading = val; 
         } else if(cmd == COMMAND_GPS_COMPASS){
-         mCompassHeading = val;
+          if(abs(mCompassHeading - val) > 20 ){
+            mDelay += 1000; 
+          }
+          mCompassHeading = val;
+        } else if(cmd == COMMAND_GPS_LOCATION){
+           //This should be the current way point
+           mWaypoint = val; 
         }
       break;
   }
@@ -134,6 +143,8 @@ void updateDisplay(){
     lcd.print(mGpsHeading);
     lcd.print(" C:");
     lcd.print(mCompassHeading);
+    lcd.print(" W:");
+    lcd.print(mWaypoint);
   } else { 
     //Print last transmition
     lcd.print("T");
