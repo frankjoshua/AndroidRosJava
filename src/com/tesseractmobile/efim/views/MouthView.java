@@ -35,6 +35,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     private final Path mWavePath;
     private byte[] mWave = new byte[1024];
     private final Paint mMouthPaint;
+    private SpeechCompleteListener mSpeechCompleteListener;
     
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -238,10 +239,19 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     }
 
     /**
-     * @param mState the mState to set
+     * @param state the mState to set
      */
-    private void setmState(final State mState) {
-        this.mState = mState;
+    private void setmState(final State state) {
+        this.mState = state;
+        if(state == State.NOT_TALKING){
+            //Let the listener know the the speech is complete
+            final SpeechCompleteListener speechCompleteListener = mSpeechCompleteListener;
+            if(speechCompleteListener != null){
+                speechCompleteListener.onSpeechComplete();
+                //Listeners only get informed once
+                mSpeechCompleteListener = null;
+            }
+        }
         postInvalidate();
     }
 
@@ -264,10 +274,16 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         invalidate();
     }
 
+    public void setOnSpeechCompleteListener(final SpeechCompleteListener speechCompleteListener){
+        this.mSpeechCompleteListener = speechCompleteListener;
+    }
 
     @Override
     public void onFftDataCapture(final Visualizer visualizer, final byte[] fft, final int samplingRate) {
         updateWave(fft);
     }
     
+    public interface SpeechCompleteListener {
+        public void onSpeechComplete();
+    }
 }
