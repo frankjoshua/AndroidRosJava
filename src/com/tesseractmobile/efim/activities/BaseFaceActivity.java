@@ -222,11 +222,34 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             });
         }
     }
+    
+    /**
+     * Speak the text then run the runnable
+     * @param speechText
+     * @param runnable
+     */
+    final protected void say(final String speechText, final Runnable runnable) {
+        //Post the runnable when speech is complete
+        getMouthView().setOnSpeechCompleteListener(new SpeechCompleteListener() {
+            
+            @Override
+            public void onSpeechComplete() {
+                runOnUiThread(runnable);
+            }
+        });
+        //Speak the text
+        say(speechText);
+    }
 
     protected final MouthView getMouthView() {
         return mouthView;
     }
 
+    /**
+     * Speak the text then listen for a response<br>
+     * Pass null to just start listening
+     * @param prompt null is OK
+     */
     final protected void listen(final String prompt) {
         if(Looper.myLooper() == Looper.getMainLooper()){
             startListening(prompt);
@@ -393,9 +416,15 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
      */
     protected void onTextInput(final String input) {
         if(input.contains("game")){
-            say("My favorite game is solitaire");
-            final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
-            startActivity(launchIntent);
+            say("My favorite game is solitaire", new Runnable() {
+                
+                @Override
+                public void run() {
+                    final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
+                    startActivity(launchIntent);
+                }
+            });
+            
         } else {
             new BotTask().execute(input);
         }
