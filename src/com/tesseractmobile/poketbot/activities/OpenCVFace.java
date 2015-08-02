@@ -1,4 +1,4 @@
-package com.tesseractmobile.efim.activities;
+package com.tesseractmobile.poketbot.activities;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +30,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
-import com.tesseractmobile.efim.R;
+import com.tesseractmobile.poketbot.R;
 
 
 public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener2{

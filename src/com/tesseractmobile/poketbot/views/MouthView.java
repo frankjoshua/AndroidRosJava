@@ -1,4 +1,4 @@
-package com.tesseractmobile.efim.views;
+package com.tesseractmobile.poketbot.views;
 
 import java.util.HashMap;
 
@@ -20,7 +20,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.TextView;
 
-import com.tesseractmobile.efim.R;
+import com.tesseractmobile.poketbot.R;
 
 public class MouthView extends TextView implements OnInitListener, OnDataCaptureListener{
 

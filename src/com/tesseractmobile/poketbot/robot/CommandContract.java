@@ -1,4 +1,4 @@
-package com.tesseractmobile.efim.robot;
+package com.tesseractmobile.poketbot.robot;
 
 /**
  * Hold static variables that match the TargetRegistration.h

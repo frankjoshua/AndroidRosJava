@@ -1,4 +1,4 @@
-package com.tesseractmobile.efim;
+package com.tesseractmobile.poketbot;
 
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -19,16 +19,16 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 
-import com.tesseractmobile.efim.robot.CommandContract;
-import com.tesseractmobile.efim.robot.RobotCommand;
-import com.tesseractmobile.efim.robot.RobotCommandInterface;
-import com.tesseractmobile.efim.robot.RobotEvent;
-import com.tesseractmobile.efim.robot.RobotEventListener;
+import com.tesseractmobile.poketbot.robot.CommandContract;
+import com.tesseractmobile.poketbot.robot.RobotCommand;
+import com.tesseractmobile.poketbot.robot.RobotCommandInterface;
+import com.tesseractmobile.poketbot.robot.RobotEvent;
+import com.tesseractmobile.poketbot.robot.RobotEventListener;
 
 public class UsbConnectionService extends Service implements RobotCommandInterface, Runnable{
 
 
-    private static final String     ACTION_USB_PERMISSION = "com.tesseractmobile.efim.action.USB_PERMISSION";
+    private static final String     ACTION_USB_PERMISSION = "com.tesseractmobile.poketbot.action.USB_PERMISSION";
     private UsbManager              mUsbManager;
 
     private PendingIntent           mPermissionIntent;

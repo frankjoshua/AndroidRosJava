@@ -1,4 +1,4 @@
-package com.tesseractmobile.efim.activities;
+package com.tesseractmobile.poketbot.activities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +28,10 @@ import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
-import com.tesseractmobile.efim.R;
-import com.tesseractmobile.efim.views.EyeView;
-import com.tesseractmobile.efim.views.MouthView;
-import com.tesseractmobile.efim.views.MouthView.SpeechCompleteListener;
+import com.tesseractmobile.poketbot.R;
+import com.tesseractmobile.poketbot.views.EyeView;
+import com.tesseractmobile.poketbot.views.MouthView;
+import com.tesseractmobile.poketbot.views.MouthView.SpeechCompleteListener;
 
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
 

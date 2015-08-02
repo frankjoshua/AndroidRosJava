@@ -24,21 +24,21 @@
             android:layout_height="match_parent"
             android:background="@drawable/background"/>
         
-        <com.tesseractmobile.efim.views.EyeView
+        <com.tesseractmobile.poketbot.views.EyeView
             android:id="@+id/eyeViewLeft"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
             android:layout_alignLeft="@+id/mouthView"
             android:layout_alignTop="@+id/eyeViewRight" />
 
-        <com.tesseractmobile.efim.views.EyeView
+        <com.tesseractmobile.poketbot.views.EyeView
             android:id="@+id/eyeViewRight"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/mouthView" />
 
-        <com.tesseractmobile.efim.views.MouthView
+        <com.tesseractmobile.poketbot.views.MouthView
             android:id="@+id/mouthView"
             android:layout_width="@dimen/width_mouth"
             android:layout_height="@dimen/height_mouth"
