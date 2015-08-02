@@ -1,6 +1,7 @@
 #include <SoftwareSerial.h>
 #include <SabertoothSimplified.h>
 #include <NewPing.h>
+#include <Average.h>
 
 //Define pins
 #define MOTOR_PIN 6
@@ -22,6 +23,9 @@ unsigned long pingTimer[SONAR_NUM]; // When each pings.
 unsigned int cm[SONAR_NUM]; // Store ping distances.
 uint8_t currentSensor = 0; // Which sensor is active.
 unsigned int mBaseDistance[SONAR_NUM]; //Inital distance of sensors
+Average<float> avg[SONAR_NUM] = {
+   Average<float>(10)
+};
 
 NewPing sonar[SONAR_NUM] = { // Sensor object array.
  NewPing(11, 12, MAX_DISTANCE)
@@ -34,9 +38,13 @@ boolean mChange = false;
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("Starting..");
   
   //Used for Motor Controler
   SWSerial.begin(9600);
+  
+  Serial.println("2 sec delay");
+  delay(2000);
   
   //Init ping sensors
   initSensors();
@@ -46,11 +54,22 @@ void loop() {
   readSensors();
   
   if(mChange){
+    Serial.print(mBaseDistance[0]);
+    Serial.print("-");
+    Serial.print(avg[0].mode());
+    Serial.print("= ");
+    int diff = mBaseDistance[0] - cm[0];
+    Serial.print(diff);
+    Serial.print(" ");
+    Serial.print(cm[0]);
+    Serial.print(" ");
     mChange = false;
     if(stateList[0] == DISTANCE_OK){
+       Serial.println("Forward");
        ST.motor(RIGHT, 60);
        ST.motor(LEFT, 60);
     } else {
+       Serial.println("Turn");
        ST.motor(RIGHT, 60);
        ST.motor(LEFT, -20);
     }
@@ -74,7 +93,7 @@ void initSensors(){
   }
   
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
-    mBaseDistance[i] = cm[i];
+    mBaseDistance[i] = avg[i].mean();
   }
 }
 
@@ -95,9 +114,9 @@ void readSensors(){
 void oneSensorCycle() { // Do something with the results.
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     int curState = 0;
-    if(cm[i] > mBaseDistance[i] + 7){
+    if(avg[i].mean() > mBaseDistance[i] + 7){
       curState = DISTANCE_CLIFF;
-    } else if(cm[i] < mBaseDistance[i] - 7) {
+    } else if(avg[i].mean() < mBaseDistance[i] - 7) {
       curState = DISTANCE_BLOCKED;
     } else {
       curState = DISTANCE_OK;
@@ -121,7 +140,8 @@ void echoCheck() { // If ping echo, set distance to array.
     int distance = sonar[currentSensor].ping_result / US_ROUNDTRIP_CM;
     //Filter 0 distance because it's probally an error
     if(distance != 0){
-      cm[currentSensor] = distance;
+      avg[currentSensor].push(distance);
+      cm[currentSensor] = avg[currentSensor].mean();
     }
   }
 }
