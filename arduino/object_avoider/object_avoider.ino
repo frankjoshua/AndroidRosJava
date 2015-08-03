@@ -48,6 +48,10 @@ void setup() {
   
   //Init ping sensors
   initSensors();
+  
+  for(int i = 0; i < SONAR_NUM; i++){
+    stateList[i] = DISTANCE_OK;
+  }
 }
 
 void loop() {
@@ -56,12 +60,10 @@ void loop() {
   if(mChange){
     Serial.print(mBaseDistance[0]);
     Serial.print("-");
-    Serial.print(avg[0].mode());
+    Serial.print(cm[0]);
     Serial.print("= ");
     int diff = mBaseDistance[0] - cm[0];
     Serial.print(diff);
-    Serial.print(" ");
-    Serial.print(cm[0]);
     Serial.print(" ");
     mChange = false;
     if(stateList[0] == DISTANCE_OK){
