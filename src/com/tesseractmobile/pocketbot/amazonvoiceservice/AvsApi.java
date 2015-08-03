@@ -32,6 +32,7 @@ public class AvsApi {
                     
                     @Override
                     public void intercept(final RequestFacade request) {
+                        request.addHeader("Accept", "application/json");
                         request.addHeader("Authorization", "Bearer " + token);
                     }
                 })
