@@ -1,4 +1,4 @@
-package com.tesseractmobile.poketbot.robot;
+package com.tesseractmobile.pocketbot.robot;
 
 public interface RobotEventListener {
     

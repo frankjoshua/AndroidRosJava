@@ -1,4 +1,4 @@
-package com.tesseractmobile.poketbot.activities;
+package com.tesseractmobile.pocketbot.activities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +28,10 @@ import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
-import com.tesseractmobile.poketbot.R;
-import com.tesseractmobile.poketbot.views.EyeView;
-import com.tesseractmobile.poketbot.views.MouthView;
-import com.tesseractmobile.poketbot.views.MouthView.SpeechCompleteListener;
+import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.views.EyeView;
+import com.tesseractmobile.pocketbot.views.MouthView;
+import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
 
@@ -50,10 +50,14 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     private Emotion              mEmotion;
 
+    
+    
+    
+    
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         setContentView(R.layout.robot_face);
 
         mouthView = (MouthView) findViewById(R.id.mouthView);
@@ -102,6 +106,10 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         mSpeechRecognizer.cancel();
         mSpeechRecognizer.destroy();
     }
+
+    
+    
+    
 
     @Override
     protected void onResume() {
@@ -295,7 +303,9 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     /**
      * @param prompt
      */
-    public void lauchListeningIntent(final String prompt) {
+    protected void lauchListeningIntent(final String prompt) {
+        
+        //Use Google Speech Recognizer
         final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
         // Specify the calling package to identify your application
@@ -514,4 +524,6 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     enum Emotion {
         JOY, ACCEPTED, AWARE, ANGER, SADNESS, REJECTED, SUPRISED, FEAR
     }
+    
+    
 }

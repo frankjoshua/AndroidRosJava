@@ -1,10 +1,9 @@
-package com.tesseractmobile.poketbot.activities;
+package com.tesseractmobile.pocketbot.activities;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -20,28 +19,16 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.samples.facedetect.DetectionBasedTracker;
 
-import retrofit.RestAdapter;
-import retrofit.http.GET;
-import retrofit.http.Path;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 
-import com.tesseractmobile.poketbot.R;
+import com.tesseractmobile.pocketbot.R;
 
 
 public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener2{
-
-    private static final String AMAZON_PROFILE_ID = "amzn1.application.6dcd3bfdc93141d1813ff178cced9734";
-    private static final String AMAZON_CLIENT_ID = "amzn1.application-oa2-client.cda8a2490ad348f3875212af080b7119";
-    private static final String AMAZON_CLIENT_SECRET = "43c866e90f62e6581db3db2b6817dc46d2b2d43699acc8bec138a9d343cd3ddb";
-    
-    public class Repo {
-
-    }
 
     private static final String TAG = "OpenCVFace";
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(0, 255, 0, 255);
@@ -139,15 +126,14 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
     public void onResume()
     {
         super.onResume();
-        if (!OpenCVLoader.initDebug()) {
+        if (!OpenCVLoader.initDebug(true)) {
             Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
         } else {
             Log.d(TAG, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
-        
-        new AmazonVoiceSerivceTast().execute();
+    
     }
 
     
@@ -230,29 +216,7 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
 
 
     
-    public interface GitHubService {
-        @GET("/users/{user}/repos")
-        List<Repo> listRepos(@Path("user") String user);
-      }
     
-    private class AmazonVoiceSerivceTast extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-            final RestAdapter restAdapter = new RestAdapter.Builder()
-            .setEndpoint("https://api.github.com")
-            .build();
-
-            final GitHubService service = restAdapter.create(GitHubService.class);
-            final List<Repo> repos = service.listRepos("octocat");
-            final Repo repo = repos.get(0);
-            if(repo != null){
-                Log.d("POCKETBOT", Integer.toString(repos.size()));
-            }
-            return null;
-        }
-        
-    }
 
 
     

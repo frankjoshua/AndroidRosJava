@@ -1,4 +1,4 @@
-package com.tesseractmobile.poketbot.activities;
+package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -10,14 +10,14 @@ import android.os.IBinder;
 import android.view.View;
 import android.widget.Toast;
 
-import com.tesseractmobile.poketbot.R;
-import com.tesseractmobile.poketbot.UsbConnectionService;
-import com.tesseractmobile.poketbot.UsbConnectionService.LocalBinder;
-import com.tesseractmobile.poketbot.robot.RobotCommand;
-import com.tesseractmobile.poketbot.robot.RobotCommandInterface;
-import com.tesseractmobile.poketbot.robot.RobotEvent;
-import com.tesseractmobile.poketbot.robot.RobotEventListener;
-import com.tesseractmobile.poketbot.robot.RobotCommand.RobotCommandType;
+import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.UsbConnectionService;
+import com.tesseractmobile.pocketbot.UsbConnectionService.LocalBinder;
+import com.tesseractmobile.pocketbot.robot.RobotCommand;
+import com.tesseractmobile.pocketbot.robot.RobotCommand.RobotCommandType;
+import com.tesseractmobile.pocketbot.robot.RobotCommandInterface;
+import com.tesseractmobile.pocketbot.robot.RobotEvent;
+import com.tesseractmobile.pocketbot.robot.RobotEventListener;
 
 public class UsbAccessoryActivity extends OpenCVFace implements RobotEventListener {
 

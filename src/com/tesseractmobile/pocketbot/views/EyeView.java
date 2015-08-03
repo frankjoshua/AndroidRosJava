@@ -1,4 +1,4 @@
-package com.tesseractmobile.poketbot.views;
+package com.tesseractmobile.pocketbot.views;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
@@ -20,7 +20,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.tesseractmobile.poketbot.R;
+import com.tesseractmobile.pocketbot.R;
 
 public class EyeView extends View {
     
