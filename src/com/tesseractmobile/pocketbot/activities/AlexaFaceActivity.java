@@ -41,7 +41,7 @@ public class AlexaFaceActivity extends OpenCVFace {
     protected static final String PRODUCT_ID = "PoketBot";
     protected static final String PRODUCT_DSN = "123456789";
     protected static final String CODE_CHALLENGE = "1";
-    protected static final String[] APP_SCOPE = new String[]{"all"};
+    protected static final String[] APP_SCOPE = new String[]{"profile"};
 
     private boolean                    mUseAlexa            = false;
     private String                     mAuthzToken;
