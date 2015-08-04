@@ -38,6 +38,10 @@ public class AlexaFaceActivity extends OpenCVFace {
     private static final String        AMAZON_PROFILE_ID    = "amzn1.application.6dcd3bfdc93141d1813ff178cced9734";
     private static final String        AMAZON_CLIENT_ID     = "amzn1.application-oa2-client.cda8a2490ad348f3875212af080b7119";
     private static final String        AMAZON_CLIENT_SECRET = "43c866e90f62e6581db3db2b6817dc46d2b2d43699acc8bec138a9d343cd3ddb";
+    protected static final String PRODUCT_ID = "PoketBot";
+    protected static final String PRODUCT_DSN = "123456789";
+    protected static final String CODE_CHALLENGE = "1";
+    protected static final String[] APP_SCOPE = new String[]{"all"};
 
     private boolean                    mUseAlexa            = false;
     private String                     mAuthzToken;
@@ -61,7 +65,16 @@ public class AlexaFaceActivity extends OpenCVFace {
         mLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
-                mAuthManager.authorize(new String[] { "profile", "postal_code" }, Bundle.EMPTY, new AuthorizeListener());
+                final Bundle options = new Bundle();
+                final String scope_data = "{\"alexa:all\":{\"productID\":\"" + PRODUCT_ID +
+                                    "\", \"productInstanceAttributes\":{\"deviceSerialNumber\":\"" +
+                                    PRODUCT_DSN + "\"}}}";
+                options.putString(AuthzConstants.BUNDLE_KEY.SCOPE_DATA.val, scope_data);
+                 
+                options.putBoolean(AuthzConstants.BUNDLE_KEY.GET_AUTH_CODE.val, true);
+                options.putString(AuthzConstants.BUNDLE_KEY.CODE_CHALLENGE.val, CODE_CHALLENGE);
+                options.putString(AuthzConstants.BUNDLE_KEY.CODE_CHALLENGE_METHOD.val, "S256");
+                mAuthManager.authorize(APP_SCOPE, options, new AuthorizeListener());
             }
         });
     }
@@ -69,7 +82,7 @@ public class AlexaFaceActivity extends OpenCVFace {
     @Override
     protected void onStart() {
         super.onStart();
-        mAuthManager.getToken(new String[] { "profile", "postal_code" }, new TokenListener());
+        mAuthManager.getToken(APP_SCOPE, new TokenListener());
     }
 
     @Override
@@ -126,6 +139,7 @@ public class AlexaFaceActivity extends OpenCVFace {
         /* There was an error during the attempt to authorize the application. */
         @Override
         public void onError(final AuthError ae) {
+            throw new UnsupportedOperationException(ae.toString());
         }
 
         /* Authorization was cancelled before it could be completed. */
@@ -145,7 +159,7 @@ public class AlexaFaceActivity extends OpenCVFace {
             final String email = profileBundle.getString(AuthzConstants.PROFILE_KEY.EMAIL.val);
             final String account = profileBundle.getString(AuthzConstants.PROFILE_KEY.USER_ID.val);
             final String zipcode = profileBundle.getString(AuthzConstants.PROFILE_KEY.POSTAL_CODE.val);
-
+            
             // Start using Alexa
             mUseAlexa = true;
 
@@ -171,7 +185,8 @@ public class AlexaFaceActivity extends OpenCVFace {
         /* getToken completed successfully. */
         @Override
         public void onSuccess(final Bundle response) {
-            mAuthzToken = response.getString(AuthzConstants.BUNDLE_KEY.TOKEN.val);
+            //mAuthzToken = response.getString(AuthzConstants.BUNDLE_KEY.TOKEN.val);
+            mAuthzToken = response.getString(AuthzConstants.BUNDLE_KEY.AUTHORIZATION_CODE.val);
             if (!TextUtils.isEmpty(mAuthzToken)) {
                 // Retrieve the profile data
                 mAuthManager.getProfile(new ProfileListener());
