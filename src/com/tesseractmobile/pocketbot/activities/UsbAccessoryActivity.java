@@ -19,7 +19,7 @@ import com.tesseractmobile.pocketbot.robot.RobotCommandInterface;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.RobotEventListener;
 
-public class UsbAccessoryActivity extends OpenCVFace implements RobotEventListener {
+public class UsbAccessoryActivity extends FirebaseFaceActivity implements RobotEventListener {
 
     
 
@@ -36,6 +36,7 @@ public class UsbAccessoryActivity extends OpenCVFace implements RobotEventListen
                                              public void onServiceConnected(final ComponentName name, final IBinder service) {
                                                  robotCommandInterface = ((LocalBinder) service).getService();
                                                  robotCommandInterface.registerRobotEventListener(UsbAccessoryActivity.this);
+                                                 robotCommandInterface.reconnectRobot();
                                              }
                                          };
     
@@ -50,14 +51,23 @@ public class UsbAccessoryActivity extends OpenCVFace implements RobotEventListen
 
     @Override
     protected void look(final float x, final float y) {
-        if(x > 1.25f) {
-            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.LEFT);
-            robotCommandInterface.sendCommand(robotCommand);
-        } else if(x < 0.75f){
-            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.RIGHT);
-            robotCommandInterface.sendCommand(robotCommand);
-        }
+//        if(x > 1.25f) {
+//            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.LEFT);
+//            robotCommandInterface.sendCommand(robotCommand);
+//        } else if(x < 0.75f){
+//            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.RIGHT);
+//            robotCommandInterface.sendCommand(robotCommand);
+//        }
         super.look(x, y);
+    }
+
+    
+    
+    @Override
+    protected void onHumanSpoted() {
+        final RobotCommand robotCommand = new RobotCommand(RobotCommandType.STOP);
+        robotCommandInterface.sendCommand(robotCommand);
+        super.onHumanSpoted();
     }
 
     @Override
@@ -131,14 +141,15 @@ public class UsbAccessoryActivity extends OpenCVFace implements RobotEventListen
     }
 
     @Override
-    protected void onTextInput(final String input) {
-        if(input.equalsIgnoreCase("move back")){
-            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.NOD);
+    protected boolean proccessInput(final String input) {
+        if(input.contains("stop") || input.contains("halt")){
+            final RobotCommand robotCommand = new RobotCommand(RobotCommandType.STOP);
             robotCommandInterface.sendCommand(robotCommand);
-        } else {
-            super.onTextInput(input);
+            return true;
         }
+        return super.proccessInput(input);
     }
 
+    
     
 }

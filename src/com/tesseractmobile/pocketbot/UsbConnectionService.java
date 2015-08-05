@@ -185,7 +185,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         if (mOutputStream != null && buffer[1] != -1) {
             try {
                 mOutputStream.write(buffer);
-                log("Command: " + command + " Target: " + target + " Value: " + value);
+                //log("Command: " + command + " Target: " + target + " Value: " + value);
                 return true;
             } catch (final IOException e) {
                 log("write failed:" + e.getMessage());
@@ -243,10 +243,23 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
         case RIGHT:
             right();
             break;
+        case STOP:
+            stop();
+            break;
+        default:
+            throw new UnsupportedOperationException("Command not implemented: " + robotCommand.getCommandType().toString());
         }
         return false;
     }
 
+
+    private void stop() {
+        synchronized (commandQueue) {
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_LEFT, 0, 0));
+            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_LEFT, 0, 0));
+            log("Adding Commands. Queue size: " + commandQueue.size());
+        }
+    }
 
     private void right() {
         synchronized (commandQueue) {
@@ -343,10 +356,11 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
                     if(command.cmd != CommandContract.CMD_PAUSE){
                         sendCommand(command.cmd, command.tar, command.val, command.delay);
                     }
-                    command.delay -= timeElapsed;
-                    if (command.delay <= 0) {   
-                        commandQueue.poll();
-                    }
+//                    command.delay -= timeElapsed;
+//                    if (command.delay <= 0) {   
+//                        commandQueue.poll();
+//                    }
+                    commandQueue.poll();
                 } else {
                     //log("No Commands");
                 }

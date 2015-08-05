@@ -203,15 +203,17 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         return mGray;
     }
 
-
-
     private void humanSpoted() {
         final long uptimeMillis = SystemClock.uptimeMillis();
         //Check if no human has been spotted for 10 seconds
         if(uptimeMillis - mLastHumanSpoted > 10000){ 
-            listen("Hello human.");
+            onHumanSpoted(); 
         }
         mLastHumanSpoted = uptimeMillis;
+    }
+
+    protected void onHumanSpoted() {
+        listen("Hello human.");
     }
 
 

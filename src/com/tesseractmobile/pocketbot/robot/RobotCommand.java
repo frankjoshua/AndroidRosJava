@@ -3,7 +3,7 @@ package com.tesseractmobile.pocketbot.robot;
 public class RobotCommand {
 
     public enum RobotCommandType {
-        NOD, SHAKE, LEFT, RIGHT
+        NOD, SHAKE, LEFT, RIGHT, STOP, FORWARD, BACKWARD
     }
 
     final private RobotCommandType robotCommandType;

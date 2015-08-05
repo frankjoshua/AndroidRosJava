@@ -289,7 +289,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                         public void run() {
                             lauchListeningIntent(prompt);
                         }
-                    }, 250);
+                    }, 50);
                 }
                 
             });
@@ -405,13 +405,15 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     /**
      * @param data
      */
-    public void proccessSpeech(final ArrayList<String> data) {
+    private void proccessSpeech(final ArrayList<String> data) {
         if (data != null && data.size() > 0) {
             final String responce = data.get(0);
             if (responce != null) {
                 // say(responce);
                 // Send text to the chat bot
-                onTextInput(responce);
+                if(proccessInput(responce) == false){
+                    onTextInput(responce);
+                }
             } else {
                 // Something went wrong
                 say("Pardon? " + SPEECH_INSTRUTIONS);
@@ -425,6 +427,15 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
      * @param input
      */
     protected void onTextInput(final String input) {
+        new BotTask().execute(input);
+    }
+    
+    /**
+     * Execute commands based on input
+     * @param input
+     * @return true if input handled
+     */
+    protected boolean proccessInput(final String input){
         if(input.contains("game")){
             say("My favorite game is solitaire", new Runnable() {
                 
@@ -434,11 +445,9 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                     startActivity(launchIntent);
                 }
             });
-            
-        } else {
-            new BotTask().execute(input);
+            return true;
         }
-        
+        return false;
     }
 
     @Override
