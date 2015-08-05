@@ -62,6 +62,7 @@ public class AlexaFaceActivity extends OpenCVFace {
         // Find the button with the login_with_amazon ID
         // and set up a click handler
         mLoginButton = (ImageButton) findViewById(R.id.login_with_amazon);
+        mLoginButton.setVisibility(View.VISIBLE);
         mLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View v) {
