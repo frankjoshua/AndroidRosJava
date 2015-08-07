@@ -14,6 +14,7 @@ public class FirebaseFaceActivity extends OpenCVFace {
     private static final String CHILD_PATH = "chat";
     private Firebase mFirebaseRef;
     private String userId;
+    boolean firstResponce;
     
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -22,7 +23,7 @@ public class FirebaseFaceActivity extends OpenCVFace {
         //Read User Id
         userId = getPreferences(MODE_PRIVATE).getString("uuid", UUID.randomUUID().toString());
         //Save User Id
-        getPreferences(MODE_PRIVATE).edit().putString("uuid", userId);
+        getPreferences(MODE_PRIVATE).edit().putString("uuid", userId).commit();
         
         Firebase.setAndroidContext(this);
         mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CHILD_PATH);
@@ -37,7 +38,12 @@ public class FirebaseFaceActivity extends OpenCVFace {
                 }
                 if(chat != null){
                     if(!chat.user.equals(userId)){
-                        listen(chat.text); 
+                        //Ignore first response
+                        if(firstResponce){
+                            listen(chat.text);
+                        } else {
+                            firstResponce = true;
+                        }
                     }
                 }
             }

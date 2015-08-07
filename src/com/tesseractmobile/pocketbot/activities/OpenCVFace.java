@@ -30,7 +30,7 @@ import com.tesseractmobile.pocketbot.R;
 
 public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener2{
 
-    private static final String TAG = "OpenCVFace";
+    protected static final String TAG = "OpenCVFace";
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(0, 255, 0, 255);
     private CameraBridgeViewBase mOpenCvCameraView;
     private DetectionBasedTracker mNativeDetector;
