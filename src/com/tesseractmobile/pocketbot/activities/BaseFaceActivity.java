@@ -35,7 +35,7 @@ import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
 
-    private static final String  SPEECH_INSTRUTIONS             = "Touch my mouth if you want to say something";
+    private static final String  SPEECH_INSTRUTIONS             = "";//"Touch my mouth if you want to say something";
 
     private static final int     VOICE_RECOGNITION_REQUEST_CODE = 0;
 
@@ -134,7 +134,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             // finish();
             break;
         case R.id.eyeViewRight:
-            say("I'm going to kill you in my sleep... Oh wait, your sleep");
+            //say("I'm going to kill you in my sleep... Oh wait, your sleep");
+            say("Please don't poke my eye.");
             anger();
             break;
         case R.id.mouthView:

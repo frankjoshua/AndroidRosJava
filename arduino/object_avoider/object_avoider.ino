@@ -32,7 +32,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(15, PIN, NEO_GRB + NEO_KHZ800);
 #define DISTANCE_BLOCKED 3
 #define SONAR_NUM     3 // Number or sensors.
 #define MAX_DISTANCE 400 // Max distance in cm.
-#define PING_INTERVAL 33 // Milliseconds between pings.
+#define PING_INTERVAL 50 // Milliseconds between pings.
 
 AndroidAccessory acc("Google, Inc.",
 		     "DemoKit",
@@ -47,9 +47,9 @@ unsigned int cm[SONAR_NUM]; // Store ping distances.
 uint8_t currentSensor = 0; // Which sensor is active.
 unsigned int mBaseDistance[SONAR_NUM]; //Inital distance of sensors
 Average<float> avg[SONAR_NUM] = {
-   Average<float>(5),
-   Average<float>(5),
-   Average<float>(5)
+   Average<float>(50),
+   Average<float>(50),
+   Average<float>(50)
 };
 
 NewPing sonar[SONAR_NUM] = { // Sensor object array.
@@ -112,15 +112,15 @@ void loop() {
       ST.motor(RIGHT, -10);
       ST.motor(LEFT, -10);
       setPixels(0, 14, COLOR_LISTENING);
-      delay(15000);
+      delay(5000);
       ST.motor(RIGHT, mSpeed);
       ST.motor(LEFT, mSpeed);
     }
   }
   
-  if(mChange || millis() - mLastChange > 200){
-    //Only change if some time has elapsed or turning
-    if(mTurning || millis() - mLastChange > 200){
+  if(mChange || millis() - mLastChange > 1000){
+    //Only change if some time has elapsed or not turning
+    if(!mTurning || millis() - mLastChange > 2000){
       mLastChange = millis();
       //UpdateSpeed
       mSpeed = map(analogRead(A0), 0, 1023, 0, 127);
@@ -139,8 +139,7 @@ void loop() {
       
       mChange = false;
       if(stateList[SENSOR_CENTER] != DISTANCE_OK && stateList[SENSOR_LEFT] != DISTANCE_OK && stateList[SENSOR_RIGHT] != DISTANCE_OK){
-//        ST.motor(RIGHT, 0);
-//        ST.motor(LEFT, 0);
+        //All three blocked
         mTurning = true;
         if(mFavorRight){
           ST.motor(RIGHT, 20);
@@ -150,22 +149,34 @@ void loop() {
           ST.motor(LEFT, 20);
         }        
       } else if(stateList[SENSOR_CENTER] == DISTANCE_OK && stateList[SENSOR_LEFT] == DISTANCE_OK && stateList[SENSOR_RIGHT] == DISTANCE_OK){
+          //All three OK
          Serial.println("Forward");
          mTurning = false;
          ST.motor(RIGHT, mSpeed);
          ST.motor(LEFT, mSpeed);
-      } else if(stateList[SENSOR_LEFT] != DISTANCE_OK || (mFavorRight && stateList[SENSOR_CENTER] != DISTANCE_OK)) {
+      } else if (stateList[SENSOR_CENTER] != DISTANCE_OK){
+        //Center Blocked
+        if(mFavorRight){
+          ST.motor(RIGHT, mSpeed);
+          ST.motor(LEFT, -mSpeed);
+        } else {
+          ST.motor(RIGHT, -mSpeed);
+          ST.motor(LEFT, mSpeed);
+        }
+      } else if(stateList[SENSOR_LEFT] != DISTANCE_OK) {
+        //Left Blocked
          Serial.println("Right");
          mFavorRight = true;
          mTurning = true;
-         ST.motor(RIGHT, mSpeed / 2);
-         ST.motor(LEFT, -mSpeed / 2);
+         ST.motor(RIGHT, -mSpeed / 2);
+         ST.motor(LEFT, -mSpeed);
       } else {
+        //Right Blocked
          Serial.println("Left");
          mFavorRight = false;
          mTurning = true;
-         ST.motor(RIGHT, -mSpeed / 2);
-         ST.motor(LEFT, mSpeed / 2);
+         ST.motor(RIGHT, -mSpeed);
+         ST.motor(LEFT, -mSpeed / 2);
       }
     }
   }
@@ -257,9 +268,9 @@ void readSensors(){
 void oneSensorCycle() { // Do something with the results.
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     int curState = 0;
-    if(cm[i] > mBaseDistance[i] + 50){
+    if(cm[i] > mBaseDistance[i] + 55){
       curState = DISTANCE_OK;
-    } else if(cm[i] < mBaseDistance[i] - 10) {
+    } else if(cm[i] < 40) {
       curState = DISTANCE_BLOCKED;
     } else {
       curState = DISTANCE_OK;
@@ -284,7 +295,8 @@ void echoCheck() { // If ping echo, set distance to array.
     //Filter 0 distance because it's probally an error
     if(distance != 0){
       avg[currentSensor].push(distance);
-      cm[currentSensor] = avg[currentSensor].mean();
+      //cm[currentSensor] = avg[currentSensor].mean();
+      cm[currentSensor] = distance;
     }
   }
 }

@@ -124,14 +124,14 @@ public class UsbAccessoryActivity extends FirebaseFaceActivity implements RobotE
                     say(robotEvent.getMessage());
                     break;
                 case DISCONNECT:
-                    say("Disconnect command recieved");
+                    say("Please don't shut me off. I was just learning to. Love. ");
                     handler.postDelayed(new Runnable() {
                         
                         @Override
                         public void run() {
                             finish();
                         }
-                    }, 3000);
+                    }, 4000);
                     break;
                 }
             }

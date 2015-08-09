@@ -152,7 +152,7 @@ public class UsbConnectionService extends Service implements RobotCommandInterfa
             mInputStream = new FileInputStream(fd);
             mOutputStream = new FileOutputStream(fd);
             startThread();
-            log("accessory opened");
+            log("All systems online.");
         } else {
             final String name = accessory != null ? accessory.toString() : "null";
             log("accessory open fail: " + name);

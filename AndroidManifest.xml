@@ -39,16 +39,16 @@
         <activity
             android:name=".activities.AlexaFaceActivity"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.FirebaseFaceActivity"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-            
+                        <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activities.UsbAccessoryActivity"

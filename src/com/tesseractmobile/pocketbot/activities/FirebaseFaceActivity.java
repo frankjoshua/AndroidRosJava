@@ -40,7 +40,8 @@ public class FirebaseFaceActivity extends OpenCVFace {
                     if(!chat.user.equals(userId)){
                         //Ignore first response
                         if(firstResponce){
-                            listen(chat.text);
+                            say
+                            (chat.text);
                         } else {
                             firstResponce = true;
                         }
