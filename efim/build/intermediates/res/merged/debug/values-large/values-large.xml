@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/C:/Users/josh/Development/StudioProjects/efim/src/main/res/values-large/dimens.xml -->
+    <eat-comment/>
+    <dimen name="height_eye">325dp</dimen>
+    <dimen name="height_mouth">250dp</dimen>
+    <dimen name="margin_top_mouth">100dp</dimen>
+    <dimen name="text_size_mouth">32dp</dimen>
+    <dimen name="width_eye">325dp</dimen>
+    <dimen name="width_mouth">960dp</dimen>
+</resources>

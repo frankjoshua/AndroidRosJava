@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\libs\okhttp-2.4.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="40340c0748190fe897baf7bffbc1b282734294e5">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\okhttp-2.4.0-d0e15df29aa4e1de6930047851208e37d95ad182.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\.gradle\caches\modules-2\files-2.1\commons-io\commons-io\2.4\b1b6ea3b7e4aa4f492509a4952029cd8e48019ad\commons-io-2.4.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\commons-io-2.4-b66dd6bcfc2d81453cbff02c8372705691d89da9.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\.gradle\caches\modules-2\files-2.1\com.mcxiaoke.volley\library\1.0.18\38da306aafee11459cd935a01d2c92a98dc670a4\library-1.0.18.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="38da306aafee11459cd935a01d2c92a98dc670a4">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\library-1.0.18-cd9a5e962b9133eaad074cd294ed7baf506fce2c.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\exploded-aar\StudioProjects\openCVLibrary300\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="28bf1a5335e6528a073d820a1a512fdfab65d5ad">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\classes-964db45f8d3dacaeba64d471005e80abcff50ec0.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\libs\retrofit-1.9.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="a681c044244d9fc375198588297a39ba78028423">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\retrofit-1.9.0-29a0afbec4cefc6d03b4696e8ea2acc95ef951f9.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\exploded-aar\ai.api\sdk\1.6.7\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="4e86ef3cee60d127eb220de841beca6854d684fd">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\classes-24738efaf5a7b65b90ed6f089321fd50df99f08d.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\jars\libs\internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\internal_impl-22.0.0-422449d94bb9f536e3f7b82940ad012d3fa46972.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="4e86306289ace4aa0cfec44a05ed2b410d36989d">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\classes-dafbdd634055a58e4821137dd849914e5f565446.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\libs\firebase-client-android-2.3.1.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="40379dc17021767e23597c2b23cda32ed6f37155">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\firebase-client-android-2.3.1-bcc756653861fdab1909dd429dbf5bc071c1093e.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.3.1\ecb6e1f8e4b0e84c4b886c2f14a1500caf309757\gson-2.3.1.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="ecb6e1f8e4b0e84c4b886c2f14a1500caf309757">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\gson-2.3.1-7ae9acb1bd05b0da2513e89b6964521465ec4d6f.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\tools\android-sdk\extras\android\m2repository\com\android\support\support-annotations\22.0.0\support-annotations-22.0.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\support-annotations-22.0.0-972d2d97c6b7db7f01fe25f770b9a6543cd16c83.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\libs\login-with-amazon-sdk.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="6487a7d412eb44c4abeaaa0ce1fefce894f1575a">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\login-with-amazon-sdk-2ef39bae0e553e8341b6334e6db6c5d3edfddd43.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\libs\okio-1.4.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="5b72bf48563ea8410e650de14aa33ff69a3e8c35">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\okio-1.4.0-5a72ac1f99e75f409a6f110794b7db03c86d06cf.jar" />
+    </item>
+    <item
+        jar="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="d84409890828e07d344a3b9b1da545dba9897b51">
+        <dex dex="C:\Users\josh\Development\StudioProjects\efim\build\intermediates\pre-dexed\debug\classes-3a1162d4301bca8c01998dd002cc331f2201dc72.jar" />
+    </item>
+
+</items>
