@@ -87,7 +87,6 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
         }
     };
     private View mViewBlocker;
-    private long mLastHumanSpoted;
     
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -204,22 +203,8 @@ public class OpenCVFace extends BaseFaceActivity implements CvCameraViewListener
     }
 
     private void humanSpoted() {
-        final long uptimeMillis = SystemClock.uptimeMillis();
-        //Check if no human has been spotted for 10 seconds
-        if(uptimeMillis - mLastHumanSpoted > 10000){ 
-            onHumanSpoted(); 
-        }
-        mLastHumanSpoted = uptimeMillis;
-    }
-
-    protected void onHumanSpoted() {
-        listen("Hello human.");
+        onHumanSpoted();
     }
 
 
-    
-    
-
-
-    
 }

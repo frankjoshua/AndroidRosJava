@@ -29,3 +29,11 @@ CVS/
 */.idea/tasks.xml
 *.iml
 *.iws
+
+#Studio
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build

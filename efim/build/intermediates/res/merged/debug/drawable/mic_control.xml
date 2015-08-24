@@ -3,4 +3,4 @@
     <item android:drawable="@drawable/cube" app:state_speaking="true"/>
     <item android:drawable="@drawable/cube" app:state_waiting="true"/>
     <item android:drawable="@drawable/microphone_control"/>
-</selector><!-- From: file:/Users/xvir/Projects/apiai-solution/api-ai-android-sdk/ailib/src/main/res/drawable/mic_control.xml --><!-- From: file:/C:/Users/josh/Development/StudioProjects/efim/build/intermediates/exploded-aar/ai.api/sdk/1.6.7/res/drawable/mic_control.xml -->
+</selector><!-- From: file:/Users/xvir/Projects/apiai-solution/api-ai-android-sdk/ailib/src/main/res/drawable/mic_control.xml --><!-- From: file:/C:/Users/josh/Development/workspace/efim/efim/build/intermediates/exploded-aar/ai.api/sdk/1.6.7/res/drawable/mic_control.xml -->

@@ -18,7 +18,7 @@ import ai.api.model.Result;
 /**
  * Created by josh on 8/19/2015.
  */
-public class AiActivity extends OpenCVFace {
+public class AiActivity extends GoogleFaceDetectActivity {
 
     private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
     private final String SUBSCRIPTION_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";

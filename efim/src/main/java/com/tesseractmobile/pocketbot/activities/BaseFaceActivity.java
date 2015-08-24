@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -50,11 +51,12 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     private boolean              mHideVoicePrompt;
 
     private Emotion              mEmotion;
+    private boolean mIsListening;
 
-    
-    
-    
-    
+    private long mLastHumanSpoted;
+
+
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -229,7 +231,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         } else {
             //If not post a runnable on th UI thread
             runOnUiThread(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     getMouthView().setText(text);
@@ -246,7 +248,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     final protected void say(final String speechText, final Runnable runnable) {
         //Post the runnable when speech is complete
         getMouthView().setOnSpeechCompleteListener(new SpeechCompleteListener() {
-            
+
             @Override
             public void onSpeechComplete() {
                 runOnUiThread(runnable);
@@ -310,7 +312,11 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     /**
      * @param prompt
      */
-    protected void lauchListeningIntent(final String prompt) {
+    protected synchronized void lauchListeningIntent(final String prompt) {
+        if(mIsListening){
+            return;
+        }
+        mIsListening = true;
         //Mute the audio to stop the beep
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
@@ -375,6 +381,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
 
     @Override
     public void onError(final int error) {
+        mIsListening = false;
         setEmotion(Emotion.ANGER);
         switch (error) {
         case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
@@ -396,7 +403,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     }
 
     @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+    protected synchronized void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        mIsListening = false;
         if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
@@ -411,7 +419,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     }
 
     @Override
-    public void onResults(final Bundle results) {
+    public synchronized void onResults(final Bundle results) {
+        mIsListening = false;
         final ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         proccessSpeech(data);
     }
@@ -472,6 +481,19 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     @Override
     public void onEvent(final int eventType, final Bundle params) {
         say("Event " + eventType);
+    }
+
+    final protected void humanSpotted(){
+        final long uptimeMillis = SystemClock.uptimeMillis();
+        //Check if no human has been spotted for 10 seconds
+        if(uptimeMillis - mLastHumanSpoted > 10000){
+            onHumanSpoted();
+        }
+        mLastHumanSpoted = uptimeMillis;
+    }
+
+    protected void onHumanSpoted() {
+        listen("Hello human.");
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {
