@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
 
+        <!--
         <com.tesseractmobile.opencv.views.FixedJavaCameraView
             xmlns:CameraBridgeViewBase="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fd_activity_surface_view"
@@ -18,7 +19,8 @@
             android:layout_height="240dp"
             android:layout_centerHorizontal="true"
             CameraBridgeViewBase:camera_id="front"
-            CameraBridgeViewBase:show_fps="true" />
+            CameraBridgeViewBase:show_fps="true" /> 
+            -->
 
         <View
             android:id="@+id/viewCameraBlocker"
