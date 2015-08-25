@@ -19,7 +19,7 @@
             android:layout_height="240dp"
             android:layout_centerHorizontal="true"
             CameraBridgeViewBase:camera_id="front"
-            CameraBridgeViewBase:show_fps="true" /> 
+            CameraBridgeViewBase:show_fps="true" />
             -->
 
         <View

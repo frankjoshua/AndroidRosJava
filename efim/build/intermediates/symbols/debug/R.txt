@@ -651,9 +651,8 @@ int id end 0x7f0d0019
 int id end_padder 0x7f0d0094
 int id expand_activities_button 0x7f0d0047
 int id expanded_menu 0x7f0d0057
-int id eyeViewLeft 0x7f0d0097
-int id eyeViewRight 0x7f0d0099
-int id fd_activity_surface_view 0x7f0d0095
+int id eyeViewLeft 0x7f0d0096
+int id eyeViewRight 0x7f0d0098
 int id front 0x7f0d0016
 int id google_wallet_classic 0x7f0d003e
 int id google_wallet_grayscale 0x7f0d003f
@@ -672,7 +671,7 @@ int id line1 0x7f0d008d
 int id line3 0x7f0d0091
 int id listMode 0x7f0d000a
 int id list_item 0x7f0d004a
-int id login_with_amazon 0x7f0d009a
+int id login_with_amazon 0x7f0d0099
 int id logo_only 0x7f0d003c
 int id main 0x7f0d0073
 int id match_parent 0x7f0d0035
@@ -685,7 +684,7 @@ int id micButton 0x7f0d0070
 int id micContainer 0x7f0d006f
 int id middle 0x7f0d001a
 int id monochrome 0x7f0d0042
-int id mouthView 0x7f0d0098
+int id mouthView 0x7f0d0097
 int id multiply 0x7f0d0028
 int id never 0x7f0d0023
 int id none 0x7f0d000f
@@ -745,7 +744,7 @@ int id topPanel 0x7f0d004e
 int id tvText 0x7f0d0074
 int id up 0x7f0d0009
 int id useLogo 0x7f0d0013
-int id viewCameraBlocker 0x7f0d0096
+int id viewCameraBlocker 0x7f0d0095
 int id withText 0x7f0d0024
 int id wrap_content 0x7f0d0027
 int integer abc_config_activityDefaultDur 0x7f0b0001

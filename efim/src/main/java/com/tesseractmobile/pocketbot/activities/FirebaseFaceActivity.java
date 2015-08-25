@@ -9,7 +9,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
-public class FirebaseFaceActivity extends OpenCVFace {
+public class FirebaseFaceActivity extends GoogleFaceDetectActivity {
 
     private static final String CHILD_PATH = "chat";
     private Firebase mFirebaseRef;
@@ -57,7 +57,7 @@ public class FirebaseFaceActivity extends OpenCVFace {
     }
 
     @Override
-    protected void onTextInput(final String input) {
+    public void onTextInput(final String input) {
         final Chat chat = new Chat(userId, input);
         mFirebaseRef.push().setValue(chat);
     }

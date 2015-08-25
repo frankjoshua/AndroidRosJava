@@ -2207,9 +2207,8 @@ containing a value of this type.
         public static final int end_padder=0x7f0d0094;
         public static final int expand_activities_button=0x7f0d0047;
         public static final int expanded_menu=0x7f0d0057;
-        public static final int eyeViewLeft=0x7f0d0097;
-        public static final int eyeViewRight=0x7f0d0099;
-        public static final int fd_activity_surface_view=0x7f0d0095;
+        public static final int eyeViewLeft=0x7f0d0096;
+        public static final int eyeViewRight=0x7f0d0098;
         public static final int front=0x7f0d0016;
         public static final int google_wallet_classic=0x7f0d003e;
         public static final int google_wallet_grayscale=0x7f0d003f;
@@ -2228,7 +2227,7 @@ containing a value of this type.
         public static final int line3=0x7f0d0091;
         public static final int listMode=0x7f0d000a;
         public static final int list_item=0x7f0d004a;
-        public static final int login_with_amazon=0x7f0d009a;
+        public static final int login_with_amazon=0x7f0d0099;
         public static final int logo_only=0x7f0d003c;
         public static final int main=0x7f0d0073;
         public static final int match_parent=0x7f0d0035;
@@ -2241,7 +2240,7 @@ containing a value of this type.
         public static final int micContainer=0x7f0d006f;
         public static final int middle=0x7f0d001a;
         public static final int monochrome=0x7f0d0042;
-        public static final int mouthView=0x7f0d0098;
+        public static final int mouthView=0x7f0d0097;
         public static final int multiply=0x7f0d0028;
         public static final int never=0x7f0d0023;
         public static final int none=0x7f0d000f;
@@ -2301,7 +2300,7 @@ containing a value of this type.
         public static final int tvText=0x7f0d0074;
         public static final int up=0x7f0d0009;
         public static final int useLogo=0x7f0d0013;
-        public static final int viewCameraBlocker=0x7f0d0096;
+        public static final int viewCameraBlocker=0x7f0d0095;
         public static final int withText=0x7f0d0024;
         public static final int wrap_content=0x7f0d0027;
     }

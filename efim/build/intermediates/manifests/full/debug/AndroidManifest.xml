@@ -46,10 +46,6 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.tesseractmobile.pocketbot.activities.OpenCVFace"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-        </activity>
-        <activity
             android:name="com.tesseractmobile.pocketbot.activities.AlexaFaceActivity"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
         </activity>
@@ -102,6 +98,8 @@
                     android:scheme="amzn" />
             </intent-filter>
         </activity>
+
+        <service android:name="com.tesseractmobile.pocketbot.service.VoiceService" />
         <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
