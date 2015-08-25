@@ -87,7 +87,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.VoiceService"/>
+        <service android:name=".service.VoiceRecognitionService"/>
     </application>
 
 </manifest>

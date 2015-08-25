@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by josh on 8/25/2015.
  */
-public class VoiceService extends Service implements RecognitionListener{
+public class VoiceRecognitionService extends Service implements RecognitionListener{
 
     private static final String  SPEECH_INSTRUTIONS             = "";//"Touch my mouth if you want to error something";
 
@@ -252,8 +252,8 @@ public class VoiceService extends Service implements RecognitionListener{
     }
 
     public class LocalBinder extends Binder {
-        public VoiceService getService(){
-            return VoiceService.this;
+        public VoiceRecognitionService getService(){
+            return VoiceRecognitionService.this;
         }
     }
 }

@@ -1,16 +1,10 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,15 +12,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
@@ -35,8 +25,8 @@ import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
+import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
-import com.tesseractmobile.pocketbot.service.VoiceService;
 import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
@@ -57,7 +47,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     private long mLastHumanSpoted;
     private ServiceConnection serviceConnection;
 
-    private VoiceService mVoiceService;
+    private VoiceRecognitionService mVoiceRecognitionService;
 
 
     @Override
@@ -88,8 +78,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                mVoiceService = ((VoiceService.LocalBinder) service).getService();
-                mVoiceService.registerVoiceRecognitionListener(BaseFaceActivity.this);
+                mVoiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
+                mVoiceRecognitionService.registerVoiceRecognitionListener(BaseFaceActivity.this);
             }
 
             @Override
@@ -98,7 +88,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             }
         };
 
-        final Intent bindIntent = new Intent(this, VoiceService.class);
+        final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
         if(bindService(bindIntent, serviceConnection, Service.BIND_AUTO_CREATE) == false){
             throw new UnsupportedOperationException("Error binding to service");
         }
@@ -107,7 +97,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-        mVoiceService.unregisterVoiceRecognitionListener(this);
+        mVoiceRecognitionService.unregisterVoiceRecognitionListener(this);
         unbindService(serviceConnection);
         serviceConnection = null;
     }
@@ -289,7 +279,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                         @Override
                         public void run() {
                             //Call service here
-                            mVoiceService.startListening();
+                            mVoiceRecognitionService.startListening();
                         }
                     }, 50);
                 }
@@ -298,7 +288,7 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             say(prompt);
         } else {
             //Call service here
-            mVoiceService.startListening();
+            mVoiceRecognitionService.startListening();
         }
         
     }
