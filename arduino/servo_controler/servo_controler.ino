@@ -2,33 +2,32 @@
 #include <TargetRegistration.h>
 #include <EasyTransfer.h>
 #include <Adafruit_NeoPixel.h>
+#include <SoftwareSerial.h>
 
 #define NEO_PIN 13
 
-#define LASER_PIN 7
-
 //Servo Control Pins
-#define  SERVO1         11
-#define  SERVO2         12
+#define  SERVO1         10
+#define  SERVO2         11
 
 ClientTarget clientTarget;
 
 Servo servos[2];
 int servoPos[2];
- 
+
+SoftwareSerial SWSerial(4, 5);
+
 void setup() 
 { 
-  pinMode(LASER_PIN, OUTPUT);
   
   initServos();
   
-  Serial.begin(9600);
-  clientTarget.begin(NEO_PIN, &Serial);
+  SWSerial.begin(COM_SPEED);
+  clientTarget.begin(NEO_PIN, &SWSerial);
   
   //Register as Listener
-  clientTarget.registerListener(TARGET_SERVO_HEAD_VERT);
-  clientTarget.registerListener(TARGET_SERVO_HEAD_HORZ);  
-  clientTarget.registerListener(TARGET_LASER_HEAD);
+  clientTarget.registerListener(TARGET_SERVO_PAN);
+  clientTarget.registerListener(TARGET_SERVO_TILT); 
 } 
  
 void loop() 
@@ -38,24 +37,12 @@ void loop()
     int target = clientTarget.getTarget();
     int cmd = clientTarget.getCommand();
     switch(target){
-       case TARGET_SERVO_HEAD_VERT:
-       case TARGET_SERVO_HEAD_HORZ:
+       case TARGET_SERVO_PAN:
+       case TARGET_SERVO_TILT:
        {
-         if(cmd == CMD_SERVO_SET){
-           setServo(target, clientTarget.getValue());
-         } else {
-           moveServo(target, clientTarget.getValue());
-         }
+         setServo(target, constrain(clientTarget.getValue(), 0, 90));
          break;
        }
-       case TARGET_LASER_HEAD:
-          
-          if(cmd == CMD_LASER_ON){
-            digitalWrite(LASER_PIN, HIGH);
-          } else {
-            digitalWrite(LASER_PIN, LOW);
-          }
-       break; 
     }
   }
 
@@ -64,9 +51,9 @@ void loop()
 Servo getServo(int target){
     //Return servo based on ID
      switch(target){
-      case TARGET_SERVO_HEAD_VERT:
+      case TARGET_SERVO_PAN:
         return servos[0];
-      case TARGET_SERVO_HEAD_HORZ:
+      case TARGET_SERVO_TILT:
         return servos[1];
     };
     //Return default servo
@@ -75,9 +62,9 @@ Servo getServo(int target){
 
 void initServos(){
   servos[0].attach(SERVO1);
-  setServo(TARGET_SERVO_HEAD_VERT, 90);
+  setServo(TARGET_SERVO_PAN, 90);
   servos[1].attach(SERVO2);
-  setServo(TARGET_SERVO_HEAD_HORZ, 90);
+  setServo(TARGET_SERVO_TILT, 90);
 }
 
 void setServo(int servo, int pos){
