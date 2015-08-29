@@ -37,7 +37,7 @@ import com.tesseractmobile.pocketbot.amazonvoiceservice.DeviceContext;
 import com.tesseractmobile.pocketbot.amazonvoiceservice.MessageHeader;
 import com.tesseractmobile.pocketbot.amazonvoiceservice.Payload;
 
-public class AlexaFaceActivity extends OpenCVFace {
+public class AlexaFaceActivity extends GoogleFaceDetectActivity {
     private static final String        AMAZON_PROFILE_ID    = "amzn1.application.6dcd3bfdc93141d1813ff178cced9734";
     private static final String        AMAZON_CLIENT_ID     = "amzn1.application-oa2-client.cda8a2490ad348f3875212af080b7119";
     private static final String        AMAZON_CLIENT_SECRET = "43c866e90f62e6581db3db2b6817dc46d2b2d43699acc8bec138a9d343cd3ddb";
@@ -91,48 +91,48 @@ public class AlexaFaceActivity extends OpenCVFace {
         super.onStart();
     }
 
-    @Override
-    protected void lauchListeningIntent(final String prompt) {
-        if (mUseAlexa) {
-            // Send Audio to Alexa
-            Toast.makeText(this, "Media Player Starting.", Toast.LENGTH_LONG).show();
-            final MediaRecorder mediaRecorder = new MediaRecorder();
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            final File file = new File(getExternalCacheDir(), "test");
-            mediaRecorder.setOutputFile(file.getPath());
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-            try {
-                mediaRecorder.prepare();
-            } catch (final IllegalStateException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (final IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            mediaRecorder.start();
-
-            new Handler().postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    mediaRecorder.stop();
-                    mediaRecorder.release();
-                    Toast.makeText(AlexaFaceActivity.this, "Media Player Stopped.", Toast.LENGTH_LONG).show();
-
-                    final MediaPlayer mediaPlayer = MediaPlayer.create(AlexaFaceActivity.this, Uri.parse(file.getPath()));
-                    mediaPlayer.start();
-                    
-                    new AmazonVoiceSerivceTask().execute(file);
-                }
-            }, 5000);
-        } else {
-            // Use Google
-            super.lauchListeningIntent(prompt);
-        }
-    }
+//    @Override
+//    protected void lauchListeningIntent(final String prompt) {
+//        if (mUseAlexa) {
+//            // Send Audio to Alexa
+//            Toast.makeText(this, "Media Player Starting.", Toast.LENGTH_LONG).show();
+//            final MediaRecorder mediaRecorder = new MediaRecorder();
+//            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//            final File file = new File(getExternalCacheDir(), "test");
+//            mediaRecorder.setOutputFile(file.getPath());
+//            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+//            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+//            try {
+//                mediaRecorder.prepare();
+//            } catch (final IllegalStateException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (final IOException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//
+//            mediaRecorder.start();
+//
+//            new Handler().postDelayed(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    mediaRecorder.stop();
+//                    mediaRecorder.release();
+//                    Toast.makeText(AlexaFaceActivity.this, "Media Player Stopped.", Toast.LENGTH_LONG).show();
+//
+//                    final MediaPlayer mediaPlayer = MediaPlayer.create(AlexaFaceActivity.this, Uri.parse(file.getPath()));
+//                    mediaPlayer.start();
+//
+//                    new AmazonVoiceSerivceTask().execute(file);
+//                }
+//            }, 5000);
+//        } else {
+//            // Use Google
+//            super.lauchListeningIntent(prompt);
+//        }
+//    }
 
     public static String generateCodeChallenge(final String challenge)  {
         //final SecureRandom random = new SecureRandom();

@@ -141,13 +141,13 @@ public class UsbAccessoryActivity extends AiActivity implements RobotEventListen
     }
 
     @Override
-    protected boolean proccessInput(final String input) {
+    public boolean onProccessInput(final String input) {
         if(input.contains("stop") || input.contains("halt")){
             final RobotCommand robotCommand = new RobotCommand(RobotCommandType.STOP);
             robotCommandInterface.sendCommand(robotCommand);
             return true;
         }
-        return super.proccessInput(input);
+        return super.onProccessInput(input);
     }
 
     

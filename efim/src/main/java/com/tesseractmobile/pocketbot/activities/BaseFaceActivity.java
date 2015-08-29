@@ -1,29 +1,22 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
+import android.app.Service;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
@@ -31,30 +24,30 @@ import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
+import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
-abstract public class BaseFaceActivity extends Activity implements OnClickListener, RecognitionListener {
+abstract public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener {
 
-    private static final String  SPEECH_INSTRUTIONS             = "";//"Touch my mouth if you want to say something";
 
-    private static final int     VOICE_RECOGNITION_REQUEST_CODE = 0;
 
-    private static final boolean HIDE_VOICE_PROMPT              = true;
 
     private MouthView            mouthView;
     private EyeView              mLeftEye;
     private EyeView              mRightEye;
-    private SpeechRecognizer     mSpeechRecognizer;
+
     private final Handler        mHandler                       = new Handler();
-    private boolean              mHideVoicePrompt;
 
     private Emotion              mEmotion;
-    private boolean mIsListening;
 
     private long mLastHumanSpoted;
+    private ServiceConnection serviceConnection;
 
+    private VoiceRecognitionService mVoiceRecognitionService;
 
 
     @Override
@@ -76,55 +69,44 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        
-        // Load settings
-        mHideVoicePrompt = HIDE_VOICE_PROMPT;
 
     }
-
-    private boolean checkVoiceRecognition() {
-        // Check if voice recognition is present
-        final PackageManager pm = getPackageManager();
-        final List<ResolveInfo> activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-        if (activities.size() == 0) {
-            getMouthView().setEnabled(false);
-            say("Voice recognizer not present");
-            Toast.makeText(this, "Voice recognizer not present", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if (SpeechRecognizer.isRecognitionAvailable(this) == false) {
-            say("I have no voice recognization service available");
-            return false;
-        }
-
-        return true;
-    }
-    
-    
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        mSpeechRecognizer.stopListening();
-        mSpeechRecognizer.cancel();
-        mSpeechRecognizer.destroy();
+    protected void onStart() {
+        super.onStart();
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mVoiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
+                mVoiceRecognitionService.registerVoiceRecognitionListener(BaseFaceActivity.this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
+        final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
+        if(bindService(bindIntent, serviceConnection, Service.BIND_AUTO_CREATE) == false){
+            throw new UnsupportedOperationException("Error binding to service");
+        }
     }
 
-    
-    
-    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mVoiceRecognitionService.unregisterVoiceRecognitionListener(this);
+        unbindService(serviceConnection);
+        serviceConnection = null;
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         //Set initial state
         setEmotion(Emotion.ANGER);
-        
-        if (checkVoiceRecognition()) {
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
-            mSpeechRecognizer.setRecognitionListener(this);
-        }
     }
 
     @Override
@@ -296,7 +278,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
                         
                         @Override
                         public void run() {
-                            lauchListeningIntent(prompt);
+                            //Call service here
+                            mVoiceRecognitionService.startListening();
                         }
                     }, 50);
                 }
@@ -304,161 +287,53 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             });
             say(prompt);
         } else {
-            lauchListeningIntent(prompt);
+            //Call service here
+            mVoiceRecognitionService.startListening();
         }
         
     }
 
-    /**
-     * @param prompt
-     */
-    protected synchronized void lauchListeningIntent(final String prompt) {
-        if(mIsListening){
-            return;
-        }
-        mIsListening = true;
-        //Mute the audio to stop the beep
-//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
 
-        //Use Google Speech Recognizer
-        final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
-        // Specify the calling package to identify your application
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
 
-        // Display an hint to the user about what he should say.
-        if(prompt != null){
-             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, prompt);
-        }
 
-        // Given an hint to the recognizer about what the user is going to say
-        // There are two form of language model available
-        // 1.LANGUAGE_MODEL_WEB_SEARCH : For short phrases
-        // 2.LANGUAGE_MODEL_FREE_FORM : If not sure about the words or phrases
-        // and its domain.
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+//    @Override
+//    protected synchronized void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+//        mIsListening = false;
+//        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
+//            if (resultCode == RESULT_OK) {
+//                proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
+//            } else {
+//                onError(resultCode);
+//            }
+//        } else {
+//            say("I had an unhandled error.");
+//        }
+//
+//        super.onActivityResult(requestCode, resultCode, data);
+//    }
 
-        // Specify how many results you want to receive. The results will be
-        // sorted where the first result is the one with higher confidence.
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-        // Start the Voice recognizer activity for the result.
-        if (mHideVoicePrompt) {
-            mSpeechRecognizer.startListening(intent);
-        } else {
-            startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
-        }
-        // say("I'm Listening");
-        // Uncomment for test speech
-        // new BotTask().execute("Are you listening?");
-    }
 
-    @Override
-    public void onReadyForSpeech(final Bundle params) {
-        setEmotion(Emotion.ACCEPTED);
-    }
-
-    @Override
-    public void onBeginningOfSpeech() {
-        setEmotion(Emotion.AWARE);
-    }
-
-    @Override
-    public void onRmsChanged(final float rmsdB) {
-        // say("Sound levels changed to " + rmsdB + " decibals");
-    }
-
-    @Override
-    public void onBufferReceived(final byte[] buffer) {
-        say("I hear something");
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-        //Show joy
-        setEmotion(Emotion.JOY);
-    }
-
-    @Override
-    public void onError(final int error) {
-        mIsListening = false;
-        setEmotion(Emotion.ANGER);
-        switch (error) {
-        case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-            say("I didn't hear you. " + SPEECH_INSTRUTIONS);
-            //listen(null);
-            break;
-        case SpeechRecognizer.ERROR_NO_MATCH:
-            //say("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
-            listen(null);
-            break;
-        case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-            say("I'm sorry, but my speech recognizer is busy. Who ever programmed me probably forgot to close the service properly.");
-            break;
-        default:
-            say("I had and unknown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
-            break;
-        }
-
-    }
-
-    @Override
-    protected synchronized void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        mIsListening = false;
-        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
-            } else {
-                onError(resultCode);
-            }
-        } else {
-            say("I had an unhandled error.");
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public synchronized void onResults(final Bundle results) {
-        mIsListening = false;
-        final ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        proccessSpeech(data);
-    }
-
-    /**
-     * @param data
-     */
-    private void proccessSpeech(final ArrayList<String> data) {
-        if (data != null && data.size() > 0) {
-            final String responce = data.get(0);
-            if (responce != null) {
-                // say(responce);
-                // Send text to the chat bot
-                if(proccessInput(responce) == false){
-                    onTextInput(responce);
-                }
-            } else {
-                // Something went wrong
-                say("Pardon? " + SPEECH_INSTRUTIONS);
-            }
-        } else {
-            say("No data recieved.");
-        }
-    }
 
     /**
      * @param input
      */
-    protected void onTextInput(final String input) {
+    public void onTextInput(final String input) {
         new BotTask().execute(input);
     }
-    
-    /**
-     * Execute commands based on input
-     * @param input
-     * @return true if input handled
-     */
-    protected boolean proccessInput(final String input){
+
+    @Override
+    public void onVoiceRecognitionStateChange(VoiceRecognitionState state) {
+
+    }
+
+    @Override
+    public void onVoiceRecognitionError(String text) {
+        say(text);
+    }
+
+    @Override
+    public boolean onProccessInput(final String input){
         if(input.contains("game")){
             say("My favorite game is solitaire", new Runnable() {
                 
@@ -471,16 +346,6 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onPartialResults(final Bundle partialResults) {
-        say("I only heard a little of what you said");
-    }
-
-    @Override
-    public void onEvent(final int eventType, final Bundle params) {
-        say("Event " + eventType);
     }
 
     final protected void humanSpotted(){
