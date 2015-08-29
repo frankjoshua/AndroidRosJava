@@ -227,8 +227,9 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
      * Listen for body connection events
      * @param bodyConnectionListener
      */
-    public void registerBodyConnectionListener(final BodyConnectionListener bodyConnectionListener){
+    public BodyInterface registerBodyConnectionListener(final BodyConnectionListener bodyConnectionListener){
         this.mBodyConnectionListener = bodyConnectionListener;
+        return this;
     }
 
     /**

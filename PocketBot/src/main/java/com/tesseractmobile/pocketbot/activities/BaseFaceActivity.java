@@ -26,6 +26,7 @@ import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
+import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import com.tesseractmobile.pocketbot.service.BluetoothService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
@@ -53,6 +54,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private VoiceRecognitionService mVoiceRecognitionService;
     private ServiceConnection bluetoothServiceConnection;
     private BluetoothService mBlueToothService;
+    private BodyInterface mBodyInterface;
 
 
     @Override
@@ -106,7 +108,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mBlueToothService = ((BluetoothService.LocalBinder) service).getService();
-                mBlueToothService.registerBodyConnectionListener(BaseFaceActivity.this);
+                mBodyInterface = mBlueToothService.registerBodyConnectionListener(BaseFaceActivity.this);
             }
 
             @Override

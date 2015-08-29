@@ -25,8 +25,8 @@ android {
 
     defaultConfig {
         applicationId "com.tesseractmobile.pocketbot"
-        minSdkVersion 15
-        targetSdkVersion 15
+        minSdkVersion 18
+        targetSdkVersion 18
 
         // Enabling multidex support.
         multiDexEnabled true
