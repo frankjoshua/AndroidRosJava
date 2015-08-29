@@ -24,6 +24,7 @@ import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.service.BluetoothService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
@@ -45,9 +46,11 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     private Emotion              mEmotion;
 
     private long mLastHumanSpoted;
-    private ServiceConnection serviceConnection;
+    private ServiceConnection voiceRecognitionServiceConnection;
 
     private VoiceRecognitionService mVoiceRecognitionService;
+    private ServiceConnection bluetoothServiceConnection;
+    private BluetoothService mBlueToothService;
 
 
     @Override
@@ -75,7 +78,8 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
     @Override
     protected void onStart() {
         super.onStart();
-        serviceConnection = new ServiceConnection() {
+        //Bind to voice recognition service
+        voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mVoiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
@@ -89,17 +93,40 @@ abstract public class BaseFaceActivity extends Activity implements OnClickListen
         };
 
         final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
-        if(bindService(bindIntent, serviceConnection, Service.BIND_AUTO_CREATE) == false){
+        if(bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false){
             throw new UnsupportedOperationException("Error binding to service");
+        }
+
+        //Bind to bluetooth service
+        bluetoothServiceConnection = new ServiceConnection(){
+
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mBlueToothService = ((BluetoothService.LocalBinder) service).getService();
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
+        final Intent bluetoothBindIntent = new Intent(this, BluetoothService.class);
+        if(bindService(bluetoothBindIntent, bluetoothServiceConnection, Service.BIND_AUTO_CREATE) == false){
+            throw new UnsupportedOperationException("Error binding to bluetooth service");
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        //Unbind from voice recognition service
         mVoiceRecognitionService.unregisterVoiceRecognitionListener(this);
-        unbindService(serviceConnection);
-        serviceConnection = null;
+        unbindService(voiceRecognitionServiceConnection);
+        voiceRecognitionServiceConnection = null;
+        //Unbind from bluetooth service
+        unbindService(bluetoothServiceConnection);
+        bluetoothServiceConnection = null;
     }
 
     @Override

@@ -26,6 +26,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:name="android.support.multidex.MultiDexApplication"
@@ -88,6 +90,8 @@
         </activity>
 
         <service android:name=".service.VoiceRecognitionService"/>
+        <service android:name=".service.BluetoothService"/>
+
     </application>
 
 </manifest>

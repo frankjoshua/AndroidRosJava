@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/efim/efim.iml" filepath="$PROJECT_DIR$/efim/efim.iml" />
+      <module fileurl="file://$PROJECT_DIR$/efim.iml" filepath="$PROJECT_DIR$/efim.iml" />
       <module fileurl="file://$PROJECT_DIR$/efim/efim-efim.iml" filepath="$PROJECT_DIR$/efim/efim-efim.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" filepath="$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" />
     </modules>
