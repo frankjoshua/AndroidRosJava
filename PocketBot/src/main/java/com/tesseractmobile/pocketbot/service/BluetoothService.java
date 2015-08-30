@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -18,6 +19,7 @@ import com.tesseractmobile.ble.BleUtils;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -40,6 +42,8 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
     private ArrayList<BluetoothDeviceData> mScannedDevices;
 
     private BodyConnectionListener mBodyConnectionListener;
+
+    protected BluetoothGattService mUartService;
 
     @Override
     public void onCreate() {
@@ -83,7 +87,6 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
                             // Add it to the mScannedDevice list
                             deviceData = new BluetoothDeviceData();
                             mScannedDevices.add(deviceData);
-                            mBodyConnectionListener.onBluetoothDeviceFound();
                         } else {
                             deviceData = previouslyScannedDeviceData;
                         }
@@ -92,7 +95,9 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
                         deviceData.rssi = rssi;
                         deviceData.scanRecord = scanRecord;
                         decodeScanRecords(deviceData);
-
+                        if(previouslyScannedDeviceData == null) {
+                            mBleManager.connect(BluetoothService.this, deviceData.device.getAddress());
+                        }
                     }
                 }
             });
@@ -223,6 +228,18 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
         deviceData.uuids = uuids;
     }
 
+    public void sendData(byte[] data) {
+        if (mUartService != null) {
+            // Split the value into chunks (UART service has a maximum number of characters that can be written )
+            //for (int i = 0; i < data.length; i += kTxMaxCharacters) {
+                //final byte[] chunk = Arrays.copyOfRange(data, i, Math.min(i + kTxMaxCharacters, data.length));
+                mBleManager.writeService(mUartService, UUID_TX, data);
+            //}
+        } else {
+            Log.w(TAG, "Uart Service not discovered. Unable to send data");
+        }
+    }
+
     /**
      * Listen for body connection events
      * @param bodyConnectionListener
@@ -248,12 +265,12 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
 
     @Override
     public void onConnected() {
-
+        mBodyConnectionListener.onError(0, "Connected");
     }
 
     @Override
     public void onConnecting() {
-
+        mBodyConnectionListener.onError(0, "Connecting");
     }
 
     @Override
@@ -263,11 +280,22 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
 
     @Override
     public void onServicesDiscovered() {
+        mUartService = mBleManager.getGattService(UUID_SERVICE);
 
+        mBleManager.enableNotification(mUartService, UUID_RX, true);
+        mBodyConnectionListener.onError(0, "Services Discovered");
     }
 
     @Override
     public void onDataAvailable(BluetoothGattCharacteristic characteristic) {
+        if (characteristic.getService().getUuid().toString().equalsIgnoreCase(UUID_SERVICE)) {
+            if (characteristic.getUuid().toString().equalsIgnoreCase(UUID_RX)) {
+                final String data = new String(characteristic.getValue(), Charset.forName("UTF-8"));
+
+                mBodyConnectionListener.onError(0, data);
+
+            }
+        }
 
     }
 

@@ -7,4 +7,6 @@ import com.tesseractmobile.pocketbot.service.BluetoothService;
  */
 public interface BodyConnectionListener {
     void onBluetoothDeviceFound();
+
+    void onError(int i, String connected);
 }

@@ -35,6 +35,8 @@ import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
+import java.nio.charset.Charset;
+
 public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener {
 
 
@@ -127,9 +129,12 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     protected void onStop() {
         super.onStop();
         //Unbind from voice recognition service
-        mVoiceRecognitionService.unregisterVoiceRecognitionListener(this);
-        unbindService(voiceRecognitionServiceConnection);
-        voiceRecognitionServiceConnection = null;
+        final VoiceRecognitionService voiceRecognitionService = this.mVoiceRecognitionService;
+        if(voiceRecognitionService != null) {
+            voiceRecognitionService.unregisterVoiceRecognitionListener(this);
+            unbindService(voiceRecognitionServiceConnection);
+            voiceRecognitionServiceConnection = null;
+        }
         //Unbind from bluetooth service
         unbindService(bluetoothServiceConnection);
         bluetoothServiceConnection = null;
@@ -150,6 +155,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         case R.id.eyeViewLeft:
             say("Ouch");
             fear();
+            mBlueToothService.sendData("Hi\n".getBytes(Charset.forName("UTF-8")));
             // finish();
             break;
         case R.id.eyeViewRight:
@@ -397,6 +403,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     public void onBluetoothDeviceFound() {
         say("Bluetooth device found");
+    }
+
+    @Override
+    public void onError(int i, String error) {
+        say(error);
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {
