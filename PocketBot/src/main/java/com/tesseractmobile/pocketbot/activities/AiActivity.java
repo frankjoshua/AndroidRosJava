@@ -5,6 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.tesseractmobile.pocketbot.robot.RobotCommand;
+
+import java.nio.charset.Charset;
+
 import ai.api.AIConfiguration;
 import ai.api.AIDataService;
 import ai.api.AIListener;
@@ -69,6 +74,9 @@ public class AiActivity extends GoogleFaceDetectActivity {
             final String measurement = result.getStringParameter("measurement");
             final int distance = result.getIntParameter("distance");
             move(direction, measurement, distance);
+        } else if(action.equals("flash")){
+            final int times = result.getIntParameter("number");
+            flash(times);
         }
         final String speech = result.getFulfillment().getSpeech();
         if(speech.equals("")){
@@ -76,6 +84,15 @@ public class AiActivity extends GoogleFaceDetectActivity {
         } else {
             listen(speech);
         }
+    }
+
+    private void flash(int times) {
+        final RobotCommand command = new RobotCommand(RobotCommand.RobotCommandType.STOP);
+        command.target = 1;
+        command.command = 2;
+        command.value = times;
+
+        sendData(command);
     }
 
     protected void move(String direction, String measurement, int distance) {

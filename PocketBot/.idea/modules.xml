@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PocketBot.iml" filepath="$PROJECT_DIR$/PocketBot.iml" />
-      <module fileurl="file://$PROJECT_DIR$/efim/efim.iml" filepath="$PROJECT_DIR$/efim/efim.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" filepath="$PROJECT_DIR$/openCVLibrary300/openCVLibrary300.iml" />
     </modules>
   </component>

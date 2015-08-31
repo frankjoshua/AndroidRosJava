@@ -30,7 +30,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     final private IBinder binder = new LocalBinder();
     private SpeechRecognizer mSpeechRecognizer;
     private boolean              mHideVoicePrompt;
-    private boolean mIsListening;
 
     private VoiceRecognitionListener mVoiceRecognitionListener;
     private VoiceRecognitionState mState;
@@ -105,10 +104,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
      * @param prompt
      */
     protected synchronized void lauchListeningIntent(final String prompt) {
-        if(mIsListening){
-            return;
-        }
-        mIsListening = true;
         //Mute the audio to stop the beep
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
@@ -177,7 +172,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     @Override
     public void onError(final int error) {
-        mIsListening = false;
         setState(VoiceRecognitionState.ERROR);
         //setEmotion(Emotion.ANGER);
         switch (error) {
@@ -201,7 +195,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     @Override
     public synchronized void onResults(final Bundle results) {
-        mIsListening = false;
         final ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         proccessSpeech(data);
     }

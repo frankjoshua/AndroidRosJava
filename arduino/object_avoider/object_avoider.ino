@@ -69,6 +69,7 @@ int mOffPix = 0;
 boolean mPixelDir = false;
 long mLastPixelUpdate = 0;
 int mSpeed = 60;
+long mRandomDelay = 2000;
 
 void setup() {
   Serial.begin(115200);
@@ -120,8 +121,9 @@ void loop() {
   
   if(mChange || millis() - mLastChange > 1000){
     //Only change if some time has elapsed or not turning
-    if(!mTurning || millis() - mLastChange > 2000){
+    if(!mTurning || millis() - mLastChange > mRandomDelay){
       mLastChange = millis();
+      mRandomDelay = random(100, 1800);
       //UpdateSpeed
       mSpeed = map(analogRead(A0), 0, 1023, 0, 127);
       Serial.print(mSpeed);
@@ -166,17 +168,21 @@ void loop() {
       } else if(stateList[SENSOR_LEFT] != DISTANCE_OK) {
         //Left Blocked
          Serial.println("Right");
-         mFavorRight = true;
+         mFavorRight = false;
          mTurning = true;
-         ST.motor(RIGHT, -mSpeed / 2);
+         //ST.motor(RIGHT, -mSpeed / 2);
+         //ST.motor(LEFT, -mSpeed);
+         ST.motor(RIGHT, mSpeed);
          ST.motor(LEFT, -mSpeed);
       } else {
         //Right Blocked
          Serial.println("Left");
-         mFavorRight = false;
+         mFavorRight = true;
          mTurning = true;
+         //ST.motor(RIGHT, -mSpeed);
+         //ST.motor(LEFT, -mSpeed / 2);
          ST.motor(RIGHT, -mSpeed);
-         ST.motor(LEFT, -mSpeed / 2);
+         ST.motor(LEFT, mSpeed);
       }
     }
   }
@@ -270,7 +276,7 @@ void oneSensorCycle() { // Do something with the results.
     int curState = 0;
     if(cm[i] > mBaseDistance[i] + 55){
       curState = DISTANCE_OK;
-    } else if(cm[i] < 40) {
+    } else if(cm[i] < 20) {
       curState = DISTANCE_BLOCKED;
     } else {
       curState = DISTANCE_OK;

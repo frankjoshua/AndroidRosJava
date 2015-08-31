@@ -13,6 +13,7 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.tesseractmobile.ble.BleDevicesScanner;
 import com.tesseractmobile.ble.BleManager;
 import com.tesseractmobile.ble.BleUtils;
@@ -44,6 +45,7 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
     private BodyConnectionListener mBodyConnectionListener;
 
     protected BluetoothGattService mUartService;
+    private int kTxMaxCharacters = 20;
 
     @Override
     public void onCreate() {
@@ -231,10 +233,10 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
     public void sendData(byte[] data) {
         if (mUartService != null) {
             // Split the value into chunks (UART service has a maximum number of characters that can be written )
-            //for (int i = 0; i < data.length; i += kTxMaxCharacters) {
-                //final byte[] chunk = Arrays.copyOfRange(data, i, Math.min(i + kTxMaxCharacters, data.length));
-                mBleManager.writeService(mUartService, UUID_TX, data);
-            //}
+            for (int i = 0; i < data.length; i += kTxMaxCharacters) {
+                final byte[] chunk = Arrays.copyOfRange(data, i, Math.min(i + kTxMaxCharacters, data.length));
+                mBleManager.writeService(mUartService, UUID_TX, chunk);
+            }
         } else {
             Log.w(TAG, "Uart Service not discovered. Unable to send data");
         }
@@ -265,12 +267,12 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
 
     @Override
     public void onConnected() {
-        mBodyConnectionListener.onError(0, "Connected");
+        mBodyConnectionListener.onError(0, "Bluetooth connecting");
     }
 
     @Override
     public void onConnecting() {
-        mBodyConnectionListener.onError(0, "Connecting");
+        mBodyConnectionListener.onError(0, "Scanning for Bluetooth devices.");
     }
 
     @Override
@@ -283,7 +285,7 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
         mUartService = mBleManager.getGattService(UUID_SERVICE);
 
         mBleManager.enableNotification(mUartService, UUID_RX, true);
-        mBodyConnectionListener.onError(0, "Services Discovered");
+        mBodyConnectionListener.onError(0, "Bluetooth connected");
     }
 
     @Override
@@ -307,6 +309,14 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
     @Override
     public void onReadRemoteRssi(int rssi) {
 
+    }
+
+    @Override
+    public void sendObject(final Object data) {
+        final Gson gson = new Gson();
+        final String s = gson.toJson(data);
+        Log.d("JSON", new String(s.getBytes(Charset.forName("UTF-8"))));
+        sendData(s.getBytes(Charset.forName("UTF-8")));
     }
 
     public class LocalBinder extends Binder {

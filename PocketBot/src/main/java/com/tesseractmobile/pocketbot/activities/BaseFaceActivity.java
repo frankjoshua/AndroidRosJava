@@ -24,9 +24,11 @@ import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
+import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.RobotCommand;
 import com.tesseractmobile.pocketbot.service.BluetoothService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
@@ -155,7 +157,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         case R.id.eyeViewLeft:
             say("Ouch");
             fear();
-            mBlueToothService.sendData("Hi\n".getBytes(Charset.forName("UTF-8")));
             // finish();
             break;
         case R.id.eyeViewRight:
@@ -237,7 +238,14 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
     }
-    
+
+    /**
+     * Sends data to the robot body
+     * @param data
+     */
+    final protected void sendData(final Object data){
+        mBodyInterface.sendObject(data);
+    }
     /**
      * Speak the text
      */

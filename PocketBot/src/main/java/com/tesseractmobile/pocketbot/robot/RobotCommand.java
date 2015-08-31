@@ -8,6 +8,11 @@ public class RobotCommand {
 
     final private RobotCommandType robotCommandType;
 
+    public int target;
+    public int command;
+    public int value;
+    public int time;
+
     public RobotCommand(final RobotCommandType robotCommandType){
         this.robotCommandType = robotCommandType;
     }
