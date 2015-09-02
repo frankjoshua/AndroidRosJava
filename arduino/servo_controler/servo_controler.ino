@@ -14,8 +14,10 @@ ClientTarget clientTarget;
 
 Servo servos[2];
 int servoPos[2];
+int servoDest[2];
 
 SoftwareSerial SWSerial(4, 5);
+
 
 void setup() 
 { 
@@ -32,20 +34,34 @@ void setup()
  
 void loop() 
 { 
-
+  delay(10);
+  
   if(clientTarget.receiveData()){
     int target = clientTarget.getTarget();
     int cmd = clientTarget.getCommand();
+    int val = clientTarget.getValue();
     switch(target){
        case TARGET_SERVO_PAN:
+       servoDest[0] = val;
+       break;
        case TARGET_SERVO_TILT:
-       {
-         setServo(target, constrain(clientTarget.getValue(), 0, 90));
-         break;
-       }
+       servoDest[1] = val;
+       break;
     }
   }
 
+  if(servoDest[0] > servoPos[0]){
+    servoPos[0]++;
+  } else if(servoDest[0] < servoPos[0]){
+    servoPos[0]--;
+  }
+  if(servoDest[1] > servoPos[1]){
+    servoPos[1]++;
+  } else if(servoDest[1] < servoPos[1]){
+    servoPos[1]--;
+  }
+  setServo(TARGET_SERVO_PAN, servoPos[0]);
+  setServo(TARGET_SERVO_TILT, servoPos[1]);
 } 
 
 Servo getServo(int target){
@@ -63,8 +79,10 @@ Servo getServo(int target){
 void initServos(){
   servos[0].attach(SERVO1);
   setServo(TARGET_SERVO_PAN, 90);
+  servoDest[0] = 90;
   servos[1].attach(SERVO2);
   setServo(TARGET_SERVO_TILT, 90);
+  servoDest[1] = 90;
 }
 
 void setServo(int servo, int pos){

@@ -94,12 +94,12 @@ void loop() {
     Serial.println(powerR);
   } else if(channels[CH5] < 1100 && channels[CH5] > MIN_INPUT){
     //PAN
-    dataStruct.tar = 10;
-    dataStruct.val = map(channels[CH3], MAX_INPUT, MIN_INPUT, 0, 180);
+    dataStruct.tar = 11;
+    dataStruct.val = map(channels[CH3], MIN_INPUT, MAX_INPUT, 0, 180);
     etData.sendData();
     //TILT
-    dataStruct.tar = 11;
-    dataStruct.val = map(channels[CH6], MAX_INPUT, MIN_INPUT, 0, 180);
+    dataStruct.tar = 10;
+    dataStruct.val = map(channels[CH6], MIN_INPUT, MAX_INPUT, 0, 180);
     etData.sendData();
   }
   //Serial.println(channels[CH6]);

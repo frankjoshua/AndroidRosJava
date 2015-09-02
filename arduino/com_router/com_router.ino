@@ -128,6 +128,10 @@ void readData(int dataLine){
     //Check for registration request
     if(tar == REGISTRATION){
       if(val == REGISTER){
+        Serial.print("Registration request for: ");
+        Serial.print(cmd);
+        Serial.print(" from ");
+        Serial.println(dataLine);
         //Register Listener
         listeners[dataLine].registerTarget(cmd);
         //Respond that registration was successful
@@ -142,6 +146,8 @@ void readData(int dataLine){
         //Mark line as connected
         setPixelColor(dataLine, 75,0,255);
       } else if(val == UNREGISTER){
+        Serial.print("UNREGISTER ");
+        Serial.println(cmd);
         //Register Listener
         listeners[dataLine].unregisterTarget(cmd);
       }
@@ -156,8 +162,12 @@ void readData(int dataLine){
 */
 void routeData(){
   int target = dataStruct.tar;
+  Serial.print("Routing ");
+  Serial.print(target);
   for(int listener = 0; listener < DATA_LISTENERS; listener++){
-     if(listeners[listener].isTarget(target)){
+     if(listeners[listener].isTarget(target)){      
+       Serial.print(" to ");
+       Serial.print(listener);
        if(listener > DATA_CHANNELS - 1){
          //Send through I2C
          etI2Cdata.sendData(listener);
@@ -171,11 +181,12 @@ void routeData(){
        setPixelColor(listener + DATA_LISTENERS, 0,50,0);
      }
   } 
+  Serial.println("");
 }
 
 void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-//  Serial.begin(115200); //Serial0 not working currently
+  Serial.begin(115200); //Serial0 not working currently
 //  etData[0].begin(details(dataStruct), &Serial); 
   Serial1.begin(115200);
   etData[0].begin(details(dataStruct), &Serial1);
@@ -213,8 +224,10 @@ void setPixelColor(int pixelNum, int red, int green, int blue){
 }
 
 void Listener::registerTarget(int target){
-  //First unregister target if registered
-  unregisterTarget(target);
+  //Check if already registered
+  if(isTarget(target)){
+    return; 
+  }
   //Add to list of registered targets
   targets[pointer] = target;
   pointer++;
