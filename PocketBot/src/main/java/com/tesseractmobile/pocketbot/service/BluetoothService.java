@@ -246,9 +246,11 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
      * Listen for body connection events
      * @param bodyConnectionListener
      */
-    public BodyInterface registerBodyConnectionListener(final BodyConnectionListener bodyConnectionListener){
+    public void registerBodyConnectionListener(final BodyConnectionListener bodyConnectionListener){
         this.mBodyConnectionListener = bodyConnectionListener;
-        return this;
+        if (mUartService != null) {
+            mBodyConnectionListener.onBodyConnected(this);
+        }
     }
 
     /**
@@ -285,7 +287,7 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
         mUartService = mBleManager.getGattService(UUID_SERVICE);
 
         mBleManager.enableNotification(mUartService, UUID_RX, true);
-        mBodyConnectionListener.onError(0, "Bluetooth connected");
+        mBodyConnectionListener.onBodyConnected(this);
     }
 
     @Override

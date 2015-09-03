@@ -1,21 +1,25 @@
 #include <SoftwareSerial.h>
+#include <SPI.h>
 #include <SabertoothSimplified.h>
 #include <NewPing.h>
 #include <Average.h>
 #include <Adafruit_NeoPixel.h>
 #include <Usb.h>
 #include <AndroidAccessory.h>
+#include "Adafruit_BLE.h"
+#include "Adafruit_BluefruitLE_SPI.h"
+#include "Adafruit_BluefruitLE_UART.h"
+#include <ArduinoJson.h>
 
-#define PIN 5
+//Define pins
+#define MOTOR_PIN 45
+#define NEO_PIN 44
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(15, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(15, NEO_PIN, NEO_GRB + NEO_KHZ800);
 #define COLOR_OK 0,255,90
 #define COLOR_BLOCKED 255,0,150
 #define COLOR_CLIFF 255,90,0
 #define COLOR_LISTENING 255,255,255
-
-//Define pins
-#define MOTOR_PIN 6
 
 //Define motors
 #define LEFT 2
@@ -53,30 +57,69 @@ Average<float> avg[SONAR_NUM] = {
 };
 
 NewPing sonar[SONAR_NUM] = { // Sensor object array.
- NewPing(11, 12, MAX_DISTANCE),
- NewPing(9, 10, MAX_DISTANCE),
- NewPing(7, 8, MAX_DISTANCE)
+ NewPing(34, 35, MAX_DISTANCE),
+ NewPing(32, 33, MAX_DISTANCE),
+ NewPing(30, 31, MAX_DISTANCE)
 };
 
 SoftwareSerial SWSerial(NOT_A_PIN, MOTOR_PIN);
 SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
 
+#define BLUEFRUIT_SPI_CS               8
+#define BLUEFRUIT_SPI_IRQ              7
+#define BLUEFRUIT_SPI_RST              6
+#define BLUEFRUIT_SPI_SCK              13
+#define BLUEFRUIT_SPI_MISO             12
+#define BLUEFRUIT_SPI_MOSI             11
+//Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_CS, BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST); //Hardware
+Adafruit_BluefruitLE_SPI ble(BLUEFRUIT_SPI_SCK, BLUEFRUIT_SPI_MISO,
+                             BLUEFRUIT_SPI_MOSI, BLUEFRUIT_SPI_CS,
+                             BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST); //Software
+
+
 boolean mChange = false;
 long mLastChange = 0;
 boolean mFavorRight = true;
 boolean mTurning = false; 
-int mOffPix = 0;
+int mOffPix = 6;
 boolean mPixelDir = false;
 long mLastPixelUpdate = 0;
 int mSpeed = 60;
 long mRandomDelay = 2000;
 
+String response = "";
+bool begin = false;
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting..");
   
+   /* Initialise the module */
+  Serial.print(F("Initialising the Bluefruit LE module: "));
+
+  if ( !ble.begin(true) )
+  {
+    Serial.println(F("Couldn't find Bluefruit, make sure it's in CoMmanD mode & check wiring?"));
+    while(1);
+  }
+  Serial.println( F("OK!") );
+  /* Disable command echo from Bluefruit */
+  ble.echo(false);
+  ble.verbose(false);  // debug info is a little annoying after this point!
+  /* Wait for connection */
+  while (! ble.isConnected()) {
+      Serial.print(".");
+      delay(500);
+  }
+  // Set module to DATA mode
+  ble.setMode(BLUEFRUIT_MODE_DATA);
+  //Turn on LED
+  pinMode(10, OUTPUT);
+  digitalWrite(10, LOW);
+  
+  //Start up Neo Pixel
   strip.begin();
-  strip.setBrightness(125);
+  strip.setBrightness(100);
   strip.show(); // Initialize all pixels to 'off'
   
   //Used for Motor Controler
@@ -187,11 +230,49 @@ void loop() {
     }
   }
   
+  // Echo received data
+  while ( ble.available() )
+  {
+    char in = ble.read();
+    Serial.print(in);
+    if (in == '{') {
+        begin = true;
+        response = "";
+    }
+
+    if (begin) response += (in);
+    if (in == '}') {
+        Serial.println("");
+        Serial.print("json: ");
+        StaticJsonBuffer<500> jsonBuffer;
+        JsonObject& root = jsonBuffer.parseObject(response);
+        if(root.success()){
+          ST.motor(RIGHT, -10);
+          ST.motor(LEFT, -10);
+          setPixels(0, 14, COLOR_LISTENING);
+          //const char* cmdType = root["robotCommandType"];
+          //Serial.print(cmdType);
+          int val = root["value"];
+          Serial.print(val);
+          for(int i = 0; i < val; i++){
+             digitalWrite(10, HIGH);
+              delay(200);
+             digitalWrite(10, LOW);
+            delay(200); 
+          }
+        } else {
+          Serial.print("JSON error"); 
+        }
+        Serial.println("");
+        begin = false;
+        break;
+    }
+  }
   
 }
 
 void updatePixels() {
-  if(millis() - mLastPixelUpdate > 50){
+  if(millis() - mLastPixelUpdate > map(mSpeed, 0, 127, 10, 100)){
     mLastPixelUpdate = millis();
     for(int i = 0; i < 3; i++){
       int startPix = 0;
@@ -213,17 +294,23 @@ void updatePixels() {
       }
     }
     
-    setPixels(mOffPix, mOffPix, 0, 0, 0);
+    
+    setPixels(mOffPix, mOffPix, 125, 125, 125);
+    
     if(mPixelDir){
+      setPixels(mOffPix - 1, mOffPix - 1, 255, 255, 255);
+      setPixels(mOffPix + 1, mOffPix + 1, 0, 0, 0);
       mOffPix++;
     } else {
+      setPixels(mOffPix - 1, mOffPix - 1, 0, 0, 0);
+      setPixels(mOffPix + 1, mOffPix + 1, 255, 255, 255);
       mOffPix--;
     } 
-    if(mOffPix > 14){
-      mOffPix = 14;
+    if(mOffPix > 13){
+      mOffPix = 13;
       mPixelDir = !mPixelDir;
-    } else if (mOffPix < 0){
-      mOffPix = 0;
+    } else if (mOffPix < 1){
+      mOffPix = 1;
       mPixelDir = !mPixelDir;
     }
   }

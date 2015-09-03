@@ -1,23 +1,23 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.3.0'
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
 allprojects {
     repositories {
         jcenter()
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 22
@@ -25,7 +25,7 @@ android {
 
     defaultConfig {
         applicationId "com.tesseractmobile.pocketbot"
-        minSdkVersion 18
+        minSdkVersion 17
         targetSdkVersion 18
 
         // Enabling multidex support.
@@ -64,5 +64,7 @@ dependencies {
     compile files('libs/okhttp-2.4.0.jar')
     compile files('libs/okio-1.4.0.jar')
     compile files('libs/retrofit-1.9.0.jar')
-    compile 'com.crashlytics.android:crashlytics:1.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+        transitive = true;
+    }
 }

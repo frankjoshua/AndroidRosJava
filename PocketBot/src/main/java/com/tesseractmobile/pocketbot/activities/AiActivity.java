@@ -42,6 +42,12 @@ public class AiActivity extends GoogleFaceDetectActivity {
 //        mAiService.startListening();
 //    }
 
+
+    @Override
+    protected void onHumanSpoted() {
+        onTextInput("hello");
+    }
+
     @Override
     public void onTextInput(final String input) {
         final AIRequest aiRequest = new AIRequest();
@@ -77,6 +83,8 @@ public class AiActivity extends GoogleFaceDetectActivity {
         } else if(action.equals("flash")){
             final int times = result.getIntParameter("number");
             flash(times);
+            say("Flashing LED " + Integer.toString(times) + " times");
+            return;
         }
         final String speech = result.getFulfillment().getSpeech();
         if(speech.equals("")){

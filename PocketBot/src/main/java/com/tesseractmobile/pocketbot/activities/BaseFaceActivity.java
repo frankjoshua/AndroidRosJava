@@ -39,6 +39,8 @@ import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import java.nio.charset.Charset;
 
+import io.fabric.sdk.android.Fabric;
+
 public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener {
 
 
@@ -56,15 +58,21 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private ServiceConnection voiceRecognitionServiceConnection;
 
     private VoiceRecognitionService mVoiceRecognitionService;
-    private ServiceConnection bluetoothServiceConnection;
-    private BluetoothService mBlueToothService;
-    private BodyInterface mBodyInterface;
+
+    protected BodyInterface mBodyInterface = new BodyInterface() {
+        @Override
+        public void sendObject(Object object) {
+            //Do nothing
+            say("I can't feel my wheels!");
+
+        }
+    };
 
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.robot_face);
 
@@ -106,25 +114,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             throw new UnsupportedOperationException("Error binding to service");
         }
 
-        //Bind to bluetooth service
-        bluetoothServiceConnection = new ServiceConnection(){
-
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                mBlueToothService = ((BluetoothService.LocalBinder) service).getService();
-                mBodyInterface = mBlueToothService.registerBodyConnectionListener(BaseFaceActivity.this);
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        };
-
-        final Intent bluetoothBindIntent = new Intent(this, BluetoothService.class);
-        if(bindService(bluetoothBindIntent, bluetoothServiceConnection, Service.BIND_AUTO_CREATE) == false){
-            throw new UnsupportedOperationException("Error binding to bluetooth service");
-        }
     }
 
     @Override
@@ -137,9 +126,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             unbindService(voiceRecognitionServiceConnection);
             voiceRecognitionServiceConnection = null;
         }
-        //Unbind from bluetooth service
-        unbindService(bluetoothServiceConnection);
-        bluetoothServiceConnection = null;
+
     }
 
     @Override
@@ -416,6 +403,12 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     public void onError(int i, String error) {
         say(error);
+    }
+
+    @Override
+    public void onBodyConnected(BodyInterface bodyInterface) {
+        this.mBodyInterface = bodyInterface;
+        say("Body interface established");
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {
