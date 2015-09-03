@@ -39,6 +39,8 @@ import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import java.nio.charset.Charset;
 
+import io.fabric.sdk.android.Fabric;
+
 public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener {
 
 
@@ -64,7 +66,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.robot_face);
 
