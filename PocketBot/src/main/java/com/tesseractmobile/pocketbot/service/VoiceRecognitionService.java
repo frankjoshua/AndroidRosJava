@@ -96,7 +96,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         }
 
         if (SpeechRecognizer.isRecognitionAvailable(this) == false) {
-            error("I have no voice recognization service available");
+            error("I have no voice recognition service available");
             return false;
         }
 
