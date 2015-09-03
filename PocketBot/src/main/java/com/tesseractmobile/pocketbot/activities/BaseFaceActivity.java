@@ -46,6 +46,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
 
     private static final int START_LISTENING = 1;
+    private static final int START_LISTENING_AFTER_PROMPT = 2;
     private MouthView            mouthView;
     private EyeView              mLeftEye;
     private EyeView              mRightEye;
@@ -55,6 +56,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         public void handleMessage(Message msg) {
             if(msg.what == START_LISTENING){
                 mVoiceRecognitionService.startListening();
+            } else if (msg.what == START_LISTENING_AFTER_PROMPT){
+                startListening((String) msg.obj);
             }
         }
 
@@ -245,6 +248,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      * Speak the text
      */
     final protected void say(final String text) {
+        mLastHumanSpoted = SystemClock.uptimeMillis();
         //Unmute Audio
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
@@ -270,6 +274,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      * @param runnable
      */
     final protected void say(final String speechText, final Runnable runnable) {
+        mLastHumanSpoted = SystemClock.uptimeMillis();
         //Post the runnable when speech is complete
         getMouthView().setOnSpeechCompleteListener(new SpeechCompleteListener() {
 
@@ -292,16 +297,14 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      * @param prompt null is OK
      */
     final protected void listen(final String prompt) {
+        mLastHumanSpoted = SystemClock.uptimeMillis();
         if(Looper.myLooper() == Looper.getMainLooper()){
             startListening(prompt);
         } else {
-            runOnUiThread(new Runnable() {
-                
-                @Override
-                public void run() {
-                    startListening(prompt);
-                }
-            });
+            final Message msg = Message.obtain();
+            msg.obj = prompt;
+            msg.what = START_LISTENING_AFTER_PROMPT;
+            mHandler.sendMessage(msg);
         }
     }
 
