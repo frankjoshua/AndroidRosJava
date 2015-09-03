@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
+import com.tesseractmobile.pocketbot.UsbConnectionService;
+import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.RobotCommand;
 
 import io.fabric.sdk.android.Fabric;
@@ -27,6 +29,7 @@ import ai.api.model.Result;
  */
 public class AiActivity extends GoogleFaceDetectActivity {
 
+    public static final String PARAM_NUMBER = "number";
     private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
     private final String SUBSCRIPTION_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
 
@@ -78,22 +81,42 @@ public class AiActivity extends GoogleFaceDetectActivity {
     private void handleAiResponse(final AIResponse aiResponse){
         final Result result = aiResponse.getResult();
         final String action = result.getAction();
-        if(action.equals("move")){
-            final String direction = result.getStringParameter("direction");
-            final String measurement = result.getStringParameter("measurement");
-            final int distance = result.getIntParameter("distance");
+        if(action.equals(CommandContract.ACTION_MOVE)){
+            final String direction = result.getStringParameter(CommandContract.PARAM_DIRECTION);
+            final String measurement = result.getStringParameter(CommandContract.PARAM_MEASUREMENT);
+            final int distance = result.getIntParameter(CommandContract.PARAM_DISTANCE);
             move(direction, measurement, distance);
-        } else if(action.equals("flash")){
-            final int times = result.getIntParameter("number");
+        } else if(action.equals(CommandContract.ACTION_FLASH)){
+            final int times = result.getIntParameter(PARAM_NUMBER);
             flash(times);
-            say("Flashing LED " + Integer.toString(times) + " times");
-            return;
+        } else if(action.equals(CommandContract.ACTION_EMOTION)){
+            emotion(result);
         }
         final String speech = result.getFulfillment().getSpeech();
         if(speech.equals("")){
             super.onTextInput(result.getResolvedQuery());
         } else {
             listen(speech);
+        }
+    }
+
+    private void emotion(Result result) {
+        final String emotion = result.getStringParameter(CommandContract.PARAM_EMOTION);
+
+        if(emotion.equals(CommandContract.EMOTION_ANGER)){
+            setEmotion(Emotion.ANGER);
+        } else if(emotion.equals(CommandContract.EMOTION_JOY)){
+            setEmotion(Emotion.JOY);
+        } else if(emotion.equals(CommandContract.EMOTION_ACCEPTED)){
+            setEmotion(Emotion.ACCEPTED);
+        } else if(emotion.equals(CommandContract.EMOTION_AWARE)){
+            setEmotion(Emotion.AWARE);
+        } else if(emotion.equals(CommandContract.EMOTION_SURPRISED)){
+            setEmotion(Emotion.SUPRISED);
+        } else if(emotion.equals(CommandContract.EMOTION_FEAR)){
+            setEmotion(Emotion.FEAR);
+        } else {
+            say("I don't understand the emotion, " + emotion);
         }
     }
 

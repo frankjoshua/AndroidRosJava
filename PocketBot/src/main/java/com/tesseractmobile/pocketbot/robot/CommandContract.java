@@ -32,4 +32,21 @@ public class CommandContract {
     public static final byte COMMAND_GPS_HEADING     = (byte) 0x5C;   // 92
     public static final byte COMMAND_GPS_COMPASS     = (byte) 0x5D;   // 92
 
+    //Actions from api.ai
+    public static final String ACTION_MOVE = "move";
+    public static final String ACTION_FLASH = "flash";
+    public static final String ACTION_EMOTION = "emotion";
+    //Parameters from api.ai
+    public static final String PARAM_DIRECTION = "direction";
+    public static final String PARAM_MEASUREMENT = "measurement";
+    public static final String PARAM_DISTANCE = "distance";
+    public static final String PARAM_EMOTION = "emotion";
+
+    //Emotion values from api.ai
+    public static final String EMOTION_ANGER = "anger";
+    public static final String EMOTION_JOY = "joy";
+    public static final String EMOTION_FEAR = "fear";
+    public static final String EMOTION_SURPRISED = "surprised";
+    public static final String EMOTION_ACCEPTED = "accepted";
+    public static final String EMOTION_AWARE = "aware";
 }

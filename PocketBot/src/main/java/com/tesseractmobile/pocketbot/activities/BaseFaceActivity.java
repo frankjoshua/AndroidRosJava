@@ -145,7 +145,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     protected void onResume() {
         super.onResume();
         //Set initial state
-        setEmotion(Emotion.ANGER);
+        setEmotion(Emotion.JOY);
     }
 
     @Override
@@ -314,7 +314,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      * @param prompt
      */
     private void startListening(final String prompt) {
-        setEmotion(Emotion.SUPRISED);
+        //setEmotion(Emotion.SUPRISED);
         if(prompt != null){
             getMouthView().setOnSpeechCompleteListener(this);
             say(prompt);
