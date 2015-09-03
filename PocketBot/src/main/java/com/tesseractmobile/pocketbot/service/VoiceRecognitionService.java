@@ -63,14 +63,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         }
     }
 
-    private void listen(final String text){
-        if(text == null){
-            lauchListeningIntent(text);
-        } else {
-            throw new UnsupportedOperationException();
-        }
-    }
-
     private void proccessInput(final String text){
         final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
         if(voiceRecognitionListener != null) {
@@ -194,24 +186,24 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     @Override
     public void onError(final int error) {
         Log.d(TAG, "Error in state " + mState.toString() + " error code " + Integer.toString(error));
-        setState(VoiceRecognitionState.ERROR);
+
         //setEmotion(Emotion.ANGER);
         switch (error) {
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
                 error("I didn't hear you. " + SPEECH_INSTRUTIONS);
                 setState(VoiceRecognitionState.READY);
-                //listen(null);
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
-                //error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
+                error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
                 setState(VoiceRecognitionState.READY);
-                listen(null);
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
                 error("I'm sorry, but my speech recognizer is busy. Who ever programmed me probably forgot to close the service properly.");
+                setState(VoiceRecognitionState.ERROR);
                 break;
             default:
                 error("I had and unknown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
+                setState(VoiceRecognitionState.ERROR);
                 break;
         }
 

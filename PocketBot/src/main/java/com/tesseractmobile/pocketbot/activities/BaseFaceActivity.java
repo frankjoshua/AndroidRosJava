@@ -47,6 +47,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     private static final int START_LISTENING = 1;
     private static final int START_LISTENING_AFTER_PROMPT = 2;
+    public static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
     private MouthView            mouthView;
     private EyeView              mLeftEye;
     private EyeView              mRightEye;
@@ -379,7 +380,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     final protected void humanSpotted(){
         final long uptimeMillis = SystemClock.uptimeMillis();
         //Check if no human has been spotted for 10 seconds
-        if(uptimeMillis - mLastHumanSpoted > 10000){
+        if(uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING){
             onHumanSpoted();
         }
         mLastHumanSpoted = uptimeMillis;
