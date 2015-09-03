@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.os.SystemClock;
 import android.text.Html;
 import android.util.Log;
@@ -41,16 +42,23 @@ import java.nio.charset.Charset;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener {
+public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener {
 
 
-
-
+    private static final int START_LISTENING = 1;
     private MouthView            mouthView;
     private EyeView              mLeftEye;
     private EyeView              mRightEye;
 
-    private final Handler        mHandler                       = new Handler();
+    private final Handler        mHandler                       = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == START_LISTENING){
+                mVoiceRecognitionService.startListening();
+            }
+        }
+
+    };
 
     private Emotion              mEmotion;
 
@@ -304,31 +312,14 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private void startListening(final String prompt) {
         setEmotion(Emotion.SUPRISED);
         if(prompt != null){
-            getMouthView().setOnSpeechCompleteListener(new SpeechCompleteListener(){
-
-                @Override
-                public void onSpeechComplete() {
-                    mHandler.postDelayed(new Runnable() {
-                        
-                        @Override
-                        public void run() {
-                            //Call service here
-                            mVoiceRecognitionService.startListening();
-                        }
-                    }, 50);
-                }
-                
-            });
+            getMouthView().setOnSpeechCompleteListener(this);
             say(prompt);
         } else {
             //Call service here
             mVoiceRecognitionService.startListening();
         }
-        
+
     }
-
-
-
 
 
 //    @Override
@@ -409,6 +400,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     public void onBodyConnected(BodyInterface bodyInterface) {
         this.mBodyInterface = bodyInterface;
         say("Body interface established");
+    }
+
+    @Override
+    public void onSpeechComplete() {
+        mHandler.sendEmptyMessage(START_LISTENING);
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {
