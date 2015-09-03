@@ -41,20 +41,21 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         super(context, attrs);
         setTextColor(Color.rgb(100, 0, 255));
         setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+
         mTts = new TextToSpeech(context, this);
         mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-            
+
             @Override
             public void onStart(final String utteranceId) {
                 setmState(State.TALKING);
             }
-            
+
             @Override
             public void onError(final String utteranceId) {
                 // TODO Auto-generated method stub
-                
+
             }
-            
+
             @Override
             public void onDone(final String utteranceId) {
                 setmState(State.NOT_TALKING);

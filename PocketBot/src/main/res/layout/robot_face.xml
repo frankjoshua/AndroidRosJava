@@ -32,6 +32,7 @@
             android:id="@+id/eyeViewLeft"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
+            android:layout_marginLeft="-20dp"
             android:layout_alignLeft="@+id/mouthView"
             android:layout_alignTop="@+id/eyeViewRight" />
 
@@ -39,8 +40,10 @@
             android:id="@+id/eyeViewRight"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/mouthView" />
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="-20dp"
+            android:layout_alignRight="@+id/mouthView"
+            android:layout_alignParentTop="true" />
 
         <com.tesseractmobile.pocketbot.views.MouthView
             android:id="@+id/mouthView"

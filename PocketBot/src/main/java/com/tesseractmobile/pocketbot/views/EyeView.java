@@ -91,7 +91,7 @@ public class EyeView extends View {
         mEyeCanvas = new Canvas(mEye);
 
         mEyeLidPaint = new Paint();
-        mEyeLidPaint.setColor(Color.BLACK);
+        mEyeLidPaint.setColor(Color.rgb(19,19,19));
         mEyeLidPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         
         mCenterPaint = new Paint();

@@ -57,7 +57,10 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     }
 
     private void error(final String text){
-        mVoiceRecognitionListener.onVoiceRecognitionError(text);
+        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
+        if(voiceRecognitionListener != null){
+            voiceRecognitionListener.onVoiceRecognitionError(text);
+        }
     }
 
     private void listen(final String text){
@@ -69,18 +72,27 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     }
 
     private void proccessInput(final String text){
-        if(mVoiceRecognitionListener.onProccessInput(text) == false){
-            onTextInput(text);
+        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
+        if(voiceRecognitionListener != null) {
+            if(voiceRecognitionListener.onProccessInput(text) == false){
+                onTextInput(text);
+            }
         }
     }
 
     private void onTextInput(final String text){
-        mVoiceRecognitionListener.onTextInput(text);
+        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
+        if(voiceRecognitionListener != null) {
+            voiceRecognitionListener.onTextInput(text);
+        }
     }
 
     private void setState(final VoiceRecognitionState state){
         mState = state;
-        mVoiceRecognitionListener.onVoiceRecognitionStateChange(state);
+        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
+        if(voiceRecognitionListener != null) {
+            voiceRecognitionListener.onVoiceRecognitionStateChange(state);
+        }
         Log.d(TAG, mState.toString());
     }
 
