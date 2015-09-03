@@ -12,6 +12,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.List;
  */
 public class VoiceRecognitionService extends Service implements RecognitionListener{
 
+    private  static final String TAG = VoiceRecognitionService.class.getName();
     private static final String  SPEECH_INSTRUTIONS             = "";//"Touch my mouth if you want to error something";
 
     private static final int     VOICE_RECOGNITION_REQUEST_CODE = 0;
@@ -32,7 +34,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     private boolean              mHideVoicePrompt;
 
     private VoiceRecognitionListener mVoiceRecognitionListener;
-    private VoiceRecognitionState mState;
+    private VoiceRecognitionState mState = VoiceRecognitionState.READY;
 
 
     @Override
@@ -79,6 +81,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     private void setState(final VoiceRecognitionState state){
         mState = state;
         mVoiceRecognitionListener.onVoiceRecognitionStateChange(state);
+        Log.d(TAG, mState.toString());
     }
 
     private boolean checkVoiceRecognition() {
@@ -104,6 +107,12 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
      * @param prompt
      */
     protected synchronized void lauchListeningIntent(final String prompt) {
+
+        if(mState != VoiceRecognitionState.READY){
+            Log.d(TAG, "Skipping Speech " +  mState.toString());
+            return;
+        }
+        setState(VoiceRecognitionState.STARTING_LISTENING);
         //Mute the audio to stop the beep
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
@@ -143,7 +152,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     @Override
     public void onReadyForSpeech(final Bundle params) {
-        setState(VoiceRecognitionState.READY);
+        setState(VoiceRecognitionState.READY_FOR_SPEECH);
         //setEmotion(Emotion.ACCEPTED);
     }
 
@@ -172,15 +181,18 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     @Override
     public void onError(final int error) {
+        Log.d(TAG, "Error in state " + mState.toString() + " error code " + Integer.toString(error));
         setState(VoiceRecognitionState.ERROR);
         //setEmotion(Emotion.ANGER);
         switch (error) {
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
                 error("I didn't hear you. " + SPEECH_INSTRUTIONS);
+                setState(VoiceRecognitionState.READY);
                 //listen(null);
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
                 //error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
+                setState(VoiceRecognitionState.READY);
                 listen(null);
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
@@ -197,6 +209,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     public synchronized void onResults(final Bundle results) {
         final ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         proccessSpeech(data);
+        setState(VoiceRecognitionState.READY);
     }
 
     /**

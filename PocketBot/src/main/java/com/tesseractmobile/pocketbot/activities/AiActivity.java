@@ -5,9 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.robot.RobotCommand;
 
+import io.fabric.sdk.android.Fabric;
 import java.nio.charset.Charset;
 
 import ai.api.AIConfiguration;
@@ -33,6 +35,7 @@ public class AiActivity extends GoogleFaceDetectActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         final AIConfiguration aiConfig = new AIConfiguration(CLIENT_ACCESS_TOKEN, SUBSCRIPTION_KEY, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
     }

@@ -19,6 +19,10 @@ allprojects {
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 android {
     compileSdkVersion 22
     buildToolsVersion "23.0.0"
