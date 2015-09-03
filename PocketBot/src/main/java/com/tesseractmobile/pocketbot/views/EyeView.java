@@ -75,8 +75,12 @@ public class EyeView extends View {
         mUpperEyelidRectDest.set(mUpperEyelidRect);
         mLowerEyelidRectDest.set(mLowerEyelidRect);
         //Setup gradients
-        final Shader shader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
-        mPupilPaint.setShader(shader);
+        final Shader pupilShader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
+        mPupilPaint.setShader(pupilShader);
+        final Shader centerShader = new LinearGradient(0, 0, w, h, Color.parseColor("#b5b5b5"), Color.parseColor("#ffffff"), Shader.TileMode.CLAMP);
+        mCenterPaint.setShader(centerShader);
+        final Shader innerShader = new LinearGradient(0, 0, w, h, Color.parseColor("#000000"), Color.parseColor("#4e4e4e"), Shader.TileMode.CLAMP);
+        mInnerRingPaint.setShader(innerShader);
         //Open the eyes
         open();
         //Look straight ahead
@@ -91,7 +95,7 @@ public class EyeView extends View {
         mEyeCanvas = new Canvas(mEye);
 
         mEyeLidPaint = new Paint();
-        mEyeLidPaint.setColor(Color.rgb(19,19,19));
+        mEyeLidPaint.setColor(Color.parseColor("#191919"));
         mEyeLidPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         
         mCenterPaint = new Paint();
@@ -106,7 +110,7 @@ public class EyeView extends View {
         mIrisPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
   
         mPupilPaint = new Paint();
-        mPupilPaint.setColor(Color.argb(255, 80, 80, 80)); //Color.argb(255, 0, 0, 0) -45 degree
+        mPupilPaint.setColor(Color.BLACK); //Color.argb(255, 0, 0, 0) -45 degree
         mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         
         animation = ValueAnimator.ofFloat(0f, 1f);
