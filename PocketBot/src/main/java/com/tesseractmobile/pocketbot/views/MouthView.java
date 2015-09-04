@@ -36,6 +36,8 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     private byte[] mWave = new byte[1024];
     private final Paint mMouthPaint;
     private SpeechCompleteListener mSpeechCompleteListener;
+
+    private HashMap<String, Boolean> mActiveUtterance = new HashMap<String, Boolean>();
     
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -48,6 +50,10 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
             @Override
             public void onStart(final String utteranceId) {
                 setmState(State.TALKING);
+                //Add to active utterance list
+                synchronized (MouthView.this){
+                    mActiveUtterance.put(utteranceId, true);
+                }
             }
 
             @Override
@@ -58,7 +64,12 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
 
             @Override
             public void onDone(final String utteranceId) {
-                setmState(State.NOT_TALKING);
+                synchronized (MouthView.this){
+                    mActiveUtterance.remove(utteranceId);
+                    if(mActiveUtterance.size() == 0){
+                        setmState(State.NOT_TALKING);
+                    }
+                }
             }
         });
 

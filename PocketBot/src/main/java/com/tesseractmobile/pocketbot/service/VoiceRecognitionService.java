@@ -24,7 +24,7 @@ import java.util.List;
 public class VoiceRecognitionService extends Service implements RecognitionListener{
 
     private  static final String TAG = VoiceRecognitionService.class.getName();
-    private static final String  SPEECH_INSTRUTIONS             = "";//"Touch my mouth if you want to error something";
+    private static final String  SPEECH_INSTRUTIONS             = "Please wait for the beep before speaking.";//"Touch my mouth if you want to error something";
 
     private static final int     VOICE_RECOGNITION_REQUEST_CODE = 0;
     private static final boolean HIDE_VOICE_PROMPT              = true;
