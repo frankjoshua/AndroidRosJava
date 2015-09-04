@@ -101,7 +101,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
         public void onUpdate(Detector.Detections<Face> detections, Face item) {
             final float centerX = item.getPosition().x + item.getWidth() / 2;
             final float centerY = item.getPosition().y + item.getHeight() / 2;
-            Log.d("PocketBot", Float.toString(centerX));
+            //Log.d("PocketBot", Float.toString(centerX));
             float x =  (480 / 2) / centerX;
             float y = centerY / (640 / 2);
             look((x - 1) * 0.5f + 1, (y - 1) * 0.5f + 1);
