@@ -30,6 +30,7 @@ import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import com.tesseractmobile.pocketbot.robot.RobotCommand;
+import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.service.BluetoothService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
@@ -404,6 +405,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     public void onBodyConnected(BodyInterface bodyInterface) {
         this.mBodyInterface = bodyInterface;
         say("Body interface established");
+    }
+
+    @Override
+    public void onRobotEvent(RobotEvent robotEvent) {
+
     }
 
     @Override

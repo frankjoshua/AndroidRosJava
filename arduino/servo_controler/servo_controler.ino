@@ -21,7 +21,8 @@ SoftwareSerial SWSerial(4, 5);
 
 void setup() 
 { 
-  
+  Serial.begin(115200);
+  Serial.println("Starting...");
   initServos();
   
   SWSerial.begin(COM_SPEED);
@@ -40,6 +41,7 @@ void loop()
     int target = clientTarget.getTarget();
     int cmd = clientTarget.getCommand();
     int val = clientTarget.getValue();
+    Serial.println(val);
     switch(target){
        case TARGET_SERVO_PAN:
        servoDest[0] = val;
@@ -78,9 +80,9 @@ Servo getServo(int target){
 
 void initServos(){
   servos[0].attach(SERVO1);
+  servos[1].attach(SERVO2);
   setServo(TARGET_SERVO_PAN, 90);
   servoDest[0] = 90;
-  servos[1].attach(SERVO2);
   setServo(TARGET_SERVO_TILT, 90);
   servoDest[1] = 90;
 }

@@ -1,25 +1,19 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.gson.Gson;
-import com.tesseractmobile.pocketbot.UsbConnectionService;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.RobotCommand;
+import com.tesseractmobile.pocketbot.robot.RobotEvent;
 
 import io.fabric.sdk.android.Fabric;
-import java.nio.charset.Charset;
 
 import ai.api.AIConfiguration;
 import ai.api.AIDataService;
-import ai.api.AIListener;
-import ai.api.AIService;
 import ai.api.AIServiceException;
-import ai.api.model.AIError;
 import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.model.Result;
@@ -32,7 +26,7 @@ public class AiActivity extends GoogleFaceDetectActivity {
     public static final String PARAM_NUMBER = "number";
     private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
     private final String SUBSCRIPTION_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
-
+    private final Handler handler = new Handler();
     private AIDataService mAiDataService;
 
     @Override
@@ -133,4 +127,30 @@ public class AiActivity extends GoogleFaceDetectActivity {
         say("I have no body. I can't move");
     }
 
+    @Override
+    public void onRobotEvent(final RobotEvent robotEvent) {
+        final Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                switch (robotEvent.getEventType()) {
+                    case ERROR:
+                        say(robotEvent.getMessage());
+                        break;
+                    case DISCONNECT:
+                        say("Please don't shut me off. I was just learning to. Love. ");
+                        handler.postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        }, 4000);
+                        break;
+                }
+            }
+        };
+        handler.post(runnable);
+
+    }
 }

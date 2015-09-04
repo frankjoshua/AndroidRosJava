@@ -39,10 +39,10 @@ void setup()
   Serial.begin(115200);
   
   //Start NEO Pixels
-  initNeoStrip(strip2);
-  initNeoStrip(strip4);
-  initNeoStrip(strip);
-  initNeoStrip(strip3);
+  initNeoStrip(strip2); //bottom
+  initNeoStrip(strip4); //low mid
+  initNeoStrip(strip); //upper mid
+  initNeoStrip(strip3); //top
   testStrip(strip2);
   testStrip(strip4);
   testStrip(strip);

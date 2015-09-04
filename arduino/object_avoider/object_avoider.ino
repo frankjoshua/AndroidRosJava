@@ -38,12 +38,12 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(15, NEO_PIN, NEO_GRB + NEO_KHZ800);
 #define MAX_DISTANCE 400 // Max distance in cm.
 #define PING_INTERVAL 50 // Milliseconds between pings.
 
-AndroidAccessory acc("Google, Inc.",
-		     "DemoKit",
-		     "DemoKit Arduino Board",
-		     "1.0",
-		     "http://www.android.com",
-		     "0000000012345678");
+//AndroidAccessory acc("Google, Inc.",
+//		     "DemoKit",
+//		     "DemoKit Arduino Board",
+//		     "1.0",
+//		     "http://www.android.com",
+//		     "0000000012345678");
 
 int stateList[SONAR_NUM];
 unsigned long pingTimer[SONAR_NUM]; // When each pings.
@@ -135,7 +135,7 @@ void setup() {
     stateList[i] = DISTANCE_OK;
   }
   
-  acc.powerOn();
+  //acc.powerOn();
 }
 
 void loop() {
@@ -145,22 +145,22 @@ void loop() {
   updatePixels();
   
   //Check if Android device is connected
-  if (acc.isConnected()) {
-    byte msg[3];
-    
-    //Read from connected Android device
-    int len = acc.read(msg, sizeof(msg), 1);
-
-    if (len > 0) {
-      //Stop on any message
-      ST.motor(RIGHT, -10);
-      ST.motor(LEFT, -10);
-      setPixels(0, 14, COLOR_LISTENING);
-      delay(5000);
-      ST.motor(RIGHT, mSpeed);
-      ST.motor(LEFT, mSpeed);
-    }
-  }
+//  if (acc.isConnected()) {
+//    byte msg[3];
+//    
+//    //Read from connected Android device
+//    int len = acc.read(msg, sizeof(msg), 1);
+//
+//    if (len > 0) {
+//      //Stop on any message
+//      ST.motor(RIGHT, -10);
+//      ST.motor(LEFT, -10);
+//      setPixels(0, 14, COLOR_LISTENING);
+//      delay(5000);
+//      ST.motor(RIGHT, mSpeed);
+//      ST.motor(LEFT, mSpeed);
+//    }
+//  }
   
   if(mChange || millis() - mLastChange > 1000){
     //Only change if some time has elapsed or not turning

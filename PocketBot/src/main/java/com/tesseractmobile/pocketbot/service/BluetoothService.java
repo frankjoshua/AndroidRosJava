@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.service;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -28,7 +29,8 @@ import java.util.UUID;
 /**
  * Created by josh on 8/29/2015.
  */
-public class BluetoothService extends Service implements BleManager.BleManagerListener, BodyInterface {
+@TargetApi(18)
+public class BluetoothService extends BodyService implements BleManager.BleManagerListener {
 
     private static final String TAG = BluetoothService.class.getName();
 
@@ -36,13 +38,13 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
     public static final String UUID_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     public static final String UUID_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
     public static final String UUID_DFU = "00001530-1212-EFDE-1523-785FEABCD123";
+    public static final Gson GSON = new Gson();
 
-    final private IBinder binder = new LocalBinder();
     private BleManager mBleManager;
     private BleDevicesScanner mScanner;
     private ArrayList<BluetoothDeviceData> mScannedDevices;
 
-    private BodyConnectionListener mBodyConnectionListener;
+
 
     protected BluetoothGattService mUartService;
     private int kTxMaxCharacters = 20;
@@ -52,7 +54,6 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
         super.onCreate();
         mBleManager = BleManager.getInstance(this);
         mBleManager.setBleListener(this);
-        startScan(null, null);
     }
 
     private void startScan(final UUID[] servicesToScan, final String deviceNameToScanFor) {
@@ -242,39 +243,14 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
         }
     }
 
-    /**
-     * Listen for body connection events
-     * @param bodyConnectionListener
-     */
-    public void registerBodyConnectionListener(final BodyConnectionListener bodyConnectionListener){
-        this.mBodyConnectionListener = bodyConnectionListener;
-        if (mUartService != null) {
-            mBodyConnectionListener.onBodyConnected(this);
-        }
-    }
-
-    /**
-     * Stop listening for body connection events
-     * @param bodyConnectionListener
-     */
-    public void unregisterBodyConnectionListener(final BodyConnectionListener bodyConnectionListener){
-        this.mBodyConnectionListener = null;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
-
     @Override
     public void onConnected() {
-        mBodyConnectionListener.onError(0, "Bluetooth connecting");
+        error(0, "Bluetooth connecting");
     }
 
     @Override
     public void onConnecting() {
-        mBodyConnectionListener.onError(0, "Scanning for Bluetooth devices.");
+        error(0, "Scanning for Bluetooth devices.");
     }
 
     @Override
@@ -285,9 +261,9 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
     @Override
     public void onServicesDiscovered() {
         mUartService = mBleManager.getGattService(UUID_SERVICE);
-
         mBleManager.enableNotification(mUartService, UUID_RX, true);
-        mBodyConnectionListener.onBodyConnected(this);
+        //Let the system know we are ready
+        bodyReady();
     }
 
     @Override
@@ -295,9 +271,7 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
         if (characteristic.getService().getUuid().toString().equalsIgnoreCase(UUID_SERVICE)) {
             if (characteristic.getUuid().toString().equalsIgnoreCase(UUID_RX)) {
                 final String data = new String(characteristic.getValue(), Charset.forName("UTF-8"));
-
-                mBodyConnectionListener.onError(0, data);
-
+                error(0, data);
             }
         }
 
@@ -315,17 +289,17 @@ public class BluetoothService extends Service implements BleManager.BleManagerLi
 
     @Override
     public void sendObject(final Object data) {
-        final Gson gson = new Gson();
+        final Gson gson = GSON;
         final String s = gson.toJson(data);
         Log.d("JSON", new String(s.getBytes(Charset.forName("UTF-8"))));
         sendData(s.getBytes(Charset.forName("UTF-8")));
     }
 
-    public class LocalBinder extends Binder {
-        public BluetoothService getService(){
-            return BluetoothService.this;
-        }
+    @Override
+    protected void bodyListenerRegistered() {
+        startScan(null, null);
     }
+
 
     private class BluetoothDeviceData {
         public BluetoothDevice device;
