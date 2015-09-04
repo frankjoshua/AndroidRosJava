@@ -44,7 +44,13 @@ void loop()
     Serial.println(val);
     switch(target){
        case TARGET_SERVO_PAN:
-       servoDest[0] = val;
+       if(cmd == CMD_RIGHT){
+         servoDest[0] -= val;
+       } else if (cmd == CMD_LEFT){
+         servoDest[0] += val;
+       } else {
+         servoDest[0] = val;
+       }
        break;
        case TARGET_SERVO_TILT:
        servoDest[1] = val;

@@ -8,4 +8,10 @@ public interface BodyInterface {
     * Converts an object to JSON then sends to the robot body
      */
     void sendObject(final Object object);
+
+    /**
+     *
+     * @return true is body is connected
+     */
+    boolean isConnected();
 }

@@ -29,9 +29,11 @@ import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.RobotCommand;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.service.BluetoothService;
+import com.tesseractmobile.pocketbot.service.UsbConnectionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
@@ -78,6 +80,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             //Do nothing
             say("I can't feel my wheels!");
 
+        }
+
+        @Override
+        public boolean isConnected() {
+            return false;
         }
     };
 
@@ -237,6 +244,19 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     protected void look(final float x, final float y){
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
+        if(x > .75f || x < .25f) {
+            if (mBodyInterface.isConnected()) {
+                final RobotCommand command = new RobotCommand();
+                command.target = CommandContract.TAR_SERVO_PAN;
+                if(x > .75f){
+                    command.command = CommandContract.CMD_LEFT;
+                } else {
+                    command.command = CommandContract.CMD_RIGHT;
+                }
+                command.value = 1;
+                mBodyInterface.sendObject(command);
+            }
+        }
     }
 
     /**

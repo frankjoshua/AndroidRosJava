@@ -58,6 +58,11 @@ abstract public class BodyService extends Service implements BodyInterface {
         }
     }
 
+    @Override
+    public boolean isConnected() {
+        return mBodyReady;
+    }
+
     protected void robotEvent(final RobotEvent robotEvent){
         final BodyConnectionListener bodyConnectionListener = this.mBodyConnectionListener;
         if(bodyConnectionListener != null){
