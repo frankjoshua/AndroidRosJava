@@ -23,6 +23,8 @@ import java.io.IOException;
 public class GoogleFaceDetectActivity extends BaseFaceActivity {
 
     private static final String TAG = GoogleFaceDetectActivity.class.getName();
+    public static final int PREVIEW_WIDTH = 640;
+    public static final int PREVIEW_HEIGHT = 480;
 
     private CameraSource mCameraSource;
     private Handler mHandler = new Handler();
@@ -38,7 +40,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
             dectector.setProcessor(new MultiProcessor.Builder<Face>(new GraphicFaceTrackerFactory()).build());
 
             mCameraSource = new CameraSource.Builder(getApplicationContext(), dectector)
-                    .setRequestedPreviewSize(640, 480)
+                    .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
                     .setFacing(CameraSource.CAMERA_FACING_FRONT)
                     .setRequestedFps(30.0f)
                     .build();
@@ -102,9 +104,9 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
             final float centerX = item.getPosition().x + item.getWidth() / 2;
             final float centerY = item.getPosition().y + item.getHeight() / 2;
             //Log.d("PocketBot", Float.toString(centerX));
-            float x =  (480 / 2) / centerX;
-            float y = centerY / (640 / 2);
-            look((x - 1) * 0.5f + 1, (y - 1) * 0.5f + 1);
+            float x = centerX / PREVIEW_WIDTH;
+            float y = centerY / PREVIEW_HEIGHT;
+            look(2 - x * 2f, y * 2f);
         }
 
         @Override

@@ -75,9 +75,13 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
     public void sendObject(Object data) {
         final Gson gson = GSON;
         final String s = gson.toJson(data);
-        Log.d("JSON", new String(s.getBytes(Charset.forName("UTF-8"))));
+        sendJson(s);
+    }
+
+    @Override
+    public void sendJson(final String json){
         final Command command = new Command();
-        command.jsonBytes = s.getBytes(Charset.forName("UTF-8"));
+        command.jsonBytes = json.getBytes(Charset.forName("UTF-8"));
         commandQueue.add(command);
     }
 

@@ -47,10 +47,12 @@ import io.fabric.sdk.android.Fabric;
 
 public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener {
 
+    private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
     private static final int START_LISTENING = 1;
     private static final int START_LISTENING_AFTER_PROMPT = 2;
     public static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
+
     private MouthView            mouthView;
     private EyeView              mLeftEye;
     private EyeView              mRightEye;
@@ -59,6 +61,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == START_LISTENING){
+                mSpeechState = SpeechState.LISTENING;
                 mVoiceRecognitionService.startListening();
             } else if (msg.what == START_LISTENING_AFTER_PROMPT){
                 startListening((String) msg.obj);
@@ -77,16 +80,21 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     protected BodyInterface mBodyInterface = new BodyInterface() {
         @Override
         public void sendObject(Object object) {
-            //Do nothing
-            say("I can't feel my wheels!");
-
+            sendJson(null);
         }
 
         @Override
         public boolean isConnected() {
             return false;
         }
+
+        @Override
+        public void sendJson(String json) {
+            //Do nothing
+            say("I can't feel my wheels!");
+        }
     };
+    private SpeechState mSpeechState = SpeechState.READY;
 
 
     @Override
@@ -99,6 +107,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         mouthView = (MouthView) findViewById(R.id.mouthView);
         mLeftEye = (EyeView) findViewById(R.id.eyeViewLeft);
         mRightEye = (EyeView) findViewById(R.id.eyeViewRight);
+
+        mouthView.setOnSpeechCompleteListener(this);
 
         // Setup click listeners
         mLeftEye.setOnClickListener(this);
@@ -233,7 +243,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                     default:
                         mLeftEye.squint();
                         mRightEye.squint();
-                        say("I don't under stand the emotion " + emotion + ".");
+                        //say("I don't under stand the emotion " + emotion + ".");
                         break;
                     }
                 }
@@ -241,20 +251,25 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         }
     }
 
+    private long mLastHeadTurn = SystemClock.uptimeMillis();
     protected void look(final float x, final float y){
-        mLeftEye.look(x, y);
-        mRightEye.look(x, y);
-        if(x > .75f || x < .25f) {
-            if (mBodyInterface.isConnected()) {
-                final RobotCommand command = new RobotCommand();
-                command.target = CommandContract.TAR_SERVO_PAN;
-                if(x > .75f){
-                    command.command = CommandContract.CMD_LEFT;
-                } else {
-                    command.command = CommandContract.CMD_RIGHT;
+        if(SystemClock.uptimeMillis() - mLastHeadTurn > 25) {
+            mLastHeadTurn = SystemClock.uptimeMillis();
+            mLeftEye.look(x, y);
+            mRightEye.look(x, y);
+            Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
+            if (x > 1.5f || x < .5f) {
+                if (mBodyInterface.isConnected()) {
+                    final RobotCommand command = new RobotCommand();
+                    command.target = CommandContract.TAR_SERVO_PAN;
+                    if (x > 1.5f) {
+                        command.command = CommandContract.CMD_LEFT;
+                    } else {
+                        command.command = CommandContract.CMD_RIGHT;
+                    }
+                    command.value = 1;
+                    sendData(command);
                 }
-                command.value = 1;
-                sendData(command);
             }
         }
     }
@@ -266,11 +281,26 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     final protected void sendData(final Object data){
         mBodyInterface.sendObject(data);
     }
+
+    /**
+     * Sends JSON directly
+     * @param json
+     */
+    final protected void sendJson(final String json){
+        mBodyInterface.sendJson(json);
+    }
+
     /**
      * Speak the text
      */
     final protected void say(final String text) {
         mLastHumanSpoted = SystemClock.uptimeMillis();
+
+        if(mSpeechState != SpeechState.READY){
+            Log.d(TAG, "Could not speak \'" + text +  "\', state is " + mSpeechState);
+            return;
+        }
+
         //Unmute Audio
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
@@ -339,8 +369,10 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         if(prompt != null){
             getMouthView().setOnSpeechCompleteListener(this);
             say(prompt);
+            mSpeechState = SpeechState.WAITING_TO_LISTEN;
         } else {
             //Call service here
+            mSpeechState = SpeechState.LISTENING;
             mVoiceRecognitionService.startListening();
         }
 
@@ -374,7 +406,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     @Override
     public void onVoiceRecognitionStateChange(VoiceRecognitionState state) {
-
+        //Any state change is not listening
+        onSpeechComplete();
     }
 
     @Override
@@ -434,7 +467,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     @Override
     public void onSpeechComplete() {
-        mHandler.sendEmptyMessage(START_LISTENING);
+        if(mSpeechState == SpeechState.LISTENING){
+            mSpeechState = SpeechState.READY;
+        } else if(mSpeechState == SpeechState.WAITING_TO_LISTEN){
+            mHandler.sendEmptyMessage(START_LISTENING);
+        }
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {

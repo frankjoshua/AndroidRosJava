@@ -261,7 +261,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
             if(speechCompleteListener != null){
                 speechCompleteListener.onSpeechComplete();
                 //Listeners only get informed once
-                mSpeechCompleteListener = null;
+                //mSpeechCompleteListener = null;
             }
         }
         postInvalidate();

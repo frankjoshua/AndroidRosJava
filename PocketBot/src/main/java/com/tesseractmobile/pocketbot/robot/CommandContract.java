@@ -36,6 +36,8 @@ public class CommandContract {
     public static final String ACTION_MOVE = "move";
     public static final String ACTION_FLASH = "flash";
     public static final String ACTION_EMOTION = "emotion";
+    public static final String ACTION_ARDUINO = "arduino";
+
     //Parameters from api.ai
     public static final String PARAM_DIRECTION = "direction";
     public static final String PARAM_MEASUREMENT = "measurement";
@@ -49,4 +51,5 @@ public class CommandContract {
     public static final String EMOTION_SURPRISED = "surprised";
     public static final String EMOTION_ACCEPTED = "accepted";
     public static final String EMOTION_AWARE = "aware";
+
 }

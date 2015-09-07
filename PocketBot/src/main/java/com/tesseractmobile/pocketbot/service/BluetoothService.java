@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -237,6 +238,11 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
             for (int i = 0; i < data.length; i += kTxMaxCharacters) {
                 final byte[] chunk = Arrays.copyOfRange(data, i, Math.min(i + kTxMaxCharacters, data.length));
                 mBleManager.writeService(mUartService, UUID_TX, chunk);
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             Log.w(TAG, "Uart Service not discovered. Unable to send data");
@@ -262,6 +268,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     public void onServicesDiscovered() {
         mUartService = mBleManager.getGattService(UUID_SERVICE);
         mBleManager.enableNotification(mUartService, UUID_RX, true);
+        stopScanning();
         //Let the system know we are ready
         bodyReady();
     }
@@ -291,8 +298,21 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     public void sendObject(final Object data) {
         final Gson gson = GSON;
         final String s = gson.toJson(data);
-        Log.d("JSON", new String(s.getBytes(Charset.forName("UTF-8"))));
-        sendData(s.getBytes(Charset.forName("UTF-8")));
+        sendJson(s);
+    }
+
+    @Override
+    public void sendJson(final String json){
+
+        new AsyncTask<Void, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                sendData(json.getBytes(Charset.forName("UTF-8")));
+                Log.d(TAG, json);
+                return null;
+            }
+        }.execute();
     }
 
     @Override
