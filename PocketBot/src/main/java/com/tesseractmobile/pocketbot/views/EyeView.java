@@ -261,8 +261,8 @@ public class EyeView extends View {
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 10;
-        mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .9);
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 20;
+        mLowerEyelidRectDest.top = mEyeCanvas.getHeight();
         mUpperEyeRotationDest = 0;
         mLowerEyeRotationDest = 0;
         //Create an animation
@@ -305,7 +305,7 @@ public class EyeView extends View {
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 10;
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 20;
         mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = -10;
         mLowerEyeRotationDest = 10;
@@ -318,7 +318,7 @@ public class EyeView extends View {
         //Save current position
         saveCurrentEyeLids();
         //Set destination position
-        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 10;
+        mUpperEyelidRectDest.bottom = mEyeCanvas.getHeight() / 20;
         mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = 10;
         mLowerEyeRotationDest = -10;

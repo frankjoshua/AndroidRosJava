@@ -42,7 +42,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
             mCameraSource = new CameraSource.Builder(getApplicationContext(), dectector)
                     .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
                     .setFacing(CameraSource.CAMERA_FACING_FRONT)
-                    .setRequestedFps(10.0f)
+                    .setRequestedFps(20.0f)
                     .build();
         }
 
