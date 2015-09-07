@@ -107,9 +107,11 @@ void setup() {
   ble.echo(false);
   ble.verbose(false);  // debug info is a little annoying after this point!
   /* Wait for connection */
-  while (! ble.isConnected()) {
+  int count = 0;
+  while (! ble.isConnected() && count < 4) {
       Serial.print(".");
       delay(500);
+      count ++;
   }
   // Set module to DATA mode
   ble.setMode(BLUEFRUIT_MODE_DATA);

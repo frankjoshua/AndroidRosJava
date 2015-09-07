@@ -254,7 +254,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                     command.command = CommandContract.CMD_RIGHT;
                 }
                 command.value = 1;
-                mBodyInterface.sendObject(command);
+                sendData(command);
             }
         }
     }

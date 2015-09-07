@@ -147,7 +147,7 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
             mOutputStream = new FileOutputStream(fd);
             startThread();
             bodyReady();
-            error(0, "All systems online.");
+            //error(0, "All systems online.");
         } else {
             final String name = accessory != null ? accessory.toString() : "null";
             error(0, "accessory open fail: " + name);
@@ -187,7 +187,9 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
     private boolean sendCommand(byte[] buffer) {
         if (mOutputStream != null) {
             try {
-                mOutputStream.write(buffer);
+                for(int i = 0; i < buffer.length; i++){
+                    mOutputStream.write(buffer[i]);
+                }
                 //log("Command: " + command + " Target: " + target + " Value: " + value);
                 return true;
             } catch (final IOException e) {

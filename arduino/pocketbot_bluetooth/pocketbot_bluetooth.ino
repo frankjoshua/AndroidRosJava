@@ -25,6 +25,8 @@
 
 #include "BluefruitConfig.h"
 
+#include <PocketBot.h>
+
 /*=========================================================================
     APPLICATION SETTINGS
 
@@ -90,6 +92,8 @@ void error(const __FlashStringHelper*err) {
 String response = "";
 bool begin = false;
 
+PocketBot pocketBot;
+
 /**************************************************************************/
 /*!
     @brief  Sets up the HW an the BLE module (this function is called
@@ -137,8 +141,10 @@ void setup(void)
   ble.verbose(false);  // debug info is a little annoying after this point!
 
   /* Wait for connection */
-  while (! ble.isConnected()) {
+  int count = 0;
+  while (! ble.isConnected() && count < 3) {
       delay(500);
+      count ++;
   }
 
   Serial.println(F("******************************"));
@@ -159,6 +165,8 @@ void setup(void)
   
   pinMode(10, OUTPUT);
   digitalWrite(10, LOW);
+  
+  pocketBot.begin(&ble);
 }
 
 /**************************************************************************/
@@ -183,39 +191,17 @@ void loop(void)
     ble.print(inputs);
   }
 
-  // Echo received data
-  while ( ble.available() )
-  {
-    char in = ble.read();
-    Serial.print(in);
-    if (in == '{') {
-        begin = true;
-        response = "";
-    }
-
-    if (begin) response += (in);
-    if (in == '}') {
-        Serial.println("");
-        Serial.print("json: ");
-        StaticJsonBuffer<500> jsonBuffer;
-        JsonObject& root = jsonBuffer.parseObject(response);
-        if(root.success()){
-          //const char* cmdType = root["robotCommandType"];
-          //Serial.print(cmdType);
-          int val = root["value"];
-          Serial.print(val);
-          for(int i = 0; i < val; i++){
-             digitalWrite(10, HIGH);
-              delay(200);
-             digitalWrite(10, LOW);
-            delay(200); 
-          }
-        } else {
-          Serial.print("JSON error"); 
-        }
-        Serial.println("");
-        begin = false;
-        break;
+  if(pocketBot.read()){
+    JsonObject& root = pocketBot.getJson();
+    //const char* cmdType = root["robotCommandType"];
+    //Serial.print(cmdType);
+    int val = root["value"];
+    Serial.print(val);
+    for(int i = 0; i < val; i++){
+       digitalWrite(10, HIGH);
+        delay(200);
+       digitalWrite(10, LOW);
+      delay(200); 
     }
   }
 

@@ -50,6 +50,9 @@ public class AiActivity extends GoogleFaceDetectActivity {
 
     @Override
     public void onTextInput(final String input) {
+        if(input == null || input.equals("")){
+            return;
+        }
         final AIRequest aiRequest = new AIRequest();
         aiRequest.setQuery(input);
 

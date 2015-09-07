@@ -2,6 +2,7 @@
 #include <EasyTransferI2C.h>
 #include <Usb.h>
 #include <AndroidAccessory.h>
+#include <ArduinoJson.h>
 
 AndroidAccessory acc("Google, Inc.",
 		     "DemoKit",
@@ -25,6 +26,9 @@ struct COM_DATA_STRUCTURE{
 //give a name to the group of data
 COM_DATA_STRUCTURE dataStruct;
 
+String response = "";
+bool begin = false;
+
 void setup()
 {
   initCom();
@@ -46,25 +50,38 @@ void loop()
 
   //Check if Android device is connected
   if (acc.isConnected()) {
-    byte msg[3];
-    
     //Read from connected Android device
-    int len = acc.read(msg, sizeof(msg), 1);
-
-    if (len > 0) {
-      //Send the data to the serial line
-      dataStruct.tar = msg[0];
-      dataStruct.cmd = msg[1];
-      dataStruct.val = msg[2];
-      dataStruct.dur = 0;
-      etData.sendData(I2C_SLAVE_ADDRESS);
+    byte in[1];
+    if(acc.read(in, sizeof(in), 1) > 0){
+      char input = (char) in[0];
+      Serial.print(input);
+      if (input == '{') {
+        begin = true;
+        response = "";
+      }
+      response += (input);
+      
+      if (input == '}') {
+        begin = false;
+        Serial.println("");
+        StaticJsonBuffer<500> jsonBuffer;
+        JsonObject& root = jsonBuffer.parseObject(response);
+        if(root.success()){
+          dataStruct.tar = root["target"];
+          dataStruct.cmd = root["command"];
+          dataStruct.val = root["value"];
+          dataStruct.dur = 0;
+          etData.sendData(I2C_SLAVE_ADDRESS);
+        }
+      }
     }
+
   }
   
 }
 
 void initCom(){
-//  Serial.begin(115200);
+  Serial.begin(115200);
 //  etData.begin(details(dataStruct), &Serial);
   Wire.begin();
   etData.begin(details(dataStruct), &Wire);
