@@ -329,11 +329,11 @@ public class EyeView extends View {
         final float xDest = Math.max(Math.min(x, 1.5f), 0.5f);
         final float yDest = Math.max(Math.min(y, 1.5f), 0.5f);
         //Don't update for small changes
-        if(Math.abs(yDest - mCenterEyeYDest) > .05f || Math.abs(xDest - mCenterEyeXDest) > .05f){
+        if(Math.abs(yDest - mCenterEyeYDest) > .1f || Math.abs(xDest - mCenterEyeXDest) > .1f){
             saveCurrentEyeLids();
             mCenterEyeXDest = xDest;
             mCenterEyeYDest = yDest;
-            startAnimation(50);
+            startAnimation(100);
         }
     }
     

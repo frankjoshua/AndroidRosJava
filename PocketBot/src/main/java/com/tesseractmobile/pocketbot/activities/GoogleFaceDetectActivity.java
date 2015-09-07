@@ -42,7 +42,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
             mCameraSource = new CameraSource.Builder(getApplicationContext(), dectector)
                     .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
                     .setFacing(CameraSource.CAMERA_FACING_FRONT)
-                    .setRequestedFps(30.0f)
+                    .setRequestedFps(10.0f)
                     .build();
         }
 
@@ -101,8 +101,10 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
 
         @Override
         public void onUpdate(Detector.Detections<Face> detections, Face item) {
+            //Center horizontal
             final float centerX = item.getPosition().x + item.getWidth() / 2;
-            final float centerY = item.getPosition().y + item.getHeight() / 2;
+            //Above center for vertical (Look into eyes instead of face)
+            final float centerY = item.getPosition().y + item.getHeight() / 4;
             //Log.d("PocketBot", Float.toString(centerX));
             float x = centerX / PREVIEW_WIDTH;
             float y = centerY / PREVIEW_HEIGHT;

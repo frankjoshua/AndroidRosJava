@@ -253,11 +253,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     private long mLastHeadTurn = SystemClock.uptimeMillis();
     protected void look(final float x, final float y){
+        mLeftEye.look(x, y);
+        mRightEye.look(x, y);
         if(SystemClock.uptimeMillis() - mLastHeadTurn > 25) {
             mLastHeadTurn = SystemClock.uptimeMillis();
-            mLeftEye.look(x, y);
-            mRightEye.look(x, y);
-            Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
+            //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
             if (x > 1.5f || x < .5f) {
                 if (mBodyInterface.isConnected()) {
                     final RobotCommand command = new RobotCommand();
