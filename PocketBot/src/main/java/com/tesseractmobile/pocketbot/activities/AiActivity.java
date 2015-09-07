@@ -115,7 +115,7 @@ public class AiActivity extends GoogleFaceDetectActivity {
         } else if(emotion.equals(CommandContract.EMOTION_FEAR)){
             setEmotion(Emotion.FEAR);
         } else {
-            say("I don't understand the emotion, " + emotion);
+            say("I had a new emotion... I don't understand, " + emotion);
         }
     }
 

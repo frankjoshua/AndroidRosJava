@@ -74,6 +74,8 @@ public class EyeView extends View {
         mLowerEyelidRect.set(0, halfHeight, mEyeCanvas.getWidth(), mEyeCanvas.getHeight() + halfHeight);
         mUpperEyelidRectDest.set(mUpperEyelidRect);
         mLowerEyelidRectDest.set(mLowerEyelidRect);
+        mUpperEyelidRectSrc.set(mUpperEyelidRect);
+        mLowerEyelidRectSrc.set(mLowerEyelidRect);
         //Setup gradients
         final Shader pupilShader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
         mPupilPaint.setShader(pupilShader);
@@ -225,8 +227,8 @@ public class EyeView extends View {
         saveCurrentEyeLids();
         //Set destination position
         final int center = (int) (mEyeCanvas.getHeight() * .6);
-        mUpperEyelidRectDest.set(0, 0, mEyeCanvas.getWidth(), center);
-        mLowerEyelidRectDest.set(0, center, mEyeCanvas.getWidth(), mEyeCanvas.getHeight());
+        mUpperEyelidRectDest.bottom = center;
+        mLowerEyelidRectDest.top = center;
         //Create animation
         startAnimation(250);
     }

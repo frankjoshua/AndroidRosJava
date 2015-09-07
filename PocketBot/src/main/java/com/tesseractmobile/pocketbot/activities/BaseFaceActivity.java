@@ -300,6 +300,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             Log.d(TAG, "Could not speak \'" + text +  "\', state is " + mSpeechState);
             return;
         }
+        mSpeechState = SpeechState.TALKING;
 
         //Unmute Audio
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -467,10 +468,10 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     @Override
     public void onSpeechComplete() {
-        if(mSpeechState == SpeechState.LISTENING){
-            mSpeechState = SpeechState.READY;
-        } else if(mSpeechState == SpeechState.WAITING_TO_LISTEN){
+        if(mSpeechState == SpeechState.WAITING_TO_LISTEN){
             mHandler.sendEmptyMessage(START_LISTENING);
+        } else {
+            mSpeechState = SpeechState.READY;
         }
     }
 
