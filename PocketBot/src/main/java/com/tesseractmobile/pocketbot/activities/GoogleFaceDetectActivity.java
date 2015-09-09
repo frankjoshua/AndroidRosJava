@@ -108,7 +108,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
             //Log.d("PocketBot", Float.toString(centerX));
             float x = centerX / PREVIEW_WIDTH;
             float y = centerY / PREVIEW_HEIGHT;
-            look(2 - x * 2f, y * 2f);
+            look(2 - x * 2f, y * 2f, PREVIEW_HEIGHT / item.getHeight());
         }
 
         @Override

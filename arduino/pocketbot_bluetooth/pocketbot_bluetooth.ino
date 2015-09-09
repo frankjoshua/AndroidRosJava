@@ -176,6 +176,7 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
+
   // Check for user input
   char n, inputs[BUFSIZE+1];
 
@@ -198,6 +199,7 @@ void loop(void)
     int val = 5;
     Serial.println("JSON");
     root.printTo(Serial);
+    Serial.println(millis());
 //    for(int i = 0; i < val; i++){
 //       digitalWrite(10, HIGH);
 //        delay(200);

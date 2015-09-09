@@ -238,11 +238,11 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
             for (int i = 0; i < data.length; i += kTxMaxCharacters) {
                 final byte[] chunk = Arrays.copyOfRange(data, i, Math.min(i + kTxMaxCharacters, data.length));
                 mBleManager.writeService(mUartService, UUID_TX, chunk);
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
         } else {
             Log.w(TAG, "Uart Service not discovered. Unable to send data");

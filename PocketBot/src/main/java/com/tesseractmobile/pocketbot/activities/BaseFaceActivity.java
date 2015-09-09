@@ -30,6 +30,7 @@ import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
+import com.tesseractmobile.pocketbot.robot.FaceInfo;
 import com.tesseractmobile.pocketbot.robot.RobotCommand;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.service.BluetoothService;
@@ -252,23 +253,29 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     }
 
     private long mLastHeadTurn = SystemClock.uptimeMillis();
-    protected void look(final float x, final float y){
+    protected void look(final float x, final float y, float z){
+        Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y) + " z " + Float.toString(z));
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
-        if(SystemClock.uptimeMillis() - mLastHeadTurn > 25) {
+        if(SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
             mLastHeadTurn = SystemClock.uptimeMillis();
             //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
-            if (x > 1.5f || x < .5f) {
+            if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < 5 || z > 7) {
                 if (mBodyInterface.isConnected()) {
-                    final RobotCommand command = new RobotCommand();
-                    command.target = CommandContract.TAR_SERVO_PAN;
-                    if (x > 1.5f) {
-                        command.command = CommandContract.CMD_LEFT;
-                    } else {
-                        command.command = CommandContract.CMD_RIGHT;
-                    }
-                    command.value = 1;
-                    sendData(command);
+                    final FaceInfo faceInfo = new FaceInfo();
+                    faceInfo.x = x;
+                    faceInfo.y = y;
+                    faceInfo.z = z;
+//                    final RobotCommand command = new RobotCommand();
+//                    command.target = CommandContract.TAR_SERVO_PAN;
+//                    if (x > 1.25f) {
+//                        command.command = CommandContract.CMD_LEFT;
+//                    } else {
+//                        command.command = CommandContract.CMD_RIGHT;
+//                    }
+//                    command.value = 10;
+//                    command.time = (int) mLastHeadTurn;
+                    sendData(faceInfo);
                 }
             }
         }

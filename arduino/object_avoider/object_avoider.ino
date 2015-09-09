@@ -2,14 +2,16 @@
 #include <SPI.h>
 #include <SabertoothSimplified.h>
 #include <NewPing.h>
-#include <Average.h>
 #include <Adafruit_NeoPixel.h>
-#include <Usb.h>
-#include <AndroidAccessory.h>
+//#include <Usb.h>
+//#include <AndroidAccessory.h>
 #include "Adafruit_BLE.h"
 #include "Adafruit_BluefruitLE_SPI.h"
 #include "Adafruit_BluefruitLE_UART.h"
-#include <ArduinoJson.h>
+#include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
+#include <PocketBot.h> //https://github.com/frankjoshua/PocketBot
+#include <RunningMedian.h> //https://github.com/RobTillaart/Arduino
+
 
 //Define pins
 #define MOTOR_PIN 45
@@ -47,13 +49,13 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(15, NEO_PIN, NEO_GRB + NEO_KHZ800);
 
 int stateList[SONAR_NUM];
 unsigned long pingTimer[SONAR_NUM]; // When each pings.
-unsigned int cm[SONAR_NUM]; // Store ping distances.
+int cm[SONAR_NUM]; // Store ping distances.
 uint8_t currentSensor = 0; // Which sensor is active.
-unsigned int mBaseDistance[SONAR_NUM]; //Inital distance of sensors
-Average<float> avg[SONAR_NUM] = {
-   Average<float>(50),
-   Average<float>(50),
-   Average<float>(50)
+int mBaseDistance[SONAR_NUM]; //Inital distance of sensors
+RunningMedian avg[SONAR_NUM] = {
+   RunningMedian(3),
+   RunningMedian(3),
+   RunningMedian(3)
 };
 
 NewPing sonar[SONAR_NUM] = { // Sensor object array.
@@ -86,9 +88,11 @@ boolean mPixelDir = false;
 long mLastPixelUpdate = 0;
 int mSpeed = 60;
 long mRandomDelay = 2000;
+long mLastHumanSpotted = 0;
+int mLeftPower = mSpeed;
+int mRightPower = mSpeed;
 
-String response = "";
-bool begin = false;
+PocketBot pocketBot;
 
 void setup() {
   Serial.begin(115200);
@@ -108,7 +112,7 @@ void setup() {
   ble.verbose(false);  // debug info is a little annoying after this point!
   /* Wait for connection */
   int count = 0;
-  while (! ble.isConnected() && count < 4) {
+  while (! ble.isConnected() && count < 5) {
       Serial.print(".");
       delay(500);
       count ++;
@@ -137,16 +141,23 @@ void setup() {
     stateList[i] = DISTANCE_OK;
   }
   
-  //acc.powerOn();
+  pocketBot.begin(&ble);
 }
 
 void loop() {
   readSensors();
-  
-  //Update neoPixels
+
   updatePixels();
+  //Reset to forward after a while
+  if(millis() - mLastHumanSpotted > 5000){
+    mLeftPower = mSpeed;
+    mRightPower = mSpeed;  
+  }
+  updateMotors();
   
-  //Check if Android device is connected
+  readBluetooth();
+  
+    //Check if Android device is connected
 //  if (acc.isConnected()) {
 //    byte msg[3];
 //    
@@ -163,114 +174,119 @@ void loop() {
 //      ST.motor(LEFT, mSpeed);
 //    }
 //  }
-  
-  if(mChange || millis() - mLastChange > 1000){
+
+}
+
+
+void readBluetooth(){
+  // Echo received data
+  if(pocketBot.read()){
+    mLastHumanSpotted = millis();
+    JsonObject& root = pocketBot.getJson();
+    //const char* cmdType = root["robotCommandType"];
+    //Serial.print(cmdType);
+    
+    float x = root["x"];
+    float y = root["y"];
+    float z = root["z"];
+    Serial.print(x);
+    Serial.print(",");
+    Serial.print(y);
+    int speed = mapFloat(z, 4, 7.5, -mSpeed, mSpeed);
+    int dir = mapFloat(x, 0.25, 1.75, -mSpeed, mSpeed);
+    mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
+    mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
+    Serial.print(",");
+    Serial.print(mLeftPower);
+    Serial.print(",");
+    Serial.print(mRightPower);
+
+    Serial.println("JSON");
+    root.printTo(Serial);
+    Serial.println(millis());
+  }
+}
+
+void updateMotors(){
+  if(mChange || millis() - mLastChange > mRandomDelay){
     //Only change if some time has elapsed or not turning
     if(!mTurning || millis() - mLastChange > mRandomDelay){
       mLastChange = millis();
-      mRandomDelay = random(100, 1800);
+      mRandomDelay = random(50, 200);
+      //mRandomDelay = 0;
       //UpdateSpeed
       mSpeed = map(analogRead(A0), 0, 1023, 0, 127);
       Serial.print(mSpeed);
       //Display current info
       Serial.print("L ");
-      int diff = mBaseDistance[SENSOR_LEFT] - cm[SENSOR_LEFT];
+      int diff = cm[SENSOR_LEFT];
       Serial.print(diff);
       Serial.print(" C ");
-      diff = mBaseDistance[SENSOR_CENTER] - cm[SENSOR_CENTER];
+      diff = cm[SENSOR_CENTER];
       Serial.print(diff);
       Serial.print(" R ");
-      diff = mBaseDistance[SENSOR_RIGHT] - cm[SENSOR_RIGHT];
+      diff = cm[SENSOR_RIGHT];
       Serial.println(diff);
 
       
       mChange = false;
-      if(stateList[SENSOR_CENTER] != DISTANCE_OK && stateList[SENSOR_LEFT] != DISTANCE_OK && stateList[SENSOR_RIGHT] != DISTANCE_OK){
-        //All three blocked
+      if(stateList[SENSOR_CENTER] == DISTANCE_CLIFF || stateList[SENSOR_LEFT] == DISTANCE_CLIFF || stateList[SENSOR_RIGHT] == DISTANCE_CLIFF){
+        //Any cliff detection is an error stop to be safe
         mTurning = true;
-        if(mFavorRight){
-          ST.motor(RIGHT, 20);
-          ST.motor(LEFT, -20);
-        } else {
-          ST.motor(RIGHT, -20);
-          ST.motor(LEFT, 20);
-        }        
+        ST.motor(RIGHT, 0);
+        ST.motor(LEFT, 0);
+      } else if(stateList[SENSOR_CENTER] != DISTANCE_OK && stateList[SENSOR_LEFT] != DISTANCE_OK && stateList[SENSOR_RIGHT] != DISTANCE_OK){
+        //All three blocked
+        turnFavorite(); 
+      } else if(stateList[SENSOR_LEFT] != DISTANCE_OK && stateList[SENSOR_RIGHT] != DISTANCE_OK){
+        //Left and right blocked, keep turing last direction
+        turnFavorite();
       } else if(stateList[SENSOR_CENTER] == DISTANCE_OK && stateList[SENSOR_LEFT] == DISTANCE_OK && stateList[SENSOR_RIGHT] == DISTANCE_OK){
           //All three OK
-         Serial.println("Forward");
-         mTurning = false;
-         ST.motor(RIGHT, mSpeed);
-         ST.motor(LEFT, mSpeed);
-      } else if (stateList[SENSOR_CENTER] != DISTANCE_OK){
-        //Center Blocked
-        if(mFavorRight){
-          ST.motor(RIGHT, mSpeed);
-          ST.motor(LEFT, -mSpeed);
-        } else {
-          ST.motor(RIGHT, -mSpeed);
-          ST.motor(LEFT, mSpeed);
-        }
+         forward();
+      } else if (stateList[SENSOR_RIGHT] != DISTANCE_OK){
+         //Right Blocked
+         turnLeft();
       } else if(stateList[SENSOR_LEFT] != DISTANCE_OK) {
         //Left Blocked
-         Serial.println("Right");
-         mFavorRight = false;
-         mTurning = true;
-         //ST.motor(RIGHT, -mSpeed / 2);
-         //ST.motor(LEFT, -mSpeed);
-         ST.motor(RIGHT, mSpeed);
-         ST.motor(LEFT, -mSpeed);
+         turnRight();
       } else {
-        //Right Blocked
-         Serial.println("Left");
-         mFavorRight = true;
-         mTurning = true;
-         //ST.motor(RIGHT, -mSpeed);
-         //ST.motor(LEFT, -mSpeed / 2);
-         ST.motor(RIGHT, -mSpeed);
-         ST.motor(LEFT, mSpeed);
+        //Center Blocked
+        turnFavorite();
       }
     }
   }
-  
-  // Echo received data
-  while ( ble.available() )
-  {
-    char in = ble.read();
-    Serial.print(in);
-    if (in == '{') {
-        begin = true;
-        response = "";
-    }
+}
 
-    if (begin) response += (in);
-    if (in == '}') {
-        Serial.println("");
-        Serial.print("json: ");
-        StaticJsonBuffer<500> jsonBuffer;
-        JsonObject& root = jsonBuffer.parseObject(response);
-        if(root.success()){
-          ST.motor(RIGHT, -10);
-          ST.motor(LEFT, -10);
-          setPixels(0, 14, COLOR_LISTENING);
-          //const char* cmdType = root["robotCommandType"];
-          //Serial.print(cmdType);
-          int val = root["value"];
-          Serial.print(val);
-          for(int i = 0; i < val; i++){
-             digitalWrite(10, HIGH);
-              delay(200);
-             digitalWrite(10, LOW);
-            delay(200); 
-          }
-        } else {
-          Serial.print("JSON error"); 
-        }
-        Serial.println("");
-        begin = false;
-        break;
-    }
+void forward(){
+  Serial.println("Forward");
+ mTurning = false;
+ ST.motor(RIGHT, mRightPower);
+ ST.motor(LEFT, mLeftPower);
+}
+
+void turnFavorite(){
+  if(mFavorRight){
+    turnRight();
+  } else {
+    turnLeft();
   }
-  
+}
+
+void turnRight(){
+  Serial.println("Right");
+  mTurning = true;
+  mFavorRight = true;
+  ST.motor(RIGHT, mSpeed);
+  ST.motor(LEFT, -mSpeed);
+}
+
+void turnLeft(){
+  Serial.println("Left");       
+  mTurning = true;
+  mFavorRight = false;
+  ST.motor(RIGHT, -mSpeed);
+  ST.motor(LEFT, mSpeed);
 }
 
 void updatePixels() {
@@ -342,7 +358,7 @@ void calibrate(){
     readSensors();
   }
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
-    mBaseDistance[i] = avg[i].mean();
+    mBaseDistance[i] = avg[i].getMedian();
   }
 }
 
@@ -363,10 +379,10 @@ void readSensors(){
 void oneSensorCycle() { // Do something with the results.
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     int curState = 0;
-    if(cm[i] > mBaseDistance[i] + 55){
-      curState = DISTANCE_OK;
-    } else if(cm[i] < 20) {
+    if(cm[i] < 35){
       curState = DISTANCE_BLOCKED;
+    } else if(cm[i] > 380) {
+      curState = DISTANCE_CLIFF;
     } else {
       curState = DISTANCE_OK;
     } 
@@ -389,9 +405,13 @@ void echoCheck() { // If ping echo, set distance to array.
     int distance = sonar[currentSensor].ping_result / US_ROUNDTRIP_CM;
     //Filter 0 distance because it's probally an error
     if(distance != 0){
-      avg[currentSensor].push(distance);
-      //cm[currentSensor] = avg[currentSensor].mean();
-      cm[currentSensor] = distance;
+      avg[currentSensor].add(distance);
+      cm[currentSensor] = avg[currentSensor].getMedian();
+      //cm[currentSensor] = distance;
     }
   }
+}
+
+float mapFloat(float x, float in_min, float in_max, float out_min, float out_max){
+ return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
