@@ -49,7 +49,7 @@ public class AiActivity extends GoogleFaceDetectActivity {
     }
 
     @Override
-    public void onTextInput(final String input) {
+    protected void doTextInput(final String input) {
         if(input == null || input.equals("")){
             return;
         }
@@ -90,10 +90,14 @@ public class AiActivity extends GoogleFaceDetectActivity {
             flash(times);
         } else if(action.equals(CommandContract.ACTION_EMOTION)){
             emotion(result);
+        } else if (action.equals(CommandContract.ACTION_SETTINGS)){
+            final String previewSetting = result.getStringParameter(CommandContract.PARAM_PREVIEW, "false");
+            final boolean shouldPreview = previewSetting.equalsIgnoreCase("true");
+            PocketBotSettings.setShowPreview(this, shouldPreview);
         }
         final String speech = result.getFulfillment().getSpeech();
         if(speech.equals("")){
-            super.onTextInput(result.getResolvedQuery());
+            super.doTextInput(result.getResolvedQuery());
         } else {
             listen(speech);
         }

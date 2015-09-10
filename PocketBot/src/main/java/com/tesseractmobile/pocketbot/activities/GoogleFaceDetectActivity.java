@@ -1,12 +1,14 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -28,7 +30,7 @@ import java.util.Vector;
 /**
  * Created by josh on 8/24/2015.
  */
-public class GoogleFaceDetectActivity extends BaseFaceActivity {
+public class GoogleFaceDetectActivity extends BaseFaceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TAG = GoogleFaceDetectActivity.class.getName();
     public static final int PREVIEW_WIDTH = 240;
@@ -56,11 +58,16 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
                     .setRequestedFps(20.0f)
                     .build();
 
-            mPreview = (CameraSourcePreview) findViewById(R.id.preview);
-            mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+
 
         }
 
+        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+        mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+
+        if(PocketBotSettings.isShowPreview(this)){
+            mPreview.setVisibility(View.VISIBLE);
+        }
 
     }
 
@@ -92,6 +99,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
                 Log.e(TAG, e.getMessage());
             }
         }
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
     }
 
     @Override
@@ -99,6 +107,18 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
         super.onStop();
         if(mIsFaceDetectAvailable) {
             mCameraSource.stop();
+        }
+        PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(PocketBotSettings.SHOW_PREVIEW)){
+            if(sharedPreferences.getBoolean(key, false)){
+                mPreview.setVisibility(View.VISIBLE);
+            } else {
+                mPreview.setVisibility(View.INVISIBLE);
+            }
         }
     }
 

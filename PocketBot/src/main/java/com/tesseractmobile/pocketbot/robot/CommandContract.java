@@ -37,12 +37,14 @@ public class CommandContract {
     public static final String ACTION_FLASH = "flash";
     public static final String ACTION_EMOTION = "emotion";
     public static final String ACTION_ARDUINO = "arduino";
+    public static final String ACTION_SETTINGS = "settings";
 
     //Parameters from api.ai
     public static final String PARAM_DIRECTION = "direction";
     public static final String PARAM_MEASUREMENT = "measurement";
     public static final String PARAM_DISTANCE = "distance";
     public static final String PARAM_EMOTION = "emotion";
+    public static final String PARAM_PREVIEW = "preview";
 
     //Emotion values from api.ai
     public static final String EMOTION_ANGER = "anger";

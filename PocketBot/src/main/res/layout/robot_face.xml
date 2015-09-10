@@ -2,14 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background" >
+    android:background="@drawable/background">
 
-    
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" >
+        android:layout_centerInParent="true">
 
         <!--
         <com.tesseractmobile.opencv.views.FixedJavaCameraView
@@ -32,18 +31,18 @@
             android:id="@+id/eyeViewLeft"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
-            android:layout_marginLeft="-20dp"
             android:layout_alignLeft="@+id/mouthView"
-            android:layout_alignTop="@+id/eyeViewRight" />
+            android:layout_alignTop="@+id/eyeViewRight"
+            android:layout_marginLeft="-20dp" />
 
         <com.tesseractmobile.pocketbot.views.EyeView
             android:id="@+id/eyeViewRight"
             android:layout_width="@dimen/width_eye"
             android:layout_height="@dimen/height_eye"
-            android:layout_marginTop="30dp"
-            android:layout_marginRight="-20dp"
+            android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/mouthView"
-            android:layout_alignParentTop="true" />
+            android:layout_marginRight="-20dp"
+            android:layout_marginTop="30dp" />
 
         <com.tesseractmobile.pocketbot.views.MouthView
             android:id="@+id/mouthView"
@@ -60,14 +59,27 @@
             android:layout_width="240dp"
             android:layout_height="320dp"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible">
+
+            <ListView
+                android:id="@+id/textList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:transcriptMode="alwaysScroll"
+                android:stackFromBottom="true"/>
 
             <com.tesseractmobile.pocketbot.views.GraphicOverlay
                 android:id="@+id/faceOverlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+
+
+
         </com.tesseractmobile.pocketbot.views.CameraSourcePreview>
+
+
     </RelativeLayout>
 
     <ImageButton

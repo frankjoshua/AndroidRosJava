@@ -57,7 +57,7 @@ public class FirebaseFaceActivity extends GoogleFaceDetectActivity {
     }
 
     @Override
-    public void onTextInput(final String input) {
+    public void doTextInput(final String input) {
         final Chat chat = new Chat(userId, input);
         mFirebaseRef.push().setValue(chat);
     }

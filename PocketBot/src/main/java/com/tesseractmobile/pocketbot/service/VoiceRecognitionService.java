@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -221,9 +220,9 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
      */
     private void proccessSpeech(final ArrayList<String> data) {
         if (data != null && data.size() > 0) {
-            final String responce = data.get(0);
-            if (responce != null) {
-                proccessInput(responce);
+            final String response = data.get(0);
+            if (response != null) {
+                proccessInput(response);
             } else {
                 // Something went wrong
                 error("Pardon? " + SPEECH_INSTRUTIONS);
@@ -251,7 +250,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         this.mVoiceRecognitionListener = null;
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return binder;

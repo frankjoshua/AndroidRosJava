@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.code.chatterbotapi.ChatterBot;
@@ -43,6 +45,7 @@ import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -57,6 +60,9 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private MouthView            mouthView;
     private EyeView              mLeftEye;
     private EyeView              mRightEye;
+    private ListView             mTextListView;
+    private ArrayList<String>    mTextList;
+    private ArrayAdapter<String> mSringAdapter;
 
     private final Handler        mHandler                       = new Handler(){
         @Override
@@ -108,6 +114,12 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         mouthView = (MouthView) findViewById(R.id.mouthView);
         mLeftEye = (EyeView) findViewById(R.id.eyeViewLeft);
         mRightEye = (EyeView) findViewById(R.id.eyeViewRight);
+        mTextListView = (ListView) findViewById(R.id.textList);
+
+        //Setup list view for text
+        mTextList = new ArrayList<String>();
+        mSringAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mTextList);
+        mTextListView.setAdapter(mSringAdapter);
 
         mouthView.setOnSpeechCompleteListener(this);
 
@@ -254,7 +266,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     private long mLastHeadTurn = SystemClock.uptimeMillis();
     protected void look(final float x, final float y, float z){
-        Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y) + " z " + Float.toString(z));
+        //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y) + " z " + Float.toString(z));
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
         if(SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
@@ -309,19 +321,34 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
         //Check if we are on the UI thread
         if(Looper.myLooper() == Looper.getMainLooper()){
-            getMouthView().setText(text);
+            setText(text);
         } else {
             //If not post a runnable on th UI thread
             runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    getMouthView().setText(text);
+                    setText(text);
                 }
             });
         }
     }
-    
+
+    /**
+     * Send the text ot the mouth view and adds text to the preview view
+     * @param text
+     */
+    private void setText(String text) {
+        addTextToList(text);
+        getMouthView().setText(text);
+    }
+
+    private void addTextToList(String text) {
+        mTextList.add(text);
+        mSringAdapter.notifyDataSetChanged();
+        mTextListView.invalidate();
+    }
+
     /**
      * Speak the text then run the runnable
      * @param speechText
@@ -402,7 +429,18 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     /**
      * @param input
      */
-    public void onTextInput(final String input) {
+    final public void onTextInput(final String input) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                addTextToList(input);
+            }
+        });
+        
+        doTextInput(input);
+    }
+
+    protected void doTextInput(String input) {
         new BotTask().execute(input);
     }
 
@@ -528,21 +566,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             }
 
             return null;
-        }
-
-        /**
-         * Updates the text on the UI Thread
-         * 
-         * @param text
-         */
-        private void say(final String text) {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    getMouthView().setText(text);
-                }
-            });
         }
     }
 
