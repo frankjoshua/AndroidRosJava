@@ -92,6 +92,8 @@ long mLastHumanSpotted = 0;
 int mLeftPower = mSpeed;
 int mRightPower = mSpeed;
 
+#define HUMAN_DELAY_MILLIS 5000
+
 PocketBot pocketBot;
 
 void setup() {
@@ -147,12 +149,18 @@ void setup() {
 void loop() {
   readSensors();
 
-  updatePixels();
+  
   //Reset to forward after a while
-  if(millis() - mLastHumanSpotted > 5000){
+  if(millis() - mLastHumanSpotted > HUMAN_DELAY_MILLIS){
     mLeftPower = mSpeed;
-    mRightPower = mSpeed;  
+    mRightPower = mSpeed; 
+    strip.setBrightness(100); 
+  } else {
+    strip.setBrightness(255);
   }
+  
+  updatePixels();
+  
   updateMotors();
   
   readBluetooth();
@@ -192,8 +200,17 @@ void readBluetooth(){
     Serial.print(x);
     Serial.print(",");
     Serial.print(y);
-    int speed = mapFloat(z, 4, 7.5, -mSpeed, mSpeed);
-    int dir = mapFloat(x, 0.25, 1.75, -mSpeed, mSpeed);
+    int speed = 0;
+    if(z > 0.3){
+      //Face is close so stop
+      speed = 0;
+    } else if (z > .4) {
+      //Face is too close - back up
+      speed = -mSpeed;
+    } else {
+      speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
+    }
+    int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
     mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
     mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
     Serial.print(",");
@@ -288,6 +305,7 @@ void turnLeft(){
   ST.motor(RIGHT, -mSpeed);
   ST.motor(LEFT, mSpeed);
 }
+
 
 void updatePixels() {
   if(millis() - mLastPixelUpdate > map(mSpeed, 0, 127, 10, 100)){

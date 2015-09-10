@@ -1,9 +1,12 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Dialog;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -14,8 +17,13 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.views.CameraSourcePreview;
+import com.tesseractmobile.pocketbot.views.GraphicOverlay;
+import com.tesseractmobile.pocketbot.views.FaceGraphic;
 
 import java.io.IOException;
+import java.util.Vector;
 
 /**
  * Created by josh on 8/24/2015.
@@ -23,10 +31,13 @@ import java.io.IOException;
 public class GoogleFaceDetectActivity extends BaseFaceActivity {
 
     private static final String TAG = GoogleFaceDetectActivity.class.getName();
-    public static final int PREVIEW_WIDTH = 640;
-    public static final int PREVIEW_HEIGHT = 480;
+    public static final int PREVIEW_WIDTH = 240;
+    public static final int PREVIEW_HEIGHT = 320;
 
     private CameraSource mCameraSource;
+    private CameraSourcePreview mPreview;
+    private GraphicOverlay mGraphicOverlay;
+
     private Handler mHandler = new Handler();
     private boolean mIsFaceDetectAvailable;
 
@@ -44,6 +55,10 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
                     .setFacing(CameraSource.CAMERA_FACING_FRONT)
                     .setRequestedFps(20.0f)
                     .build();
+
+            mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+            mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+
         }
 
 
@@ -71,9 +86,10 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
         super.onStart();
         if(mIsFaceDetectAvailable) {
             try {
-                mCameraSource.start();
+                //mCameraSource.start();
+                mPreview.start(mCameraSource, mGraphicOverlay);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, e.getMessage());
             }
         }
     }
@@ -89,36 +105,66 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity {
     private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
         @Override
         public Tracker<Face> create(Face face) {
-            return new GraphicFaceTracker();
+            return new GraphicFaceTracker(mGraphicOverlay);
         }
     }
 
+    static public XYZ getCenter(final Face face){
+        final XYZ xyz = new XYZ();
+        //Center horizontal
+        final float centerX = face.getPosition().x + face.getWidth() / 2;
+        //Above center for vertical (Look into eyes instead of face)
+        final float centerY = face.getPosition().y + face.getHeight() / 2;
+        //Log.d("PocketBot", Float.toString(centerX));
+        float cx = centerX / PREVIEW_WIDTH;
+        float cy = centerY / PREVIEW_HEIGHT;
+
+        xyz.x = 2 - cx * 2f;
+        xyz.y = cy * 2f;
+        xyz.z = face.getHeight() / PREVIEW_HEIGHT;
+
+        return xyz;
+    }
+
     private class GraphicFaceTracker extends Tracker<Face> {
+        private GraphicOverlay mOverlay;
+        private FaceGraphic mFaceGraphic;
+
+        GraphicFaceTracker(GraphicOverlay overlay) {
+            mOverlay = overlay;
+            mFaceGraphic = new FaceGraphic(overlay);
+        }
+
         @Override
         public void onNewItem(int id, Face item) {
+            mFaceGraphic.setId(id);
             humanSpotted();
         }
 
         @Override
         public void onUpdate(Detector.Detections<Face> detections, Face item) {
-            //Center horizontal
-            final float centerX = item.getPosition().x + item.getWidth() / 2;
-            //Above center for vertical (Look into eyes instead of face)
-            final float centerY = item.getPosition().y + item.getHeight() / 4;
-            //Log.d("PocketBot", Float.toString(centerX));
-            float x = centerX / PREVIEW_WIDTH;
-            float y = centerY / PREVIEW_HEIGHT;
-            look(2 - x * 2f, y * 2f, PREVIEW_HEIGHT / item.getHeight());
+            mOverlay.add(mFaceGraphic);
+            mFaceGraphic.updateFace(item);
+
+            final XYZ xyz = GoogleFaceDetectActivity.getCenter(item);
+            look(xyz.x, xyz.y, xyz.z);
         }
 
         @Override
         public void onMissing(Detector.Detections<Face> detections) {
             super.onMissing(detections);
+            mOverlay.remove(mFaceGraphic);
+            look(1.0f, 1.0f, 1.0f);
         }
 
         @Override
         public void onDone() {
+            mOverlay.remove(mFaceGraphic);
             super.onDone();
         }
+    }
+
+    public static class XYZ {
+        public float x,y,z;
     }
 }

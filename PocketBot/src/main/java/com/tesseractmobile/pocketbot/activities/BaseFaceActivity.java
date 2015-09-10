@@ -260,22 +260,16 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         if(SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
             mLastHeadTurn = SystemClock.uptimeMillis();
             //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
-            if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < 5 || z > 7) {
+            if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < .2f || z > .4f) {
                 if (mBodyInterface.isConnected()) {
                     final FaceInfo faceInfo = new FaceInfo();
                     faceInfo.x = x;
                     faceInfo.y = y;
                     faceInfo.z = z;
-//                    final RobotCommand command = new RobotCommand();
-//                    command.target = CommandContract.TAR_SERVO_PAN;
-//                    if (x > 1.25f) {
-//                        command.command = CommandContract.CMD_LEFT;
-//                    } else {
-//                        command.command = CommandContract.CMD_RIGHT;
-//                    }
-//                    command.value = 10;
-//                    command.time = (int) mLastHeadTurn;
                     sendData(faceInfo);
+                }
+                if(z > .55f){
+                    setEmotion(Emotion.FEAR);
                 }
             }
         }
