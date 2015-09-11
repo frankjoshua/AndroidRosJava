@@ -56,8 +56,8 @@
 
         <com.tesseractmobile.pocketbot.views.CameraSourcePreview
             android:id="@+id/preview"
-            android:layout_width="240dp"
-            android:layout_height="320dp"
+            android:layout_width="@dimen/width_camera_preview"
+            android:layout_height="@dimen/height_camera_preview"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:visibility="invisible">

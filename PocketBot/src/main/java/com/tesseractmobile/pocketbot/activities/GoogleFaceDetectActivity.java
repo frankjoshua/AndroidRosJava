@@ -33,8 +33,8 @@ import java.util.Vector;
 public class GoogleFaceDetectActivity extends BaseFaceActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TAG = GoogleFaceDetectActivity.class.getName();
-    public static final int PREVIEW_WIDTH = 240;
-    public static final int PREVIEW_HEIGHT = 320;
+    public int PREVIEW_WIDTH = 240;
+    public int PREVIEW_HEIGHT = 320;
 
     private CameraSource mCameraSource;
     private CameraSourcePreview mPreview;
@@ -47,9 +47,15 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        PREVIEW_HEIGHT = (int) getResources().getDimension(R.dimen.height_camera_preview);
+        PREVIEW_WIDTH = (int) getResources().getDimension(R.dimen.width_camera_preview);
+
         mIsFaceDetectAvailable = checkGooglePlayServices();
         if(mIsFaceDetectAvailable) {
-            FaceDetector dectector = new FaceDetector.Builder(getApplicationContext()).build();
+            FaceDetector dectector = new FaceDetector.Builder(getApplicationContext())
+                    .setTrackingEnabled(true)
+                    .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                    .build();
             dectector.setProcessor(new MultiProcessor.Builder<Face>(new GraphicFaceTrackerFactory()).build());
 
             mCameraSource = new CameraSource.Builder(getApplicationContext(), dectector)
@@ -129,19 +135,19 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
         }
     }
 
-    static public XYZ getCenter(final Face face){
+    static public XYZ getCenter(final Face face, final int viewWidth, final int viewHeight){
         final XYZ xyz = new XYZ();
         //Center horizontal
         final float centerX = face.getPosition().x + face.getWidth() / 2;
         //Above center for vertical (Look into eyes instead of face)
         final float centerY = face.getPosition().y + face.getHeight() / 2;
         //Log.d("PocketBot", Float.toString(centerX));
-        float cx = centerX / PREVIEW_WIDTH;
-        float cy = centerY / PREVIEW_HEIGHT;
+        float cx = centerX / viewWidth;
+        float cy = centerY / viewHeight;
 
         xyz.x = 2 - cx * 2f;
         xyz.y = cy * 2f;
-        xyz.z = face.getHeight() / PREVIEW_HEIGHT;
+        xyz.z = face.getHeight() / viewHeight;
 
         return xyz;
     }
@@ -166,7 +172,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(item);
 
-            final XYZ xyz = GoogleFaceDetectActivity.getCenter(item);
+            final XYZ xyz = GoogleFaceDetectActivity.getCenter(item, PREVIEW_WIDTH, PREVIEW_HEIGHT);
             look(xyz.x, xyz.y, xyz.z);
         }
 

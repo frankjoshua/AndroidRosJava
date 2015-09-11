@@ -196,16 +196,16 @@ void loop(void)
     JsonObject& root = pocketBot.getJson();
     //const char* cmdType = root["robotCommandType"];
     //Serial.print(cmdType);
-    int val = 5;
+    int val = root["parameters"]["number"];
     Serial.println("JSON");
     root.printTo(Serial);
     Serial.println(millis());
-//    for(int i = 0; i < val; i++){
-//       digitalWrite(10, HIGH);
-//        delay(200);
-//       digitalWrite(10, LOW);
-//      delay(200); 
-//    }
+    for(int i = 0; i < val; i++){
+       digitalWrite(10, HIGH);
+        delay(200);
+       digitalWrite(10, LOW);
+      delay(200); 
+    }
   }
 
 }

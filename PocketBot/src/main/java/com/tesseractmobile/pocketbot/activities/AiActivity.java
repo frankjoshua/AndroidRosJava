@@ -35,6 +35,7 @@ public class AiActivity extends GoogleFaceDetectActivity {
         Fabric.with(this, new Crashlytics());
         final AIConfiguration aiConfig = new AIConfiguration(CLIENT_ACCESS_TOKEN, SUBSCRIPTION_KEY, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
+
     }
 
 //    @Override
@@ -79,15 +80,12 @@ public class AiActivity extends GoogleFaceDetectActivity {
         final Result result = aiResponse.getResult();
         final String action = result.getAction();
         if(action.equals(CommandContract.ACTION_ARDUINO)){
-            sendJson(aiResponse.toString());
+            sendData(result);
         } else if(action.equals(CommandContract.ACTION_MOVE)){
             final String direction = result.getStringParameter(CommandContract.PARAM_DIRECTION);
             final String measurement = result.getStringParameter(CommandContract.PARAM_MEASUREMENT);
             final int distance = result.getIntParameter(CommandContract.PARAM_DISTANCE);
             move(direction, measurement, distance);
-        } else if(action.equals(CommandContract.ACTION_FLASH)){
-            final int times = result.getIntParameter(PARAM_NUMBER);
-            flash(times);
         } else if(action.equals(CommandContract.ACTION_EMOTION)){
             emotion(result);
         } else if (action.equals(CommandContract.ACTION_SETTINGS)){
@@ -121,15 +119,6 @@ public class AiActivity extends GoogleFaceDetectActivity {
         } else {
             say("I had a new emotion... I don't understand, " + emotion);
         }
-    }
-
-    private void flash(int times) {
-        final RobotCommand command = new RobotCommand(RobotCommand.RobotCommandType.STOP);
-        command.target = 1;
-        command.command = 2;
-        command.value = times;
-
-        sendData(command);
     }
 
     protected void move(String direction, String measurement, int distance) {
