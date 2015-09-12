@@ -115,6 +115,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
             Log.d(TAG, "Skipping Speech " +  mState.toString());
             return;
         }
+        Log.d(TAG, "Launching Voice Prompt: " + (prompt != null ? prompt : "null"));
         setState(VoiceRecognitionState.STARTING_LISTENING);
         //Mute the audio to stop the beep
 //        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -186,23 +187,28 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     public void onError(final int error) {
         Log.d(TAG, "Error in state " + mState.toString() + " error code " + Integer.toString(error));
 
-        //setEmotion(Emotion.ANGER);
+        //Best practice: call setState() first then out put the error
         switch (error) {
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                error("I didn't hear you. " + SPEECH_INSTRUTIONS);
                 setState(VoiceRecognitionState.READY);
+                error("I didn't hear you. " + SPEECH_INSTRUTIONS);
                 break;
             case SpeechRecognizer.ERROR_NO_MATCH:
-                error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
-                setState(VoiceRecognitionState.READY);
+                if(mState == VoiceRecognitionState.END_OF_SPEECH){
+                    setState(VoiceRecognitionState.READY);
+                    error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
+                } else {
+                    //This should not happen but it does
+                    Log.e(TAG, "Bad SpeechRecognizer.ERROR_NO_MATCH error in state " + mState);
+                }
                 break;
             case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                error("I'm sorry, but my speech recognizer is busy. Who ever programmed me probably forgot to close the service properly.");
                 setState(VoiceRecognitionState.ERROR);
+                error("I'm sorry, but my speech recognizer is busy. Who ever programmed me probably forgot to close the service properly.");
                 break;
             default:
-                error("I had and unknown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
                 setState(VoiceRecognitionState.ERROR);
+                error("I had and unknown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
                 break;
         }
 

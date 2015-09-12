@@ -305,13 +305,14 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     /**
      * Speak the text
+     * @return true is speech was sent to the mouth
      */
-    final protected void say(final String text) {
+    final synchronized protected boolean say(final String text) {
         mLastHumanSpoted = SystemClock.uptimeMillis();
 
         if(mSpeechState != SpeechState.READY){
             Log.d(TAG, "Could not speak \'" + text +  "\', state is " + mSpeechState);
-            return;
+            return false;
         }
         mSpeechState = SpeechState.TALKING;
 
@@ -332,6 +333,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 }
             });
         }
+        return true;
     }
 
     /**
@@ -377,7 +379,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      * Pass null to just start listening
      * @param prompt null is OK
      */
-    final protected void listen(final String prompt) {
+    final synchronized protected void listen(final String prompt) {
         mLastHumanSpoted = SystemClock.uptimeMillis();
         if(Looper.myLooper() == Looper.getMainLooper()){
             startListening(prompt);
@@ -397,8 +399,9 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         //setEmotion(Emotion.SUPRISED);
         if(prompt != null){
             getMouthView().setOnSpeechCompleteListener(this);
-            say(prompt);
-            mSpeechState = SpeechState.WAITING_TO_LISTEN;
+            if(say(prompt)){
+                mSpeechState = SpeechState.WAITING_TO_LISTEN;
+            }
         } else {
             //Call service here
             mSpeechState = SpeechState.LISTENING;
@@ -447,7 +450,9 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     public void onVoiceRecognitionStateChange(VoiceRecognitionState state) {
         //Any state change is not listening
-        onSpeechComplete();
+        if(state == VoiceRecognitionState.READY){
+            onSpeechComplete();
+        }
     }
 
     @Override
@@ -471,7 +476,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         return false;
     }
 
-    final protected void humanSpotted(){
+    final synchronized protected void humanSpotted(){
         final long uptimeMillis = SystemClock.uptimeMillis();
         //Check if no human has been spotted for 10 seconds
         if(uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING){

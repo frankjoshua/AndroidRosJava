@@ -11,6 +11,7 @@
 #include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
 #include <PocketBot.h> //https://github.com/frankjoshua/PocketBot
 #include <RunningMedian.h> //https://github.com/RobTillaart/Arduino
+#include <MemoryFree.h>
 
 
 //Define pins
@@ -89,10 +90,11 @@ long mLastPixelUpdate = 0;
 int mSpeed = 60;
 long mRandomDelay = 2000;
 long mLastHumanSpotted = 0;
+long mLastManualControl = 0;
 int mLeftPower = mSpeed;
 int mRightPower = mSpeed;
 
-#define HUMAN_DELAY_MILLIS 5000
+#define HUMAN_DELAY_MILLIS 3000
 
 PocketBot pocketBot;
 
@@ -151,7 +153,7 @@ void loop() {
 
   
   //Reset to forward after a while
-  if(millis() - mLastHumanSpotted > HUMAN_DELAY_MILLIS){
+  if(millis() - mLastHumanSpotted > HUMAN_DELAY_MILLIS && millis() - mLastManualControl > HUMAN_DELAY_MILLIS){
     mLeftPower = mSpeed;
     mRightPower = mSpeed; 
     strip.setBrightness(100); 
@@ -189,38 +191,56 @@ void loop() {
 void readBluetooth(){
   // Echo received data
   if(pocketBot.read()){
-    mLastHumanSpotted = millis();
-    JsonObject& root = pocketBot.getJson();
-    //const char* cmdType = root["robotCommandType"];
-    //Serial.print(cmdType);
     
-    float x = root["x"];
-    float y = root["y"];
-    float z = root["z"];
-    Serial.print(x);
-    Serial.print(",");
-    Serial.print(y);
-    int speed = 0;
-    if(z > 0.3){
-      //Face is close so stop
-      speed = 0;
-    } else if (z > .4) {
-      //Face is too close - back up
-      speed = -mSpeed;
-    } else {
-      speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
+    JsonObject& root = pocketBot.getJson();
+    if(!root.success()){
+     Serial.println("*************** JSON ERROR **************"); 
+     return;
     }
-    int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
-    mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
-    mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
-    Serial.print(",");
-    Serial.print(mLeftPower);
-    Serial.print(",");
-    Serial.print(mRightPower);
-
+    //Debuging output
     Serial.println("JSON");
     root.printTo(Serial);
     Serial.println(millis());
+    
+    if(!root.containsKey("action")){
+      if(millis() > mLastManualControl + HUMAN_DELAY_MILLIS){
+        mLastHumanSpotted = millis();
+        float x = root["x"];
+        float y = root["y"];
+        float z = root["z"];
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        int speed = 0;
+        if(z > 0.3){
+          //Face is close so stop
+          speed = 0;
+        } else if (z > .4) {
+          //Face is too close - back up
+          speed = -mSpeed;
+        } else {
+          speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
+        }
+        int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
+        mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
+        mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
+        Serial.print(",");
+        Serial.print(mLeftPower);
+        Serial.print(",");
+        Serial.println(mRightPower);
+      }
+    } else {
+      Serial.println("Manual Control");
+      //Manual Control
+      mLastManualControl = millis();
+      mLeftPower = -mSpeed;
+      mRightPower = -mSpeed;
+    }
+  } else {
+    // Serial.print("freeMemory()=");
+   // Serial.println(freeMemory());
+//     pocketBot.printRawTo(Serial);
+//     Serial.println("");
   }
 }
 
@@ -235,13 +255,13 @@ void updateMotors(){
       mSpeed = map(analogRead(A0), 0, 1023, 0, 127);
       Serial.print(mSpeed);
       //Display current info
-      Serial.print("L ");
+      Serial.print(" L");
       int diff = cm[SENSOR_LEFT];
       Serial.print(diff);
-      Serial.print(" C ");
+      Serial.print(" C");
       diff = cm[SENSOR_CENTER];
       Serial.print(diff);
-      Serial.print(" R ");
+      Serial.print(" R");
       diff = cm[SENSOR_RIGHT];
       Serial.println(diff);
 
