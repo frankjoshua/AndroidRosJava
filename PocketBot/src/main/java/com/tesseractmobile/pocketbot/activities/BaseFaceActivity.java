@@ -5,6 +5,10 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,16 +31,11 @@ import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
-import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
-import com.tesseractmobile.pocketbot.robot.CommandContract;
-import com.tesseractmobile.pocketbot.robot.FaceInfo;
-import com.tesseractmobile.pocketbot.robot.RobotCommand;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
-import com.tesseractmobile.pocketbot.service.BluetoothService;
-import com.tesseractmobile.pocketbot.service.UsbConnectionService;
+import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
@@ -44,12 +43,11 @@ import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener {
+public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener, SensorEventListener {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -57,27 +55,32 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private static final int START_LISTENING_AFTER_PROMPT = 2;
     public static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
 
-    private MouthView            mouthView;
-    private EyeView              mLeftEye;
-    private EyeView              mRightEye;
-    private ListView             mTextListView;
-    private ArrayList<String>    mTextList;
+    private MouthView mouthView;
+    private EyeView mLeftEye;
+    private EyeView mRightEye;
+    private ListView mTextListView;
+    private ArrayList<String> mTextList;
     private ArrayAdapter<String> mSringAdapter;
+    private SensorData mSensorData = new SensorData();
 
-    private final Handler        mHandler                       = new Handler(){
+    //Device sensor manager
+    private SensorManager mSensorManager;
+
+
+    private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == START_LISTENING){
+            if (msg.what == START_LISTENING) {
                 mSpeechState = SpeechState.LISTENING;
                 mVoiceRecognitionService.startListening();
-            } else if (msg.what == START_LISTENING_AFTER_PROMPT){
+            } else if (msg.what == START_LISTENING_AFTER_PROMPT) {
                 startListening((String) msg.obj);
             }
         }
 
     };
 
-    private Emotion              mEmotion;
+    private Emotion mEmotion;
 
     private long mLastHumanSpoted;
     private ServiceConnection voiceRecognitionServiceConnection;
@@ -102,7 +105,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         }
     };
     private SpeechState mSpeechState = SpeechState.READY;
-
+    private float[] mGravity;
+    private float[] mGeomagnetic;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -128,9 +132,13 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         mRightEye.setOnClickListener(this);
         mouthView.setOnClickListener(this);
 
+        //Start senors
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
     }
@@ -153,7 +161,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         };
 
         final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
-        if(bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false){
+        if (bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false) {
             throw new UnsupportedOperationException("Error binding to service");
         }
 
@@ -164,7 +172,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         super.onStop();
         //Unbind from voice recognition service
         final VoiceRecognitionService voiceRecognitionService = this.mVoiceRecognitionService;
-        if(voiceRecognitionService != null) {
+        if (voiceRecognitionService != null) {
             voiceRecognitionService.unregisterVoiceRecognitionListener(this);
             unbindService(voiceRecognitionServiceConnection);
             voiceRecognitionServiceConnection = null;
@@ -175,8 +183,19 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     protected void onResume() {
         super.onResume();
+        //Start listening for orientation
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
+
         //Set initial state
         setEmotion(Emotion.JOY);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //Stop listening for orientation
+        mSensorManager.unregisterListener(this);
     }
 
     @Override
@@ -184,19 +203,19 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         final int viewId = v.getId();
 
         switch (viewId) {
-        case R.id.eyeViewLeft:
-            say("Ouch");
-            fear();
-            // finish();
-            break;
-        case R.id.eyeViewRight:
-            //say("I'm going to kill you in my sleep... Oh wait, your sleep");
-            say("Please don't poke my eye.");
-            anger();
-            break;
-        case R.id.mouthView:
-            listen(null);
-            break;
+            case R.id.eyeViewLeft:
+                say("Ouch");
+                fear();
+                // finish();
+                break;
+            case R.id.eyeViewRight:
+                //say("I'm going to kill you in my sleep... Oh wait, your sleep");
+                say("Please don't poke my eye.");
+                anger();
+                break;
+            case R.id.mouthView:
+                listen(null);
+                break;
         }
     }
 
@@ -218,7 +237,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     /**
      * Set the face to mimic the emotional state
-     * 
+     *
      * @param emotion
      */
     final public void setEmotion(final Emotion emotion) {
@@ -229,35 +248,35 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 @Override
                 public void run() {
                     switch (emotion) {
-                    case ACCEPTED:
-                        mLeftEye.squint();
-                        mRightEye.squint();
-                        break;
-                    case SUPRISED:
-                        mLeftEye.open();
-                        mRightEye.open();
-                        mLeftEye.blink();
-                        mRightEye.blink();
-                        break;
-                    case AWARE:
-                        mLeftEye.open();
-                        mRightEye.squint();
-                        break;
-                    case JOY:
-                        mLeftEye.wideOpenLeft();
-                        mRightEye.wideOpenRight();
-                        break;
-                    case FEAR:
-                        fear();
-                        break;
-                    case ANGER:
-                        anger();
-                        break;
-                    default:
-                        mLeftEye.squint();
-                        mRightEye.squint();
-                        //say("I don't under stand the emotion " + emotion + ".");
-                        break;
+                        case ACCEPTED:
+                            mLeftEye.squint();
+                            mRightEye.squint();
+                            break;
+                        case SUPRISED:
+                            mLeftEye.open();
+                            mRightEye.open();
+                            mLeftEye.blink();
+                            mRightEye.blink();
+                            break;
+                        case AWARE:
+                            mLeftEye.open();
+                            mRightEye.squint();
+                            break;
+                        case JOY:
+                            mLeftEye.wideOpenLeft();
+                            mRightEye.wideOpenRight();
+                            break;
+                        case FEAR:
+                            fear();
+                            break;
+                        case ANGER:
+                            anger();
+                            break;
+                        default:
+                            mLeftEye.squint();
+                            mRightEye.squint();
+                            //say("I don't under stand the emotion " + emotion + ".");
+                            break;
                     }
                 }
             });
@@ -265,22 +284,26 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     }
 
     private long mLastHeadTurn = SystemClock.uptimeMillis();
-    protected void look(final float x, final float y, float z){
+
+    protected void look(final float x, final float y, float z) {
         //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y) + " z " + Float.toString(z));
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
-        if(SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
+        if (SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
             mLastHeadTurn = SystemClock.uptimeMillis();
             //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
             if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < .2f || z > .4f) {
                 if (mBodyInterface.isConnected()) {
-                    final FaceInfo faceInfo = new FaceInfo();
-                    faceInfo.x = x;
-                    faceInfo.y = y;
-                    faceInfo.z = z;
-                    sendData(faceInfo);
+                    mSensorData.setFace_x(x);
+                    mSensorData.setFace_y(y);
+                    mSensorData.setFace_z(z);
+//                    final FaceInfo faceInfo = new FaceInfo();
+//                    faceInfo.x = x;
+//                    faceInfo.y = y;
+//                    faceInfo.z = z;
+                    sendData(mSensorData);
                 }
-                if(z > .55f){
+                if (z > .55f) {
                     setEmotion(Emotion.FEAR);
                 }
             }
@@ -289,29 +312,32 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     /**
      * Sends data to the robot body
+     *
      * @param data
      */
-    final protected void sendData(final Object data){
+    final protected void sendData(final Object data) {
         mBodyInterface.sendObject(data);
     }
 
     /**
      * Sends JSON directly
+     *
      * @param json
      */
-    final protected void sendJson(final String json){
+    final protected void sendJson(final String json) {
         mBodyInterface.sendJson(json);
     }
 
     /**
      * Speak the text
+     *
      * @return true is speech was sent to the mouth
      */
     final synchronized protected boolean say(final String text) {
         mLastHumanSpoted = SystemClock.uptimeMillis();
 
-        if(mSpeechState != SpeechState.READY){
-            Log.d(TAG, "Could not speak \'" + text +  "\', state is " + mSpeechState);
+        if (mSpeechState != SpeechState.READY) {
+            Log.d(TAG, "Could not speak \'" + text + "\', state is " + mSpeechState);
             return false;
         }
         mSpeechState = SpeechState.TALKING;
@@ -321,7 +347,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 //        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
 
         //Check if we are on the UI thread
-        if(Looper.myLooper() == Looper.getMainLooper()){
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             setText(text);
         } else {
             //If not post a runnable on th UI thread
@@ -338,6 +364,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     /**
      * Send the text ot the mouth view and adds text to the preview view
+     *
      * @param text
      */
     private void setText(String text) {
@@ -353,6 +380,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     /**
      * Speak the text then run the runnable
+     *
      * @param speechText
      * @param runnable
      */
@@ -377,11 +405,12 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     /**
      * Speak the text then listen for a response<br>
      * Pass null to just start listening
+     *
      * @param prompt null is OK
      */
     final synchronized protected void listen(final String prompt) {
         mLastHumanSpoted = SystemClock.uptimeMillis();
-        if(Looper.myLooper() == Looper.getMainLooper()){
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             startListening(prompt);
         } else {
             final Message msg = Message.obtain();
@@ -393,13 +422,14 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     /**
      * Must be run on the UI thread
+     *
      * @param prompt
      */
     private void startListening(final String prompt) {
         //setEmotion(Emotion.SUPRISED);
-        if(prompt != null){
+        if (prompt != null) {
             getMouthView().setOnSpeechCompleteListener(this);
-            if(say(prompt)){
+            if (say(prompt)) {
                 mSpeechState = SpeechState.WAITING_TO_LISTEN;
             }
         } else {
@@ -428,7 +458,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 //    }
 
 
-
     /**
      * @param input
      */
@@ -439,7 +468,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 addTextToList(input);
             }
         });
-        
+
         doTextInput(input);
     }
 
@@ -450,7 +479,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     public void onVoiceRecognitionStateChange(VoiceRecognitionState state) {
         //Any state change is not listening
-        if(state == VoiceRecognitionState.READY){
+        if (state == VoiceRecognitionState.READY) {
             onSpeechComplete();
         }
     }
@@ -461,10 +490,10 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     }
 
     @Override
-    public boolean onProccessInput(final String input){
-        if(input.contains("game")){
+    public boolean onProccessInput(final String input) {
+        if (input.contains("game")) {
             say("My favorite game is solitaire", new Runnable() {
-                
+
                 @Override
                 public void run() {
                     final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
@@ -476,10 +505,10 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         return false;
     }
 
-    final synchronized protected void humanSpotted(){
+    final synchronized protected void humanSpotted() {
         final long uptimeMillis = SystemClock.uptimeMillis();
         //Check if no human has been spotted for 10 seconds
-        if(uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING){
+        if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
             onHumanSpoted();
         }
         mLastHumanSpoted = uptimeMillis;
@@ -512,11 +541,50 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     @Override
     public void onSpeechComplete() {
-        if(mSpeechState == SpeechState.WAITING_TO_LISTEN){
+        if (mSpeechState == SpeechState.WAITING_TO_LISTEN) {
             mHandler.sendEmptyMessage(START_LISTENING);
         } else {
             mSpeechState = SpeechState.READY;
         }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            mGravity = lowPass(event.values.clone(), mGravity);
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
+        if (mGravity != null && mGeomagnetic != null) {
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+            if (success) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
+                final int heading = (int) (Math.toDegrees(orientation[0]) + 360 + 180) % 360;
+                if (heading != mSensorData.getHeading()) {
+                    mSensorData.setHeading(heading);
+                    //sendData(mSensorData);
+                    //Log.d(TAG, " New Heading " + mHeading);
+                }
+            }
+        }
+
+    }
+
+    private float[] lowPass(float[] input, float[] output) {
+        if (output == null) return input;
+        for (int i = 0; i < input.length; i++) {
+            output[i] = output[i] + 0.25f * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {
@@ -542,7 +610,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 // Get the response from the chat bot
                 final ChatterBotThought chatterBotThought = new ChatterBotThought();
                 chatterBotThought.setText(params[0]);
-                chatterBotThought.setEmotions(new String[] { "Happy" });
+                chatterBotThought.setEmotions(new String[]{"Happy"});
                 final ChatterBotThought responseThought = bot1session.think(chatterBotThought);
                 // Check for emotions
                 final String[] emotions = responseThought.getEmotions();
@@ -577,6 +645,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     enum Emotion {
         JOY, ACCEPTED, AWARE, ANGER, SADNESS, REJECTED, SUPRISED, FEAR
     }
-    
-    
+
+
 }
