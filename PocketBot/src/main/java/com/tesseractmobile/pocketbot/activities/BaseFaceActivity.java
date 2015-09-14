@@ -436,7 +436,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 addTextToList(input);
             }
         });
-        
+
         doTextInput(input);
     }
 
