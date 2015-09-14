@@ -79,10 +79,13 @@ public class EyeView extends View {
         //Setup gradients
         final Shader pupilShader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
         mPupilPaint.setShader(pupilShader);
+
         final Shader centerShader = new LinearGradient(0, 0, w, h, Color.parseColor("#b5b5b5"), Color.parseColor("#ffffff"), Shader.TileMode.CLAMP);
         mCenterPaint.setShader(centerShader);
+
         final Shader innerShader = new LinearGradient(0, 0, w, h, Color.parseColor("#000000"), Color.parseColor("#4e4e4e"), Shader.TileMode.CLAMP);
         mInnerRingPaint.setShader(innerShader);
+
         //Open the eyes
         open();
         //Look straight ahead
@@ -102,18 +105,22 @@ public class EyeView extends View {
         
         mCenterPaint = new Paint();
         mCenterPaint.setColor(Color.argb(255, 181, 181, 181));// White 45 degree
+        mCenterPaint.setAntiAlias(true);
         
         mInnerRingPaint = new Paint();
         mInnerRingPaint.setColor(Color.BLACK); //Color.argb(255, 72, 72, 72) 45 degree
         mInnerRingPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mInnerRingPaint.setAntiAlias(true);
         
         mIrisPaint = new Paint();
         mIrisPaint.setColor(Color.argb(255, 137, 223, 255));
         mIrisPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mIrisPaint.setAntiAlias(true);
   
         mPupilPaint = new Paint();
         mPupilPaint.setColor(Color.BLACK); //Color.argb(255, 0, 0, 0) -45 degree
         mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mPupilPaint.setAntiAlias(true);
         
         animation = ValueAnimator.ofFloat(0f, 1f);
         animation.addUpdateListener(new AnimatorUpdateListener() {
