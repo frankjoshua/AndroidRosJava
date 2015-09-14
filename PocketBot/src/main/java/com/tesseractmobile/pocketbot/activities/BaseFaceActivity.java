@@ -107,6 +107,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private SpeechState mSpeechState = SpeechState.READY;
     private float[] mGravity;
     private float[] mGeomagnetic;
+    private long mLastSensorTransmision;
+    private int mSensorDelay = 500;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -301,12 +303,20 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 //                    faceInfo.x = x;
 //                    faceInfo.y = y;
 //                    faceInfo.z = z;
-                    sendData(mSensorData);
+                    sendSensorData();
                 }
                 if (z > .55f) {
                     setEmotion(Emotion.FEAR);
                 }
             }
+        }
+    }
+
+    private void sendSensorData() {
+        final long uptime = SystemClock.uptimeMillis();
+        if(mBodyInterface.isConnected() && uptime > mLastSensorTransmision + mSensorDelay) {
+            mLastSensorTransmision = uptime;
+            sendData(mSensorData);
         }
     }
 
@@ -566,7 +576,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 final int heading = (int) (Math.toDegrees(orientation[0]) + 360 + 180) % 360;
                 if (heading != mSensorData.getHeading()) {
                     mSensorData.setHeading(heading);
-                    //sendData(mSensorData);
+                    sendSensorData();
                     //Log.d(TAG, " New Heading " + mHeading);
                 }
             }

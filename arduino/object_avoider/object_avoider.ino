@@ -94,6 +94,9 @@ long mLastManualControl = 0;
 int mLeftPower = mSpeed;
 int mRightPower = mSpeed;
 
+int mDestHeading = 90;
+int mHeading = 0;
+
 #define HUMAN_DELAY_MILLIS 3000
 
 PocketBot pocketBot;
@@ -102,27 +105,8 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Starting..");
   
-   /* Initialise the module */
-  Serial.print(F("Initialising the Bluefruit LE module: "));
+  initBluetooth();
 
-  if ( !ble.begin(true) )
-  {
-    Serial.println(F("Couldn't find Bluefruit, make sure it's in CoMmanD mode & check wiring?"));
-    while(1);
-  }
-  Serial.println( F("OK!") );
-  /* Disable command echo from Bluefruit */
-  ble.echo(false);
-  ble.verbose(false);  // debug info is a little annoying after this point!
-  /* Wait for connection */
-  int count = 0;
-  while (! ble.isConnected() && count < 5) {
-      Serial.print(".");
-      delay(500);
-      count ++;
-  }
-  // Set module to DATA mode
-  ble.setMode(BLUEFRUIT_MODE_DATA);
   //Turn on LED
   pinMode(10, OUTPUT);
   digitalWrite(10, LOW);
@@ -148,6 +132,30 @@ void setup() {
   pocketBot.begin(&ble);
 }
 
+void initBluetooth(){
+     /* Initialise the module */
+  Serial.print(F("Initialising the Bluefruit LE module: "));
+
+  if ( !ble.begin(true) )
+  {
+    Serial.println(F("Couldn't find Bluefruit, make sure it's in CoMmanD mode & check wiring?"));
+    while(1);
+  }
+  Serial.println( F("OK!") );
+  /* Disable command echo from Bluefruit */
+  ble.echo(false);
+  ble.verbose(false);  // debug info is a little annoying after this point!
+  /* Wait for connection */
+  int count = 0;
+  while (! ble.isConnected() && count < 5) {
+      Serial.print(".");
+      delay(500);
+      //count ++;
+  }
+  // Set module to DATA mode
+  ble.setMode(BLUEFRUIT_MODE_DATA);
+}
+
 void loop() {
   readSensors();
 
@@ -156,6 +164,15 @@ void loop() {
   if(millis() - mLastHumanSpotted > HUMAN_DELAY_MILLIS && millis() - mLastManualControl > HUMAN_DELAY_MILLIS){
     mLeftPower = mSpeed;
     mRightPower = mSpeed; 
+    if(mHeading > 10 && mHeading <= 180){
+      //Turn left
+      mLeftPower -= 10;
+      mRightPower += 10;
+    } else if (mHeading < 350 && mHeading >= 180){
+      //Turn right
+      mLeftPower += 10;
+      mRightPower -= 10;
+    }
     strip.setBrightness(100); 
   } else {
     strip.setBrightness(255);
@@ -198,36 +215,39 @@ void readBluetooth(){
      return;
     }
     //Debuging output
-    Serial.println("JSON");
+    Serial.println("-----------------   JSON    ----------------");
     root.printTo(Serial);
     Serial.println(millis());
     
     if(!root.containsKey("action")){
       if(millis() > mLastManualControl + HUMAN_DELAY_MILLIS){
         mLastHumanSpotted = millis();
-        float x = root["x"];
-        float y = root["y"];
-        float z = root["z"];
-        Serial.print(x);
-        Serial.print(",");
-        Serial.print(y);
-        int speed = 0;
-        if(z > 0.3){
-          //Face is close so stop
-          speed = 0;
-        } else if (z > .4) {
-          //Face is too close - back up
-          speed = -mSpeed;
-        } else {
-          speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
-        }
-        int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
-        mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
-        mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
-        Serial.print(",");
-        Serial.print(mLeftPower);
-        Serial.print(",");
-        Serial.println(mRightPower);
+        float x = root["FACE_X"];
+        float y = root["FACE_Y"];
+        float z = root["FACE_Z"];
+        mHeading = root["heading"];
+        Serial.print(" HEADING = ");
+        Serial.println(mHeading);
+//        Serial.print(x);
+//        Serial.print(",");
+//        Serial.print(y);
+//        int speed = 0;
+//        if(z > 0.3){
+//          //Face is close so stop
+//          speed = 0;
+//        } else if (z > .4) {
+//          //Face is too close - back up
+//          speed = -mSpeed;
+//        } else {
+//          speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
+//        }
+//        int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
+//        mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
+//        mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
+//        Serial.print(",");
+//        Serial.print(mLeftPower);
+//        Serial.print(",");
+//        Serial.println(mRightPower);
       }
     } else {
       Serial.println("Manual Control");
@@ -237,10 +257,10 @@ void readBluetooth(){
       mRightPower = -mSpeed;
     }
   } else {
-    // Serial.print("freeMemory()=");
-   // Serial.println(freeMemory());
-//     pocketBot.printRawTo(Serial);
-//     Serial.println("");
+    Serial.print("freeMemory()=");
+    Serial.println(freeMemory());
+    pocketBot.printRawTo(Serial);
+    Serial.println("");
   }
 }
 
@@ -296,7 +316,10 @@ void updateMotors(){
 }
 
 void forward(){
-  Serial.println("Forward");
+ Serial.print("Forward ");
+ Serial.print(mLeftPower);
+ Serial.print(" ");
+ Serial.println(mRightPower);
  mTurning = false;
  ST.motor(RIGHT, mRightPower);
  ST.motor(LEFT, mLeftPower);
