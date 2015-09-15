@@ -119,9 +119,6 @@ void setup() {
   //Used for Motor Controler
   SWSerial.begin(9600);
   
-  Serial.println("2 sec delay");
-  delay(2000);
-  
   //Init ping sensors
   initSensors();
   
@@ -221,33 +218,38 @@ void readBluetooth(){
     
     if(!root.containsKey("action")){
       if(millis() > mLastManualControl + HUMAN_DELAY_MILLIS){
-        mLastHumanSpotted = millis();
-        float x = root["FACE_X"];
-        float y = root["FACE_Y"];
-        float z = root["FACE_Z"];
+        
+        float x = root["face_x"];
+        float y = root["face_y"];
+        float z = root["face_z"];
+        int faceId = root["face_id"];
         mHeading = root["heading"];
         Serial.print(" HEADING = ");
         Serial.println(mHeading);
-//        Serial.print(x);
-//        Serial.print(",");
-//        Serial.print(y);
-//        int speed = 0;
-//        if(z > 0.3){
-//          //Face is close so stop
-//          speed = 0;
-//        } else if (z > .4) {
-//          //Face is too close - back up
-//          speed = -mSpeed;
-//        } else {
-//          speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
-//        }
-//        int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
-//        mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
-//        mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
-//        Serial.print(",");
-//        Serial.print(mLeftPower);
-//        Serial.print(",");
-//        Serial.println(mRightPower);
+        //Any id other than -1 is an active face
+        if(faceId != -1){
+          mLastHumanSpotted = millis();
+          Serial.print(x);
+          Serial.print(",");
+          Serial.print(y);
+          int speed = 0;
+          if(z > 0.4){
+            //Face is close so stop
+            speed = -mSpeed;
+          } else if (z > .3) {
+            //Face is too close - back up
+            speed = 0;
+          } else {
+            speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
+          }
+          int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
+          mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
+          mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
+          Serial.print(",");
+          Serial.print(mLeftPower);
+          Serial.print(",");
+          Serial.println(mRightPower);
+        }
       }
     } else {
       Serial.println("Manual Control");
@@ -257,10 +259,10 @@ void readBluetooth(){
       mRightPower = -mSpeed;
     }
   } else {
-    Serial.print("freeMemory()=");
-    Serial.println(freeMemory());
-    pocketBot.printRawTo(Serial);
-    Serial.println("");
+//    Serial.print("freeMemory()=");
+//    Serial.println(freeMemory());
+//    pocketBot.printRawTo(Serial);
+//    Serial.println("");
   }
 }
 
@@ -273,17 +275,19 @@ void updateMotors(){
       //mRandomDelay = 0;
       //UpdateSpeed
       mSpeed = map(analogRead(A0), 0, 1023, 0, 127);
-      Serial.print(mSpeed);
-      //Display current info
-      Serial.print(" L");
-      int diff = cm[SENSOR_LEFT];
-      Serial.print(diff);
-      Serial.print(" C");
-      diff = cm[SENSOR_CENTER];
-      Serial.print(diff);
-      Serial.print(" R");
-      diff = cm[SENSOR_RIGHT];
-      Serial.println(diff);
+      if(mChange){
+        Serial.print(mSpeed);
+        //Display current info
+        Serial.print(" L");
+        int diff = cm[SENSOR_LEFT];
+        Serial.print(diff);
+        Serial.print(" C");
+        diff = cm[SENSOR_CENTER];
+        Serial.print(diff);
+        Serial.print(" R");
+        diff = cm[SENSOR_RIGHT];
+        Serial.println(diff);
+      }
 
       
       mChange = false;
@@ -334,7 +338,7 @@ void turnFavorite(){
 }
 
 void turnRight(){
-  Serial.println("Right");
+  //Serial.println("Right");
   mTurning = true;
   mFavorRight = true;
   ST.motor(RIGHT, mSpeed);
@@ -342,7 +346,7 @@ void turnRight(){
 }
 
 void turnLeft(){
-  Serial.println("Left");       
+  //Serial.println("Left");       
   mTurning = true;
   mFavorRight = false;
   ST.motor(RIGHT, -mSpeed);

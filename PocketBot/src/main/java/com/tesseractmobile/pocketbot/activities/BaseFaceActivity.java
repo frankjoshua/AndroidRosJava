@@ -109,6 +109,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private float[] mGeomagnetic;
     private long mLastSensorTransmision;
     private int mSensorDelay = 500;
+    private int mHumanCount = 0;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -299,10 +300,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                     mSensorData.setFace_x(x);
                     mSensorData.setFace_y(y);
                     mSensorData.setFace_z(z);
-//                    final FaceInfo faceInfo = new FaceInfo();
-//                    faceInfo.x = x;
-//                    faceInfo.y = y;
-//                    faceInfo.z = z;
                     sendSensorData();
                 }
                 if (z > .55f) {
@@ -515,13 +512,29 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         return false;
     }
 
-    final synchronized protected void humanSpotted() {
+    final synchronized protected void humanSpotted(final int id) {
+
+        if(id == SensorData.NO_FACE){
+            mHumanCount--;
+            if(mHumanCount == 0){
+                mSensorData.setFace_id(id);
+                onHumanLeft();
+                sendSensorData();
+            }
+            return;
+        }
+        mHumanCount++;
+        mSensorData.setFace_id(id);
         final long uptimeMillis = SystemClock.uptimeMillis();
         //Check if no human has been spotted for 10 seconds
         if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
             onHumanSpoted();
         }
         mLastHumanSpoted = uptimeMillis;
+    }
+
+    private void onHumanLeft() {
+        say("Goodbye");
     }
 
     protected void onHumanSpoted() {
@@ -574,7 +587,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 SensorManager.getOrientation(R, orientation);
                 //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
                 final int heading = (int) (Math.toDegrees(orientation[0]) + 360 + 180) % 360;
-                if (heading != mSensorData.getHeading()) {
+                if (Math.abs(heading - mSensorData.getHeading()) > 1) {
                     mSensorData.setHeading(heading);
                     sendSensorData();
                     //Log.d(TAG, " New Heading " + mHeading);

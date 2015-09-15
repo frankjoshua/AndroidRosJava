@@ -251,17 +251,17 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     @Override
     public void onConnected() {
-        error(0, "Bluetooth connecting");
+        //error(0, "Bluetooth connected");
     }
 
     @Override
     public void onConnecting() {
-        error(0, "Scanning for Bluetooth devices.");
+        //error(0, "Scanning for Bluetooth devices.");
     }
 
     @Override
     public void onDisconnected() {
-
+        error(0, "Bluetooth connection lost.");
     }
 
     @Override

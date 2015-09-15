@@ -164,7 +164,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
         @Override
         public void onNewItem(int id, Face item) {
             mFaceGraphic.setId(id);
-            humanSpotted();
+            humanSpotted(id);
         }
 
         @Override
@@ -180,12 +180,14 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
         public void onMissing(Detector.Detections<Face> detections) {
             super.onMissing(detections);
             mOverlay.remove(mFaceGraphic);
-            look(1.0f, 1.0f, 1.0f);
+
         }
 
         @Override
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
+            humanSpotted(-1);
+            look(1.0f, 1.0f, 1.0f);
             super.onDone();
         }
     }
