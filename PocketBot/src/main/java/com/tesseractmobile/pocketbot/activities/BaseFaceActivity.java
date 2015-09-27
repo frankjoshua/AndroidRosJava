@@ -22,7 +22,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
@@ -43,8 +42,6 @@ import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
-import java.util.ArrayList;
-
 import io.fabric.sdk.android.Fabric;
 
 public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener, SensorEventListener {
@@ -59,8 +56,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private EyeView mLeftEye;
     private EyeView mRightEye;
     private ListView mTextListView;
-    private ArrayList<String> mTextList;
-    private ArrayAdapter<String> mSringAdapter;
+    private SpeechAdapter mSpeechAdapter;
     private SensorData mSensorData = new SensorData();
 
     //Device sensor manager
@@ -124,9 +120,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         mTextListView = (ListView) findViewById(R.id.textList);
 
         //Setup list view for text
-        mTextList = new ArrayList<String>();
-        mSringAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mTextList);
-        mTextListView.setAdapter(mSringAdapter);
+        mSpeechAdapter = new SpeechAdapter(this);
+        mTextListView.setAdapter(mSpeechAdapter);
 
         mouthView.setOnSpeechCompleteListener(this);
 
@@ -375,14 +370,12 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      * @param text
      */
     private void setText(String text) {
-        addTextToList(text);
+        addTextToList(text, true);
         getMouthView().setText(text);
     }
 
-    private void addTextToList(String text) {
-        mTextList.add(text);
-        mSringAdapter.notifyDataSetChanged();
-        mTextListView.invalidate();
+    private void addTextToList(final String text, final boolean isPocketBot) {
+        mSpeechAdapter.addText(text, isPocketBot);
     }
 
     /**
@@ -472,7 +465,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                addTextToList(input);
+                addTextToList(input, false);
             }
         });
 
