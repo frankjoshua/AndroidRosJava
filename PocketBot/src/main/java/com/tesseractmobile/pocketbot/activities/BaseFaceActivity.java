@@ -46,8 +46,9 @@ import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 import java.util.ArrayList;
 
 import io.fabric.sdk.android.Fabric;
+import tag.TagGame;
 
-public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener, SensorEventListener {
+public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener, SensorEventListener{
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -110,6 +111,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private long mLastSensorTransmision;
     private int mSensorDelay = 500;
     private int mHumanCount = 0;
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -309,7 +311,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         }
     }
 
-    private void sendSensorData() {
+    protected void sendSensorData() {
         final long uptime = SystemClock.uptimeMillis();
         if(mBodyInterface.isConnected() && uptime > mLastSensorTransmision + mSensorDelay) {
             mLastSensorTransmision = uptime;
@@ -603,6 +605,10 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
             output[i] = output[i] + 0.25f * (input[i] - output[i]);
         }
         return output;
+    }
+
+    protected SensorData getSensorData(){
+        return mSensorData;
     }
 
     @Override

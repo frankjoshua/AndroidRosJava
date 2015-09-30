@@ -13,6 +13,7 @@ public class SensorData {
     private float face_y;
     private float face_z;
     private int heading;
+    private int destHeading;
     private long time;
 
 
@@ -33,6 +34,11 @@ public class SensorData {
 
     public void setHeading(int heading) {
         this.heading = heading;
+        update();
+    }
+
+    public void setDestHeading(int heading) {
+        this.destHeading = heading;
         update();
     }
 
