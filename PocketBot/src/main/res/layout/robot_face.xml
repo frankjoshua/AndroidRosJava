@@ -6,9 +6,10 @@
 
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
 
         <!--
         <com.tesseractmobile.opencv.views.FixedJavaCameraView
@@ -21,11 +22,6 @@
             CameraBridgeViewBase:show_fps="true" />
             -->
 
-        <View
-            android:id="@+id/viewCameraBlocker"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/background" />
 
         <com.tesseractmobile.pocketbot.views.EyeView
             android:id="@+id/eyeViewLeft"
@@ -33,7 +29,7 @@
             android:layout_height="@dimen/height_eye"
             android:layout_alignLeft="@+id/mouthView"
             android:layout_alignTop="@+id/eyeViewRight"
-            android:layout_marginLeft="-20dp" />
+            android:layout_marginLeft="-20dp"/>
 
         <com.tesseractmobile.pocketbot.views.EyeView
             android:id="@+id/eyeViewRight"
@@ -52,35 +48,32 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/margin_top_mouth"
             android:background="@drawable/mouth_static"
-            android:textSize="@dimen/text_size_mouth" />
-
-        <com.tesseractmobile.pocketbot.views.CameraSourcePreview
-            android:id="@+id/preview"
-            android:layout_width="@dimen/width_camera_preview"
-            android:layout_height="@dimen/height_camera_preview"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:visibility="invisible">
-
-            <ListView
-                android:id="@+id/textList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:transcriptMode="alwaysScroll"
-                android:stackFromBottom="true"/>
-
-            <com.tesseractmobile.pocketbot.views.GraphicOverlay
-                android:id="@+id/faceOverlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-
-
-
-        </com.tesseractmobile.pocketbot.views.CameraSourcePreview>
+            android:textSize="@dimen/text_size_mouth"/>
 
 
     </RelativeLayout>
+
+    <com.tesseractmobile.pocketbot.views.CameraSourcePreview
+        android:id="@+id/preview"
+        android:layout_width="@dimen/width_camera_preview"
+        android:layout_height="@dimen/width_camera_preview"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible">
+
+        <ListView
+            android:id="@+id/textList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stackFromBottom="true"
+            android:transcriptMode="alwaysScroll" />
+
+        <com.tesseractmobile.pocketbot.views.GraphicOverlay
+            android:id="@+id/faceOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.tesseractmobile.pocketbot.views.CameraSourcePreview>
 
     <ImageButton
         android:id="@+id/login_with_amazon"
@@ -88,5 +81,5 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:src="@drawable/login_button_image_state"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 </RelativeLayout>

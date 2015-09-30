@@ -47,8 +47,9 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        PREVIEW_HEIGHT = (int) getResources().getDimension(R.dimen.height_camera_preview);
+        //PREVIEW_HEIGHT = (int) getResources().getDimension(R.dimen.height_camera_preview);
         PREVIEW_WIDTH = (int) getResources().getDimension(R.dimen.width_camera_preview);
+        PREVIEW_HEIGHT = PREVIEW_WIDTH;
 
         mIsFaceDetectAvailable = checkGooglePlayServices();
         if(mIsFaceDetectAvailable) {
@@ -59,7 +60,7 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
             dectector.setProcessor(new MultiProcessor.Builder<Face>(new GraphicFaceTrackerFactory()).build());
 
             mCameraSource = new CameraSource.Builder(getApplicationContext(), dectector)
-                    .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
+                    .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_WIDTH)
                     .setFacing(CameraSource.CAMERA_FACING_FRONT)
                     .setRequestedFps(20.0f)
                     .build();

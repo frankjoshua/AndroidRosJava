@@ -41,10 +41,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         super.onCreate();
         // Load settings
         mHideVoicePrompt = HIDE_VOICE_PROMPT;
-        if (checkVoiceRecognition()) {
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
-            mSpeechRecognizer.setRecognitionListener(this);
-        }
+
     }
 
     @Override
@@ -112,7 +109,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     protected synchronized void lauchListeningIntent(final String prompt) {
 
         if(mState != VoiceRecognitionState.READY){
-            Log.d(TAG, "Skipping Speech " +  mState.toString());
+            Log.d(TAG, "Unable to listen. State is " +  mState.toString());
             return;
         }
         Log.d(TAG, "Launching Voice Prompt: " + (prompt != null ? prompt : "null"));
@@ -250,6 +247,10 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     public void registerVoiceRecognitionListener(final VoiceRecognitionListener voiceRecognitionListener){
         this.mVoiceRecognitionListener = voiceRecognitionListener;
+        if (checkVoiceRecognition()) {
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
+            mSpeechRecognizer.setRecognitionListener(this);
+        }
     }
 
     public void unregisterVoiceRecognitionListener(final VoiceRecognitionListener voiceRecognitionListener){

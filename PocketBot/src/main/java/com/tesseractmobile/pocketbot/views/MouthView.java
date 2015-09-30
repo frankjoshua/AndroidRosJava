@@ -108,7 +108,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
 //            setBackgroundResource(R.drawable.mouth_static);
 //        }
         //Draw text
-        super.onDraw(canvas);
+        //super.onDraw(canvas);
     }
 
 
