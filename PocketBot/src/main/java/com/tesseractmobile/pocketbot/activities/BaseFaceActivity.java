@@ -43,7 +43,6 @@ import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import io.fabric.sdk.android.Fabric;
-import tag.TagGame;
 
 public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener, SensorEventListener{
 

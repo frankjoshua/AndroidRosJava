@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -19,8 +18,8 @@ import org.altbeacon.beacon.service.RunningAverageRssiFilter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import tag.HeadingEstimate;
-import tag.TagGame;
+import com.tesseractmobile.tag.HeadingEstimate;
+import com.tesseractmobile.tag.TagGame;
 
 /**
  * Created by josh on 9/30/2015.
@@ -125,7 +124,17 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
                         hander.sendMessage(obtain);
                         //Update heading estimate
                         mHeadingEstimate.newData(getSensorData().getHeading(), distanceChange);
-                        getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
+                        if(mTagGame.getState() == TagGame.IT) {
+                            //Chase
+                            getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
+                        } else {
+                            //Run Away
+                            int direction = mHeadingEstimate.getHeadingEstimate() - 180;
+                            if(direction < 0){
+                                direction += 360;
+                            }
+                            getSensorData().setDestHeading(direction);
+                        }
                     }
                 }
             }

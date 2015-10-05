@@ -267,10 +267,12 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     public void onServicesDiscovered() {
         mUartService = mBleManager.getGattService(UUID_SERVICE);
-        mBleManager.enableNotification(mUartService, UUID_RX, true);
-        stopScanning();
-        //Let the system know we are ready
-        bodyReady();
+        if(mUartService != null) {
+            mBleManager.enableNotification(mUartService, UUID_RX, true);
+            stopScanning();
+            //Let the system know we are ready
+            bodyReady();
+        }
     }
 
     @Override

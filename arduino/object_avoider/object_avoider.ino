@@ -161,15 +161,18 @@ void loop() {
   if(millis() - mLastHumanSpotted > HUMAN_DELAY_MILLIS && millis() - mLastManualControl > HUMAN_DELAY_MILLIS){
     mLeftPower = mSpeed;
     mRightPower = mSpeed; 
-    if(mHeading > 10 && mHeading <= 180){
-      //Turn left
-      mLeftPower -= 10;
-      mRightPower += 10;
-    } else if (mHeading < 350 && mHeading >= 180){
-      //Turn right
-      mLeftPower += 10;
-      mRightPower -= 10;
+    if(abs(mHeading - mDestHeading) > 10){
+      if(isTurnLeft(mHeading, mDestHeading)){
+        //Turn left
+        mLeftPower -= 10;
+        mRightPower += 10;
+      } else{
+        //Turn right
+        mLeftPower += 10;
+        mRightPower -= 10;
+      }
     }
+    
     strip.setBrightness(100); 
   } else {
     strip.setBrightness(255);
@@ -224,6 +227,7 @@ void readBluetooth(){
         float z = root["face_z"];
         int faceId = root["face_id"];
         mHeading = root["heading"];
+        mDestHeading = root["destHeading"];
         Serial.print(" HEADING = ");
         Serial.println(mHeading);
         //Any id other than -1 is an active face
@@ -236,7 +240,7 @@ void readBluetooth(){
           if(z > 0.4){
             //Face is close so stop
             speed = -mSpeed;
-          } else if (z > .3) {
+          } else if (z > 0.3) {
             //Face is too close - back up
             speed = 0;
           } else {
@@ -479,4 +483,24 @@ void echoCheck() { // If ping echo, set distance to array.
 
 float mapFloat(float x, float in_min, float in_max, float out_min, float out_max){
  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+/**
+* Returns ture if left turn false if right
+*/
+boolean isTurnLeft(int heading, int destHeading){ 
+  // assume new and heading are both 0..359 normalized (e.g. compass readings)
+  if (heading < destHeading){
+    heading += 360;  // denormalize ...
+  }
+  int left = heading - destHeading;   // calculate left turn, will allways be 0..359  
+  
+  // take the smallest turn
+  if (left < 180){
+    // Turn left
+    return true;
+  } else {
+    // Turn right
+    return false;
+  }
 }
