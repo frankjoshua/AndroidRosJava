@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -47,7 +48,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     private BleDevicesScanner mScanner;
     private ArrayList<BluetoothDeviceData> mScannedDevices;
 
-
+    private Handler mHandler = new Handler();
 
     protected BluetoothGattService mUartService;
     private int kTxMaxCharacters = 20;
@@ -127,6 +128,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     private void stopScanning() {
         // Stop scanning
         if (mScanner != null) {
+            Log.d(TAG, "stopScanning");
             mScanner.stop();
             mScanner = null;
         }
@@ -274,6 +276,15 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     public void onDisconnected() {
         Log.d(TAG, "onDisconnected");
+        stopScanning();
+        //Retry scan in 5 seconds
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mScannedDevices.clear();
+                startScan(new UUID[]{UUID.fromString(UUID_SERVICE)}, null);
+            }
+        }, 5000);
     }
 
     @Override
@@ -335,7 +346,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     protected void bodyListenerRegistered() {
         Log.d(TAG, "bodyListenerRegistered");
-        startScan(null, null);
+        startScan(new UUID[]{UUID.fromString(UUID_SERVICE)}, null);
     }
 
     @Override
