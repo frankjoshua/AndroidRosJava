@@ -11,7 +11,6 @@
 #include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
 #include <PocketBot.h> //https://github.com/frankjoshua/PocketBot
 #include <RunningMedian.h> //https://github.com/RobTillaart/Arduino
-#include <MemoryFree.h>
 
 
 //Define pins
@@ -164,12 +163,12 @@ void loop() {
     if(abs(mHeading - mDestHeading) > 10){
       if(isTurnLeft(mHeading, mDestHeading)){
         //Turn left
-        mLeftPower -= 10;
-        mRightPower += 10;
+        mLeftPower -= mSpeed * .25;
+        mRightPower += mSpeed * .25;
       } else{
         //Turn right
-        mLeftPower += 10;
-        mRightPower -= 10;
+        mLeftPower += mSpeed * .25;
+        mRightPower -= mSpeed * .25;
       }
     }
     
@@ -237,16 +236,16 @@ void readBluetooth(){
           Serial.print(",");
           Serial.print(y);
           int speed = 0;
-          if(z > 0.4){
-            //Face is close so stop
-            speed = -mSpeed;
-          } else if (z > 0.3) {
+          if(z > 0.6){
             //Face is too close - back up
+            speed = -mSpeed;
+          } else if (z > 0.5) {
+            //Face is close so stop
             speed = 0;
           } else {
-            speed = mapFloat(y, 0.3, 0.6, -mSpeed, mSpeed);
+            speed = mapFloat(z, 0.2, 0.7, mSpeed, -mSpeed);
           }
-          int dir = mapFloat(x, 0.8, 1.12, -mSpeed/2, mSpeed/2);
+          int dir = mapFloat(x, 0.5, 1.5, -mSpeed/2, mSpeed/2);
           mLeftPower =  constrain(speed - dir, -mSpeed, mSpeed);
           mRightPower = constrain(speed + dir, -mSpeed, mSpeed);
           Serial.print(",");

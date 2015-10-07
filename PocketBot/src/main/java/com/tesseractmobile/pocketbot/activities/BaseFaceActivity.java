@@ -282,16 +282,14 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         }
     }
 
-    private long mLastHeadTurn = SystemClock.uptimeMillis();
-
     protected void look(final float x, final float y, float z) {
         //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y) + " z " + Float.toString(z));
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
-        if (SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
-            mLastHeadTurn = SystemClock.uptimeMillis();
+        //if (SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
+            //mLastHeadTurn = SystemClock.uptimeMillis();
             //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
-            if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < .2f || z > .4f) {
+            //if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < .2f || z > .4f) {
                 if (mBodyInterface.isConnected()) {
                     mSensorData.setFace_x(x);
                     mSensorData.setFace_y(y);
@@ -301,8 +299,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
                 if (z > .55f) {
                     setEmotion(Emotion.FEAR);
                 }
-            }
-        }
+            //}
+        //}
     }
 
     protected void sendSensorData() {
@@ -507,19 +505,20 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     }
 
     final synchronized protected void humanSpotted(final int id) {
-
+        final long uptimeMillis = SystemClock.uptimeMillis();
         if(id == SensorData.NO_FACE){
             mHumanCount--;
             if(mHumanCount == 0){
                 mSensorData.setFace_id(id);
-                onHumanLeft();
+                if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
+                    onHumanLeft();
+                }
                 sendSensorData();
             }
             return;
         }
         mHumanCount++;
         mSensorData.setFace_id(id);
-        final long uptimeMillis = SystemClock.uptimeMillis();
         //Check if no human has been spotted for 10 seconds
         if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
             onHumanSpoted();

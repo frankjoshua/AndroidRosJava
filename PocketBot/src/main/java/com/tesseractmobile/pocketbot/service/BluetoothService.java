@@ -25,13 +25,15 @@ import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
 
 /**
  * Created by josh on 8/29/2015.
  */
 @TargetApi(18)
-public class BluetoothService extends BodyService implements BleManager.BleManagerListener {
+public class BluetoothService extends BodyService implements BleManager.BleManagerListener, Runnable {
 
     private static final String TAG = BluetoothService.class.getName();
 
@@ -50,11 +52,17 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     protected BluetoothGattService mUartService;
     private int kTxMaxCharacters = 20;
 
+    private Queue<byte[]> mMessageQueue = new LinkedList<byte[]>();
+
     @Override
     public void onCreate() {
         super.onCreate();
         mBleManager = BleManager.getInstance(this);
         mBleManager.setBleListener(this);
+
+        //Start thread
+        Thread thread = new Thread(this);
+        thread.start();
     }
 
     private void startScan(final UUID[] servicesToScan, final String deviceNameToScanFor) {
@@ -306,20 +314,33 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     public void sendJson(final String json){
 
-        new AsyncTask<Void, Void, Void>(){
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                sendData(json.getBytes(Charset.forName("UTF-8")));
-                Log.d(TAG, json);
-                return null;
-            }
-        }.execute();
+        mMessageQueue.add(json.getBytes(Charset.forName("UTF-8")));
+        Log.d(TAG, json);
+//        new AsyncTask<Void, Void, Void>(){
+//
+//            @Override
+//            protected Void doInBackground(Void... params) {
+//                sendData(json.getBytes(Charset.forName("UTF-8")));
+//                Log.d(TAG, json);
+//                return null;
+//            }
+//        }.execute();
     }
 
     @Override
     protected void bodyListenerRegistered() {
         startScan(null, null);
+    }
+
+    @Override
+    public void run() {
+        while(true){
+            byte[] message = mMessageQueue.poll();
+            while(message != null){
+                sendData(message);
+                message = mMessageQueue.poll();
+            }
+        }
     }
 
 

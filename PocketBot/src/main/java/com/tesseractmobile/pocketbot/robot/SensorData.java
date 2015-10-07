@@ -43,7 +43,8 @@ public class SensorData {
     }
 
     private void update() {
-        time = System.currentTimeMillis();
+        //Uptime, don't excede max int value on uno
+        time = SystemClock.uptimeMillis() % 2147483647;
     }
 
     public float getFace_x() {
