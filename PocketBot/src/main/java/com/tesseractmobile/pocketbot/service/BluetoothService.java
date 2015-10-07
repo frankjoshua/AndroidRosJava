@@ -80,8 +80,12 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
                 @Override
                 public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
                     final String deviceName = device.getName();
-                    //Log.d(TAG, "Discovered device: " + (deviceName != null ? deviceName : "<unknown>"));
+                    final String name = deviceName != null ? deviceName : "<unknown>";
 
+                    if(name.equals("Adafruit Bluefruit LE") == false){
+                        return;
+                    }
+                    Log.d(TAG, "Discovered device: " + name);
                     BluetoothDeviceData previouslyScannedDeviceData = null;
                     if (deviceNameToScanFor == null || (deviceName != null && deviceName.equalsIgnoreCase(deviceNameToScanFor))) {       // Workaround for bug in service discovery. Discovery filtered by service uuid is not working on Android 4.3, 4.4
                         if (mScannedDevices == null) mScannedDevices = new ArrayList<>();       // Safeguard
@@ -259,21 +263,22 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     @Override
     public void onConnected() {
-        //error(0, "Bluetooth connected");
+        Log.d(TAG, "onConnected");
     }
 
     @Override
     public void onConnecting() {
-        //error(0, "Scanning for Bluetooth devices.");
+        Log.d(TAG, "onConnecting");
     }
 
     @Override
     public void onDisconnected() {
-        error(0, "Bluetooth connection lost.");
+        Log.d(TAG, "onDisconnected");
     }
 
     @Override
     public void onServicesDiscovered() {
+        Log.d(TAG, "onServicesDiscovered");
         mUartService = mBleManager.getGattService(UUID_SERVICE);
         if(mUartService != null) {
             mBleManager.enableNotification(mUartService, UUID_RX, true);
@@ -288,7 +293,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
         if (characteristic.getService().getUuid().toString().equalsIgnoreCase(UUID_SERVICE)) {
             if (characteristic.getUuid().toString().equalsIgnoreCase(UUID_RX)) {
                 final String data = new String(characteristic.getValue(), Charset.forName("UTF-8"));
-                error(0, data);
+                Log.d(TAG, data);
             }
         }
 
@@ -296,12 +301,12 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     @Override
     public void onDataAvailable(BluetoothGattDescriptor descriptor) {
-
+        Log.d(TAG, "onDataAvailable");
     }
 
     @Override
     public void onReadRemoteRssi(int rssi) {
-
+        Log.d(TAG, "onReadRemoteRssi");
     }
 
     @Override
@@ -329,6 +334,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     @Override
     protected void bodyListenerRegistered() {
+        Log.d(TAG, "bodyListenerRegistered");
         startScan(null, null);
     }
 
