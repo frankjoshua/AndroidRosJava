@@ -39,6 +39,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     private static final String TAG = BluetoothService.class.getName();
 
     public static final String UUID_SERVICE = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+    public static final UUID[] SERVICES_TO_SCAN = new UUID[]{UUID.fromString(UUID_SERVICE)};
     public static final String UUID_RX = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     public static final String UUID_TX = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
     public static final String UUID_DFU = "00001530-1212-EFDE-1523-785FEABCD123";
@@ -276,13 +277,14 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     public void onDisconnected() {
         Log.d(TAG, "onDisconnected");
+        error(0, "Body interface lost");
         stopScanning();
         //Retry scan in 5 seconds
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mScannedDevices.clear();
-                startScan(new UUID[]{UUID.fromString(UUID_SERVICE)}, null);
+                startScan(SERVICES_TO_SCAN, null);
             }
         }, 5000);
     }
@@ -346,7 +348,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     protected void bodyListenerRegistered() {
         Log.d(TAG, "bodyListenerRegistered");
-        startScan(new UUID[]{UUID.fromString(UUID_SERVICE)}, null);
+        startScan(SERVICES_TO_SCAN, null);
     }
 
     @Override

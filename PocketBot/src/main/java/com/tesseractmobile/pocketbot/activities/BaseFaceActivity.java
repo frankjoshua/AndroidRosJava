@@ -104,7 +104,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private float[] mGravity;
     private float[] mGeomagnetic;
     private long mLastSensorTransmision;
-    private int mSensorDelay = 500;
+    private int mSensorDelay = 100;
     private int mHumanCount = 0;
 
 
