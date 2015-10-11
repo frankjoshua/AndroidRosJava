@@ -169,10 +169,10 @@ public class GoogleFaceDetectActivity extends BaseFaceActivity implements Shared
 
         @Override
         public void onUpdate(Detector.Detections<Face> detections, Face item) {
+            final XYZ xyz = GoogleFaceDetectActivity.getCenter(item, PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            mFaceGraphic.setmXyz(xyz);
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(item);
-
-            final XYZ xyz = GoogleFaceDetectActivity.getCenter(item, PREVIEW_WIDTH, PREVIEW_HEIGHT);
             look(xyz.x, xyz.y, xyz.z);
         }
 

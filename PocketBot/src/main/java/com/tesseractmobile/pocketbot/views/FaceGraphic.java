@@ -35,6 +35,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
     private Paint mBoxPaint;
 
     private volatile Face mFace;
+    private volatile GoogleFaceDetectActivity.XYZ mXyz;
     private int mFaceId;
     private float mFaceHappiness;
 
@@ -80,7 +81,6 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         if (face == null) {
             return;
         }
-        final GoogleFaceDetectActivity.XYZ xyz = GoogleFaceDetectActivity.getCenter(face, canvas.getWidth(), canvas.getHeight());
 
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
@@ -90,9 +90,9 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
 //        canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
 //        canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
 //        canvas.drawText("left eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mIdPaint);
-        canvas.drawText("x " + String.format("%.2f", xyz.x), x + ID_X_OFFSET * 2, y - ID_Y_OFFSET, mIdPaint);
-        canvas.drawText("y " + String.format("%.2f", xyz.y), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
-        canvas.drawText("z " + String.format("%.2f", xyz.z), x + ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mIdPaint);
+        canvas.drawText("x " + String.format("%.2f", mXyz.x), x + ID_X_OFFSET * 2, y - ID_Y_OFFSET, mIdPaint);
+        canvas.drawText("y " + String.format("%.2f", mXyz.y), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
+        canvas.drawText("z " + String.format("%.2f", mXyz.z), x + ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mIdPaint);
         canvas.drawText("smile " + String.format("%.2f", mFace.getIsSmilingProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 3, mIdPaint);
 
         // Draws a bounding box around the face.
@@ -103,6 +103,14 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
+    }
+
+    public GoogleFaceDetectActivity.XYZ getmXyz() {
+        return mXyz;
+    }
+
+    public void setmXyz(GoogleFaceDetectActivity.XYZ mXyz) {
+        this.mXyz = mXyz;
     }
 }
 
