@@ -1,8 +1,11 @@
 package com.tesseractmobile.pocketbot.activities;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 
 import com.crashlytics.android.Crashlytics;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
@@ -151,4 +154,5 @@ public class AiActivity extends GoogleFaceDetectActivity {
         handler.post(runnable);
 
     }
+
 }

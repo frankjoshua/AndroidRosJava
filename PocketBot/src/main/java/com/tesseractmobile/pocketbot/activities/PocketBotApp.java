@@ -15,7 +15,7 @@ import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 /**
  * Created by josh on 9/27/2015.
  */
-public class PocketBotApp extends MultiDexApplication {
+public class PocketBotApp extends Application{
 
     @Override
     public void onCreate() {
@@ -41,9 +41,9 @@ public class PocketBotApp extends MultiDexApplication {
 
     @Override
     protected void attachBaseContext(Context base) {
-        //Enable MultiDex support
-        MultiDex.install(this);
         super.attachBaseContext(base);
+        //Enable MultiDex support
+        //MultiDex.install(this);
     }
 
 }

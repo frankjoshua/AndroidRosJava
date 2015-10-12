@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.media.audiofx.Visualizer;
 import android.media.audiofx.Visualizer.OnDataCaptureListener;
+import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
@@ -45,33 +46,35 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 
         mTts = new TextToSpeech(context, this);
-        mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+        if(Build.VERSION.SDK_INT >= 15) {
+            mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
 
-            @Override
-            public void onStart(final String utteranceId) {
-                setmState(State.TALKING);
-                //Add to active utterance list
-                synchronized (MouthView.this){
-                    mActiveUtterance.put(utteranceId, true);
-                }
-            }
-
-            @Override
-            public void onError(final String utteranceId) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onDone(final String utteranceId) {
-                synchronized (MouthView.this){
-                    mActiveUtterance.remove(utteranceId);
-                    if(mActiveUtterance.size() == 0){
-                        setmState(State.NOT_TALKING);
+                @Override
+                public void onStart(final String utteranceId) {
+                    setmState(State.TALKING);
+                    //Add to active utterance list
+                    synchronized (MouthView.this) {
+                        mActiveUtterance.put(utteranceId, true);
                     }
                 }
-            }
-        });
+
+                @Override
+                public void onError(final String utteranceId) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                @Override
+                public void onDone(final String utteranceId) {
+                    synchronized (MouthView.this) {
+                        mActiveUtterance.remove(utteranceId);
+                        if (mActiveUtterance.size() == 0) {
+                            setmState(State.NOT_TALKING);
+                        }
+                    }
+                }
+            });
+        }
 
         mLastChange = SystemClock.uptimeMillis();
         

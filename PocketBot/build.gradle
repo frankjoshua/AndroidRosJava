@@ -33,7 +33,7 @@ android {
         targetSdkVersion 18
 
         // Enabling multidex support.
-        multiDexEnabled true
+        multiDexEnabled false
     }
 
     buildTypes {

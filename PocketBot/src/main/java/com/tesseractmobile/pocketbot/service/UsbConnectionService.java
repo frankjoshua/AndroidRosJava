@@ -92,7 +92,7 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
         mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
         final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         filter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
-        filter.addAction(UsbManager.ACTION_USB_ACCESSORY_ATTACHED);
+
         registerReceiver(usbReciever, filter);
 
         //connectAccessory();
@@ -167,27 +167,6 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
         thread.start();
     }
 
-//    @Override
-//    public boolean sendCommand(final byte command, final byte target, final int value, final int time) {
-//        final byte[] buffer = new byte[3];
-//
-//        if (value > 255 || value < 0){
-//            error(0, "Value out of range " + value);
-//            return false;
-//        }
-//
-//        if(command == -1){
-//            return false; //I don't remember what this is for
-//        }
-//
-//        buffer[0] = target;
-//        buffer[1] = command;
-//        buffer[2] = (byte) value;
-//       // buffer[3] = (byte) time;
-//
-//        return sendCommand(buffer);
-//    }
-
     private boolean sendCommand(byte[] buffer) {
         if (mOutputStream != null) {
             try {
@@ -212,96 +191,6 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
         }
         return false;
     }
-
-
-//    @Override
-//    public boolean sendCommand(final RobotCommand robotCommand) {
-//        switch (robotCommand.getCommandType()) {
-//        case NOD:
-//            //nod();
-//            backup();
-//            return true;
-//        case SHAKE:
-//            //shake();
-//            backup();
-//            break;
-//        case LEFT:
-//            left();
-//            break;
-//        case RIGHT:
-//            right();
-//            break;
-//        case STOP:
-//            stop();
-//            break;
-//        default:
-//            throw new UnsupportedOperationException("Command not implemented: " + robotCommand.getCommandType().toString());
-//        }
-//        return false;
-//    }
-
-
-//    private void stop() {
-//        synchronized (commandQueue) {
-//            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_LEFT, 0, 0));
-//            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_LEFT, 0, 0));
-//        }
-//    }
-//
-//    private void right() {
-//        synchronized (commandQueue) {
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, CommandContract.CMD_RIGHT, 30, 50));
-//        }
-//    }
-//
-//    private void left() {
-//        synchronized (commandQueue) {
-//        }
-//    }
-//
-//    private void backup() {
-//        synchronized (commandQueue) {
-//            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_BACKWARD, 30, 50));
-//            commandQueue.add(new Command(CommandContract.TAR_MOTOR_RIGHT, CommandContract.CMD_PAUSE, 0, 500));
-//            commandQueue.add(new Command(CommandContract.TAR_MOTOR_LEFT, CommandContract.CMD_FORWARD, 0, 50));
-//        }
-//    }
-//
-//    /**
-//     *
-//     */
-//    private void shake() {
-//        synchronized (commandQueue) {
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 175, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 100, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 175, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 100, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 175, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 100, 150));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_PAN, (byte) 0, 127, 0));
-//        }
-//    }
-//
-//    /**
-//     *
-//     */
-//    private void nod() {
-//        synchronized (commandQueue) {
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 175, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 100, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 175, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 100, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 175, 300));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 100, 150));
-//            commandQueue.add(new Command(CommandContract.TAR_SERVO_TILT, (byte) 0, 127, 0));
-//        }
-//    }
-
-//    @Override
-//    public void reconnectRobot() {
-//        closeAccessory();
-//        connectAccessory();
-//    }
 
     @Override
     public void run() {
@@ -360,18 +249,8 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
 
 
     public class Command {
-//        public byte cmd;
-//        public byte tar;
-//        public int val;
-//        public int delay;
-        public byte[] jsonBytes;
 
-//        public Command(final byte tar, final byte cmd, final int val, final int delay) {
-//            this.cmd = cmd;
-//            this.tar = tar;
-//            this.val = val;
-//            this.delay = delay;
-//        }
+        public byte[] jsonBytes;
 
         public Command(final byte[] jsonBytes){
             this.jsonBytes = jsonBytes;

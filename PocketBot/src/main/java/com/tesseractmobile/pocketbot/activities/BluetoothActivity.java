@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
@@ -17,6 +18,17 @@ import com.tesseractmobile.pocketbot.service.BodyService;
 public class BluetoothActivity extends AiActivity{
 
     private ServiceConnection bluetoothServiceConnection;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //Only phones with API 18+ have Bluetooth LE
+        if(Build.VERSION.SDK_INT < 18){
+            startActivity(new Intent(this, AiActivity.class));
+            finish();
+            return;
+        }
+    }
 
     @Override
     protected void onStart() {

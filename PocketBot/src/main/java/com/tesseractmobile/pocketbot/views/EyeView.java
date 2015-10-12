@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.views;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -28,7 +30,9 @@ public class EyeView extends View {
 
         @Override
         public void handleMessage(final Message msg) {
-            animation.start();
+            if(Build.VERSION.SDK_INT >= 11) {
+                animation.start();
+            }
         }
         
     };
@@ -89,14 +93,14 @@ public class EyeView extends View {
         //Open the eyes
         open();
         //Look straight ahead
-        look(1.0f,1.0f);
+        look(1.0f, 1.0f);
     }
 
     public EyeView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         final BitmapFactory.Options options = new Options();
-        options.inMutable = true;
-        mEye = BitmapFactory.decodeResource(getResources(), R.drawable.eye_open, options);
+        //options.inMutable = true;
+        mEye = BitmapFactory.decodeResource(getResources(), R.drawable.eye_open, options).copy(Bitmap.Config.ARGB_8888, true);
         mEyeCanvas = new Canvas(mEye);
 
         mEyeLidPaint = new Paint();
@@ -121,16 +125,21 @@ public class EyeView extends View {
         mPupilPaint.setColor(Color.BLACK); //Color.argb(255, 0, 0, 0) -45 degree
         mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         mPupilPaint.setAntiAlias(true);
-        
-        animation = ValueAnimator.ofFloat(0f, 1f);
-        animation.addUpdateListener(new AnimatorUpdateListener() {
-            
-            @Override
-            public void onAnimationUpdate(final ValueAnimator animation) {
-                mAnimationPercent = (Float) animation.getAnimatedValue();
-                invalidate();
-            }
-        });
+
+        if(Build.VERSION.SDK_INT >= 11) {
+            animation = ValueAnimator.ofFloat(0f, 1f);
+            animation.addUpdateListener(new AnimatorUpdateListener() {
+
+                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                @Override
+                public void onAnimationUpdate(final ValueAnimator animation) {
+                    mAnimationPercent = (Float) animation.getAnimatedValue();
+                    invalidate();
+                }
+            });
+        } else {
+            animation = null;
+        }
     }
 
     /**
@@ -221,7 +230,7 @@ public class EyeView extends View {
     public void blink(){
         close();
         postDelayed(new Runnable() {
-            
+
             @Override
             public void run() {
                 open();
@@ -244,7 +253,9 @@ public class EyeView extends View {
      * 
      */
     public void startAnimation(final int duration) {
-        animation.setDuration(duration);
+        if(Build.VERSION.SDK_INT >= 11) {
+            animation.setDuration(duration);
+        }
         mHandler.sendEmptyMessage(0);
     }
 

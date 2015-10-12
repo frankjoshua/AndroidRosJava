@@ -1,6 +1,7 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.bluetooth.le.AdvertiseSettings;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -51,6 +52,10 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Only phones with API 18+ have Bluetooth LE
+        if(Build.VERSION.SDK_INT < 18){
+            return;
+        }
         mTagGame = new TagGame(this);
 
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -159,6 +164,9 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        beaconManager.unbind(this);
+        final BeaconManager beaconManager = this.beaconManager;
+        if(beaconManager != null){
+            beaconManager.unbind(this);
+        }
     }
 }
