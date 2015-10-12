@@ -41,9 +41,9 @@ public class PocketBotApp extends MultiDexApplication {
 
     @Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
         //Enable MultiDex support
         MultiDex.install(this);
+        super.attachBaseContext(base);
     }
 
 }

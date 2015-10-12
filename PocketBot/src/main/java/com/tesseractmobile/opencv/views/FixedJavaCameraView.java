@@ -1,16 +1,16 @@
 package com.tesseractmobile.opencv.views;
 
-import org.opencv.android.JavaCameraView;
+//import org.opencv.android.JavaCameraView;
 
 import android.content.Context;
 import android.util.AttributeSet;
 
-public class FixedJavaCameraView extends JavaCameraView {
-
-    public FixedJavaCameraView(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-        
-    }
+//public class FixedJavaCameraView extends JavaCameraView {
+public class FixedJavaCameraView {
+//    public FixedJavaCameraView(final Context context, final AttributeSet attrs) {
+//        super(context, attrs);
+//
+//    }
 
 //    @Override
 //    public void surfaceChanged(final SurfaceHolder arg0, final int arg1, final int arg2, final int arg3) {
