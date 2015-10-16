@@ -3,12 +3,15 @@ package com.tesseractmobile.pocketbot.views;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.drawable.AnimationDrawable;
 import android.media.audiofx.Visualizer;
 import android.media.audiofx.Visualizer.OnDataCaptureListener;
 import android.os.Build;
@@ -29,17 +32,15 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     private final TextToSpeech mTts;
     private boolean isTalkReady;
     private State mState;
-    private int mLastAnimation;
-    private final long mLastChange;
-    private final Path mPath;
-    private final Paint mPaint;
-    private final Path mWavePath;
-    private byte[] mWave = new byte[1024];
     private final Paint mMouthPaint;
     private SpeechCompleteListener mSpeechCompleteListener;
 
     private HashMap<String, Boolean> mActiveUtterance = new HashMap<String, Boolean>();
-    
+
+    private Bitmap[] mMouthBitmaps;
+    private int mCurrentBitmap = 0;
+    private long mLastChange;
+
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         setTextColor(Color.rgb(100, 0, 255));
@@ -74,42 +75,36 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
                     }
                 }
             });
+
         }
 
-        mLastChange = SystemClock.uptimeMillis();
-        
-        mPath = new Path();
-        mWavePath = new Path();
-        mPaint = new Paint();
-        mPaint.setColor(Color.BLACK);
-        mPaint.setStrokeWidth(10);
-        mPaint.setStyle(Style.STROKE);
         mMouthPaint = new Paint();
         mMouthPaint.setColor(Color.WHITE);
 
-        
+        mMouthBitmaps = new Bitmap[4];
+        mMouthBitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.staticmouthhappy);
+        mMouthBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth1);
+        mMouthBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth2);
+        mMouthBitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth3);
     }
 
     
     @Override
     protected void onDraw(final Canvas canvas) {
-        
-        drawMouth(getWidth(), getHeight());
-        canvas.drawRoundRect(new RectF(0, 0, canvas.getWidth(), canvas.getHeight()), 50, 50, mMouthPaint);
-        canvas.drawPath(mPath, mPaint);
-        canvas.drawPath(mWavePath, mPaint);
-        
-        //canvas.drawPath(mWavePath, mPaint);
-//        if(mState == State.TALKING){
-//            final long uptimeMillis = SystemClock.uptimeMillis();
-//            if(uptimeMillis - mLastChange > 70){
-//                mLastChange = uptimeMillis;
-//                setNextMouth();
-//            }
-//            invalidate();
-//        } else {
-//            setBackgroundResource(R.drawable.mouth_static);
-//        }
+
+        if(mState == State.TALKING){
+            invalidate();
+            if(SystemClock.uptimeMillis() - mLastChange > 75){
+                mLastChange = SystemClock.uptimeMillis();
+                mCurrentBitmap++;
+                if(mCurrentBitmap > 3){
+                    mCurrentBitmap = 1;
+                }
+            }
+        }
+        final RectF destRect = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
+        canvas.drawRoundRect(destRect, 50, 50, mMouthPaint);
+        canvas.drawBitmap(mMouthBitmaps[mCurrentBitmap], null, destRect, null);
         //Draw text
         //super.onDraw(canvas);
     }
@@ -118,102 +113,11 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        drawMouth(w, h);
         final Visualizer mVisualizer = new Visualizer(0);
         mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
         mVisualizer.setEnabled(true);
     }
 
-
-    /**
-     * @param w
-     * @param h
-     */
-    protected void drawMouth(final int w, final int h) {
-        mWavePath.reset();
-        mPath.reset();
-        mPath.moveTo(0, h / 2);
-        //mPath.lineTo(w, h / 2);
-//        mPath.quadTo(w / 2, h, w, h/2);
-//        //mPath.lineTo(0, h / 2);
-//        mPath.quadTo(w / 2, (float) (h *.75), 0, h/2);
-        
-        //Draw vertical lines
-        for(int line = 1; line < 5; line++){
-            mPath.moveTo((w / 5) * line, 0);
-            mPath.lineTo((w / 5) * line, h);
-        }
-        
-        int gap = 0;
-        final int waves = 25;
-        final int waveLength = mWave.length / waves;
-        final int waveWidth = w / waves;
-        int centerY = h / 2;
-        mPath.moveTo(0, centerY);
-        mWavePath.moveTo(0, centerY);
-        int x = 0;
-        int sum = 0;
-        int count = 0;
-        int section = 0;
-        for(int i = 0; i < mWave.length; i ++){
-            count++;
-            final byte wave = mWave[i] <= -127 ||  mWave[i] >= 127 ? 0 : mWave[i];
-            sum += wave;
-            if(i % waveLength == 0){
-                section++;
-                if(section > waves / 2){
-                    centerY -= h/2/waves;
-                    gap += 5;
-                } else {
-                    centerY += h/2/waves;
-                    gap -= 5;
-                }
-//                final int radius = h / 2;
-//                final double angle = ((180 / waves) / (2 * Math.PI)) * section;
-//                section++;
-//                centerY = (int) ((h / 2) + radius * Math.cos(angle));
-                final int waveHeight = (sum / count);
-                final int destY = centerY + waveHeight;
-                mPath.quadTo(x + waveWidth / 2, destY + gap, x + waveWidth, centerY + gap);
-                mWavePath.quadTo(x + waveWidth / 2, centerY -waveHeight - gap, x + waveWidth, centerY - gap);
-                //mPath.lineTo(x, destY);
-                x += waveWidth;
-                count = 0;
-                sum = 0;
-            }
-            
-        }
-    }
-
-
-    private void setNextMouth() {
-        mLastAnimation++;
-        if(mLastAnimation > 5){
-            mLastAnimation = 0;
-        }
-        final int image;
-        switch(mLastAnimation){
-            case 0:
-                image = R.drawable.mouth_static;
-                break;
-            case 1:
-                image = R.drawable.mouth_speaking_1;
-                break;
-            case 2:
-                image = R.drawable.mouth_speaking_2;
-                break;
-            case 3:
-                image = R.drawable.mouth_speaking_3;
-                break;
-            case 4:
-                image = R.drawable.mouth_speaking_2;
-                break;
-            default:
-                image = R.drawable.mouth_speaking_1;
-                break;
-        }
-        setBackgroundResource(image);
-    }
 
 
     @Override
@@ -259,6 +163,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     private void setmState(final State state) {
         this.mState = state;
         if(state == State.NOT_TALKING){
+            mCurrentBitmap = 0;
             //Let the listener know the the speech is complete
             final SpeechCompleteListener speechCompleteListener = mSpeechCompleteListener;
             if(speechCompleteListener != null){
@@ -285,7 +190,6 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
      * @param waveform
      */
     public void updateWave(final byte[] waveform) {
-        mWave = waveform;
         invalidate();
     }
 

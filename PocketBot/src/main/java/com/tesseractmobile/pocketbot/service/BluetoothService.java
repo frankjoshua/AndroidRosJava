@@ -354,10 +354,18 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     public void run() {
         while(true){
-            byte[] message = mMessageQueue.poll();
-            while(message != null){
-                sendData(message);
-                message = mMessageQueue.poll();
+            final Queue<byte[]> messageQueue = mMessageQueue;
+            if(messageQueue != null) {
+                byte[] message = messageQueue.poll();
+                while (message != null) {
+                    sendData(message);
+                    message = messageQueue.poll();
+                }
+            }
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

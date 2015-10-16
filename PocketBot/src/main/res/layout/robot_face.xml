@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/accent_material_dark">
+    android:background="@drawable/background">
 
 
     <RelativeLayout
@@ -47,7 +47,7 @@
             android:layout_below="@+id/eyeViewLeft"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/margin_top_mouth"
-            android:background="@drawable/mouth_static"
+            android:background="@drawable/staticmouth"
             android:textSize="@dimen/text_size_mouth"/>
 
 
