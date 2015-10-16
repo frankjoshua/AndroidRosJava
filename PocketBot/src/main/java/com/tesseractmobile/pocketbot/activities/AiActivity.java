@@ -2,6 +2,8 @@ package com.tesseractmobile.pocketbot.activities;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -95,6 +97,21 @@ public class AiActivity extends GoogleFaceDetectActivity {
             final String previewSetting = result.getStringParameter(CommandContract.PARAM_PREVIEW, "false");
             final boolean shouldPreview = previewSetting.equalsIgnoreCase("true");
             PocketBotSettings.setShowPreview(this, shouldPreview);
+        } else if (action.equals(CommandContract.ACTION_LAUNCH)){
+            //Launch an app
+            final String packageName = result.getStringParameter(CommandContract.PARAM_PACKAGE);
+            final Intent intent = getPackageManager().getLaunchIntentForPackage(packageName);
+            if(intent != null){
+                //If found launch the app
+                startActivity(intent);
+            } else {
+                //Find the app in the pay store if not installed
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)));
+                }
+            }
         }
         final String speech = result.getFulfillment().getSpeech();
         if(speech.equals("")){

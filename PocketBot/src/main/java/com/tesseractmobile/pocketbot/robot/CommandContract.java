@@ -38,6 +38,7 @@ public class CommandContract {
     public static final String ACTION_EMOTION = "emotion";
     public static final String ACTION_ARDUINO = "arduino";
     public static final String ACTION_SETTINGS = "settings";
+    public static final String ACTION_LAUNCH = "launch";
 
     //Parameters from api.ai
     public static final String PARAM_DIRECTION = "direction";
@@ -45,6 +46,7 @@ public class CommandContract {
     public static final String PARAM_DISTANCE = "distance";
     public static final String PARAM_EMOTION = "emotion";
     public static final String PARAM_PREVIEW = "preview";
+    public static final String PARAM_PACKAGE = "package";
 
     //Emotion values from api.ai
     public static final String EMOTION_ANGER = "anger";
@@ -53,5 +55,4 @@ public class CommandContract {
     public static final String EMOTION_SURPRISED = "surprised";
     public static final String EMOTION_ACCEPTED = "accepted";
     public static final String EMOTION_AWARE = "aware";
-
 }
