@@ -45,35 +45,4 @@ public class UsbAccessoryActivity extends AiActivity {
     }
 
 
-    private boolean flipFlop;
-    
-    @Override
-    public void onClick(final View v) {
-        super.onClick(v);
-        
-        final int viewId = v.getId();
-
-        switch (viewId) {
-        case R.id.eyeViewLeft:
-//            if(flipFlop){
-//                final RobotCommand robotCommand = new RobotCommand(RobotCommandType.NOD);
-//                robotCommandInterface.sendCommand(robotCommand);
-//            } else {
-//                final RobotCommand robotCommand = new RobotCommand(RobotCommandType.SHAKE);
-//                robotCommandInterface.sendCommand(robotCommand);
-//            }
-            flipFlop = !flipFlop;
-
-            break;
-        case R.id.eyeViewRight:
-            //robotCommandInterface.reconnectRobot();
-            break;
-        case R.id.mouthView:
-            super.onClick(v);
-            break;
-        }
-
-    }
-
-
 }

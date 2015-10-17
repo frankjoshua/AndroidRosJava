@@ -33,8 +33,11 @@ import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
+import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
@@ -44,7 +47,7 @@ import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends Activity implements OnClickListener, VoiceRecognitionListener, BodyConnectionListener, SpeechCompleteListener, SensorEventListener{
+public class BaseFaceActivity extends Activity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface{
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -52,9 +55,8 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private static final int START_LISTENING_AFTER_PROMPT = 2;
     public static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
 
-    private MouthView mouthView;
-    private EyeView mLeftEye;
-    private EyeView mRightEye;
+
+    private RobotFace mRobotFace;
     private ListView mTextListView;
     private SpeechAdapter mSpeechAdapter;
     private SensorData mSensorData = new SensorData();
@@ -76,7 +78,6 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     };
 
-    private Emotion mEmotion;
 
     private long mLastHumanSpoted;
     private ServiceConnection voiceRecognitionServiceConnection;
@@ -115,21 +116,13 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
         setContentView(R.layout.robot_face);
 
-        mouthView = (MouthView) findViewById(R.id.mouthView);
-        mLeftEye = (EyeView) findViewById(R.id.eyeViewLeft);
-        mRightEye = (EyeView) findViewById(R.id.eyeViewRight);
+
+        mRobotFace = new EfimFace(this, this);
         mTextListView = (ListView) findViewById(R.id.textList);
 
         //Setup list view for text
         mSpeechAdapter = new SpeechAdapter(this);
         mTextListView.setAdapter(mSpeechAdapter);
-
-        mouthView.setOnSpeechCompleteListener(this);
-
-        // Setup click listeners
-        mLeftEye.setOnClickListener(this);
-        mRightEye.setOnClickListener(this);
-        mouthView.setOnClickListener(this);
 
         //Start senors
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -197,110 +190,23 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         mSensorManager.unregisterListener(this);
     }
 
-    @Override
-    public void onClick(final View v) {
-        final int viewId = v.getId();
-
-        switch (viewId) {
-            case R.id.eyeViewLeft:
-                say("Ouch");
-                fear();
-                // finish();
-                break;
-            case R.id.eyeViewRight:
-                //say("I'm going to kill you in my sleep... Oh wait, your sleep");
-                say("Please don't poke my eye.");
-                anger();
-                break;
-            case R.id.mouthView:
-                listen(null);
-                break;
-        }
-    }
-
-    /**
-     * Set look to fearful
-     */
-    private void fear() {
-        mLeftEye.squintLeft();
-        mRightEye.squintRight();
-    }
-
-    /**
-     * Set look to angry
-     */
-    private void anger() {
-        mLeftEye.squintRight();
-        mRightEye.squintLeft();
-    }
-
     /**
      * Set the face to mimic the emotional state
      *
      * @param emotion
      */
     final public void setEmotion(final Emotion emotion) {
-        if (mEmotion != emotion) {
-            mEmotion = emotion;
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    switch (emotion) {
-                        case ACCEPTED:
-                            mLeftEye.squint();
-                            mRightEye.squint();
-                            break;
-                        case SUPRISED:
-                            mLeftEye.open();
-                            mRightEye.open();
-                            mLeftEye.blink();
-                            mRightEye.blink();
-                            break;
-                        case AWARE:
-                            mLeftEye.open();
-                            mRightEye.squint();
-                            break;
-                        case JOY:
-                            mLeftEye.wideOpenLeft();
-                            mRightEye.wideOpenRight();
-                            break;
-                        case FEAR:
-                            fear();
-                            break;
-                        case ANGER:
-                            anger();
-                            break;
-                        default:
-                            mLeftEye.squint();
-                            mRightEye.squint();
-                            //say("I don't under stand the emotion " + emotion + ".");
-                            break;
-                    }
-                }
-            });
-        }
+        mRobotFace.setEmotion(emotion);
     }
 
     protected void look(final float x, final float y, float z) {
-        //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y) + " z " + Float.toString(z));
-        mLeftEye.look(x, y);
-        mRightEye.look(x, y);
-        //if (SystemClock.uptimeMillis() - mLastHeadTurn > 350) {
-            //mLastHeadTurn = SystemClock.uptimeMillis();
-            //Log.d(TAG, "x " + Float.toString(x) + " y " + Float.toString(y));
-            //if (x > 1.25f || x < .75f || y > 1.25f || y < .75f || z < .2f || z > .4f) {
-                if (mBodyInterface.isConnected()) {
-                    mSensorData.setFace_x(x);
-                    mSensorData.setFace_y(y);
-                    mSensorData.setFace_z(z);
-                    sendSensorData();
-                }
-                if (z > .55f) {
-                    setEmotion(Emotion.FEAR);
-                }
-            //}
-        //}
+        mRobotFace.look(x, y, x);
+        if (mBodyInterface.isConnected()) {
+            mSensorData.setFace_x(x);
+            mSensorData.setFace_y(y);
+            mSensorData.setFace_z(z);
+            sendSensorData();
+        }
     }
 
     protected void sendSensorData() {
@@ -370,35 +276,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
      */
     private void setText(String text) {
         addTextToList(text, true);
-        getMouthView().setText(text);
+        mRobotFace.say(text);
     }
 
     private void addTextToList(final String text, final boolean isPocketBot) {
         mSpeechAdapter.addText(text, isPocketBot);
-    }
-
-    /**
-     * Speak the text then run the runnable
-     *
-     * @param speechText
-     * @param runnable
-     */
-    final protected void say(final String speechText, final Runnable runnable) {
-        mLastHumanSpoted = SystemClock.uptimeMillis();
-        //Post the runnable when speech is complete
-        getMouthView().setOnSpeechCompleteListener(new SpeechCompleteListener() {
-
-            @Override
-            public void onSpeechComplete() {
-                runOnUiThread(runnable);
-            }
-        });
-        //Speak the text
-        say(speechText);
-    }
-
-    protected final MouthView getMouthView() {
-        return mouthView;
     }
 
     /**
@@ -427,7 +309,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     private void startListening(final String prompt) {
         //setEmotion(Emotion.SUPRISED);
         if (prompt != null) {
-            getMouthView().setOnSpeechCompleteListener(this);
+            mRobotFace.setOnSpeechCompleteListener(this);
             if (say(prompt)) {
                 mSpeechState = SpeechState.WAITING_TO_LISTEN;
             }
@@ -491,14 +373,9 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
     @Override
     public boolean onProccessInput(final String input) {
         if (input.contains("game")) {
-            say("My favorite game is solitaire", new Runnable() {
-
-                @Override
-                public void run() {
-                    final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
-                    startActivity(launchIntent);
-                }
-            });
+            say("My favorite game is solitaire");
+            final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
+            startActivity(launchIntent);
             return true;
         }
         return false;
@@ -607,6 +484,11 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
 
     }
 
+    @Override
+    public void listen() {
+        listen(null);
+    }
+
     private class BotTask extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -662,7 +544,7 @@ public class BaseFaceActivity extends Activity implements OnClickListener, Voice
         }
     }
 
-    enum Emotion {
+    public enum Emotion {
         JOY, ACCEPTED, AWARE, ANGER, SADNESS, REJECTED, SUPRISED, FEAR
     }
 
