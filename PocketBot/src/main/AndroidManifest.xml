@@ -63,7 +63,6 @@
         </activity>
         <activity
             android:name=".activities.UsbAccessoryActivity"
-            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />

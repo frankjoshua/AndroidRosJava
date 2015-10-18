@@ -2,33 +2,35 @@ package com.tesseractmobile.pocketbot.robot;
 
 import android.os.SystemClock;
 
+import java.math.BigDecimal;
+
 /**
  * Created by josh on 9/13/2015.
  */
 public class SensorData {
     public static final int NO_FACE = -1;
 
-    private float face_id = NO_FACE;
+    private int face_id = NO_FACE;
     private float face_x;
     private float face_y;
     private float face_z;
     private int heading;
     private int destHeading;
-    private long time;
+    //private long time;
 
 
     public void setFace_x(float face_x) {
-        this.face_x = face_x;
+        this.face_x = round(face_x, 2);
         update();
     }
 
     public void setFace_y(float face_y) {
-        this.face_y = face_y;
+        this.face_y = round(face_y, 2);
         update();
     }
 
     public void setFace_z(float face_z) {
-        this.face_z = face_z;
+        this.face_z = round(face_z, 2);
         update();
     }
 
@@ -44,7 +46,7 @@ public class SensorData {
 
     private void update() {
         //Uptime, don't excede max int value on uno
-        time = SystemClock.uptimeMillis() % 2147483647;
+        //time = SystemClock.uptimeMillis() % 2147483647;
     }
 
     public float getFace_x() {
@@ -67,7 +69,19 @@ public class SensorData {
         return face_id;
     }
 
-    public void setFace_id(float face_id) {
+    public void setFace_id(int face_id) {
         this.face_id = face_id;
     }
+
+    /**
+     * Round to certain number of decimals
+     *
+     * @param d
+     * @param decimalPlace the numbers of decimals
+     * @return
+     */
+    public static float round(float d, int decimalPlace) {
+        return BigDecimal.valueOf(d).setScale(decimalPlace,BigDecimal.ROUND_HALF_UP).floatValue();
+    }
+
 }
