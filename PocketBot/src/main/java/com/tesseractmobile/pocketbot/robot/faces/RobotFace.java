@@ -11,7 +11,7 @@ public interface RobotFace {
      * Display this emotion
      * @param emotion
      */
-    public void setEmotion(BaseFaceActivity.Emotion emotion);
+    void setEmotion(BaseFaceActivity.Emotion emotion);
 
     /**
      * Direction to look in
@@ -19,13 +19,15 @@ public interface RobotFace {
      * @param y
      * @param z
      */
-    public void look(float x, float y, float z);
+    void look(float x, float y, float z);
 
     /**
      * Speak the text
      * @param text
      */
-    public void say(String text);
+    void say(String text);
 
     void setOnSpeechCompleteListener(MouthView.SpeechCompleteListener speechCompleteListener);
+
+    void setRobotInterface(final RobotInterface robotInterface);
 }

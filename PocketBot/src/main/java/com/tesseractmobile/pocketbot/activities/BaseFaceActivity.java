@@ -1,6 +1,5 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -17,10 +16,11 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.ListView;
 
@@ -31,23 +31,25 @@ import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.PreviewFragment;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.SensorData;
-import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
-import com.tesseractmobile.pocketbot.views.EyeView;
-import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends Activity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface{
+public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface{
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -114,15 +116,43 @@ public class BaseFaceActivity extends Activity implements  VoiceRecognitionListe
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
 
-        setContentView(R.layout.robot_face);
+        setContentView(R.layout.main);
 
+        if(savedInstanceState == null){
+            //Create the face fragment
+            final FaceFragment faceFragment = new EfimFaceFragment();
+            //Set up a listener for when the view is created
+            faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
+                @Override
+                public void onComplete() {
+                    mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
+                }
+            });
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.add(R.id.main_window, faceFragment, "FACE");
 
-        mRobotFace = new EfimFace(this, this);
-        mTextListView = (ListView) findViewById(R.id.textList);
+            //Create Preview Fragment
+            final PreviewFragment previewFragment = new PreviewFragment();
+            previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener(){
 
-        //Setup list view for text
-        mSpeechAdapter = new SpeechAdapter(this);
-        mTextListView.setAdapter(mSpeechAdapter);
+                @Override
+                public void onComplete() {
+                    mTextListView = previewFragment.getListView();
+                    //Setup list view for text
+                    mSpeechAdapter = new SpeechAdapter(BaseFaceActivity.this);
+                    mTextListView.setAdapter(mSpeechAdapter);
+                }
+            });
+            ft.add(R.id.main_window, previewFragment, "PREVIEW");
+
+            //Create face tracking fragment
+            final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
+            faceTrackingFragment.setRobotInterface(this);
+            ft.add(R.id.main_window, faceTrackingFragment, "FACE_TRACKING");
+
+            //Commit both fragments
+            ft.commit();
+        }
 
         //Start senors
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -179,8 +209,6 @@ public class BaseFaceActivity extends Activity implements  VoiceRecognitionListe
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
 
-        //Set initial state
-        setEmotion(Emotion.JOY);
     }
 
     @Override
@@ -199,7 +227,8 @@ public class BaseFaceActivity extends Activity implements  VoiceRecognitionListe
         mRobotFace.setEmotion(emotion);
     }
 
-    protected void look(final float x, final float y, float z) {
+    @Override
+    public void look(final float x, final float y, float z) {
         mRobotFace.look(x, y, x);
         if (mBodyInterface.isConnected()) {
             mSensorData.setFace_x(x);
@@ -381,7 +410,8 @@ public class BaseFaceActivity extends Activity implements  VoiceRecognitionListe
         return false;
     }
 
-    final synchronized protected void humanSpotted(final int id) {
+    @Override
+    final synchronized public void humanSpotted(final int id) {
         final long uptimeMillis = SystemClock.uptimeMillis();
         if(id == SensorData.NO_FACE){
             mHumanCount--;

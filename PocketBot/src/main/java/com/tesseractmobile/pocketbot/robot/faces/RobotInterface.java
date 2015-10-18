@@ -5,4 +5,8 @@ package com.tesseractmobile.pocketbot.robot.faces;
  */
 public interface RobotInterface {
     void listen();
+
+    void humanSpotted(int id);
+
+    void look(float x, float y, float z);
 }

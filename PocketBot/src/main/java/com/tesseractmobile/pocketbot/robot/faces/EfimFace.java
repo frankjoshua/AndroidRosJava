@@ -28,14 +28,12 @@ public class EfimFace implements RobotFace, OnClickListener, SpeechCompleteListe
 
     private RobotInterface mRobotInterface;
 
-    public EfimFace(final Context context, final RobotInterface robotInterface){
-        //Set robot interface
-        mRobotInterface = robotInterface;
+    public EfimFace(final View view){
 
         //Init views
-        mouthView = (MouthView) ((Activity) context).findViewById(R.id.mouthView);
-        mLeftEye = (EyeView) ((Activity) context).findViewById(R.id.eyeViewLeft);
-        mRightEye = (EyeView) ((Activity) context).findViewById(R.id.eyeViewRight);
+        mouthView = (MouthView) view.findViewById(R.id.mouthView);
+        mLeftEye = (EyeView) view.findViewById(R.id.eyeViewLeft);
+        mRightEye = (EyeView) view.findViewById(R.id.eyeViewRight);
 
         //Listen for end of speech
         mouthView.setOnSpeechCompleteListener(this);
@@ -44,6 +42,11 @@ public class EfimFace implements RobotFace, OnClickListener, SpeechCompleteListe
         mLeftEye.setOnClickListener(this);
         mRightEye.setOnClickListener(this);
         mouthView.setOnClickListener(this);
+    }
+
+    @Override
+    public void setRobotInterface(final RobotInterface robotInterface){
+        this.mRobotInterface = robotInterface;
     }
 
     @Override

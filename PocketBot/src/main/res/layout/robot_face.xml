@@ -53,27 +53,6 @@
 
     </RelativeLayout>
 
-    <com.tesseractmobile.pocketbot.views.CameraSourcePreview
-        android:id="@+id/preview"
-        android:layout_width="@dimen/width_camera_preview"
-        android:layout_height="@dimen/width_camera_preview"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="invisible">
-
-        <ListView
-            android:id="@+id/textList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:stackFromBottom="true"
-            android:transcriptMode="alwaysScroll" />
-
-        <com.tesseractmobile.pocketbot.views.GraphicOverlay
-            android:id="@+id/faceOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </com.tesseractmobile.pocketbot.views.CameraSourcePreview>
 
     <ImageButton
         android:id="@+id/login_with_amazon"

@@ -7,6 +7,7 @@ import android.graphics.Paint;
 
 import com.google.android.gms.vision.face.Face;
 import com.tesseractmobile.pocketbot.activities.GoogleFaceDetectActivity;
+import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 
 /**
  * Graphic instance for rendering face position, orientation, and landmarks within an associated
@@ -35,7 +36,7 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
     private Paint mBoxPaint;
 
     private volatile Face mFace;
-    private volatile GoogleFaceDetectActivity.XYZ mXyz;
+    private volatile FaceTrackingFragment.XYZ mXyz;
     private int mFaceId;
     private float mFaceHappiness;
 
@@ -105,11 +106,11 @@ public class FaceGraphic extends GraphicOverlay.Graphic {
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
     }
 
-    public GoogleFaceDetectActivity.XYZ getmXyz() {
+    public FaceTrackingFragment.XYZ getmXyz() {
         return mXyz;
     }
 
-    public void setmXyz(GoogleFaceDetectActivity.XYZ mXyz) {
+    public void setmXyz(FaceTrackingFragment.XYZ mXyz) {
         this.mXyz = mXyz;
     }
 }
