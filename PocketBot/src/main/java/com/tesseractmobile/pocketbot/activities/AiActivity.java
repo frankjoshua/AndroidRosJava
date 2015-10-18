@@ -26,7 +26,7 @@ import ai.api.model.Result;
 /**
  * Created by josh on 8/19/2015.
  */
-public class AiActivity extends GoogleFaceDetectActivity {
+public class AiActivity extends BaseFaceActivity {
 
     public static final String PARAM_NUMBER = "number";
     private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";

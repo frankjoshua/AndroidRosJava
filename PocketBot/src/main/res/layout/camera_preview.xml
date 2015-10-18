@@ -9,8 +9,7 @@
         android:id="@+id/preview"
         android:layout_width="@dimen/width_camera_preview"
         android:layout_height="@dimen/height_camera_preview"
-
-        android:visibility="visible">
+        android:visibility="invisible">
 
         <com.tesseractmobile.pocketbot.views.GraphicOverlay
             android:id="@+id/faceOverlay"

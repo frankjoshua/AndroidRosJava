@@ -9,7 +9,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
-public class FirebaseFaceActivity extends GoogleFaceDetectActivity {
+public class FirebaseFaceActivity extends BaseFaceActivity {
 
     private static final String CHILD_PATH = "chat";
     private Firebase mFirebaseRef;

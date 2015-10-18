@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.google.android.gms.vision.face.Face;
-import com.tesseractmobile.pocketbot.activities.GoogleFaceDetectActivity;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 
 /**

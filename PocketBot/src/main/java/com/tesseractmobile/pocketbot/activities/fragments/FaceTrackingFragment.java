@@ -1,6 +1,7 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,7 +26,7 @@ import java.io.IOException;
 /**
  * Created by josh on 10/18/2015.
  */
-public class FaceTrackingFragment extends CallbackFragment{
+public class FaceTrackingFragment extends CallbackFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public int PREVIEW_WIDTH = 240;
     public int PREVIEW_HEIGHT = 320;
@@ -58,6 +59,7 @@ public class FaceTrackingFragment extends CallbackFragment{
         if(PocketBotSettings.isShowPreview(activity)){
             mPreview.setVisibility(View.VISIBLE);
         }
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(activity, this);
     }
 
     @Override
@@ -86,6 +88,17 @@ public class FaceTrackingFragment extends CallbackFragment{
 
     public void setRobotInterface(RobotInterface mRobotInterface) {
         this.mRobotInterface = mRobotInterface;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(PocketBotSettings.SHOW_PREVIEW)){
+            if(sharedPreferences.getBoolean(key, false)){
+                mPreview.setVisibility(View.VISIBLE);
+            } else {
+                mPreview.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {

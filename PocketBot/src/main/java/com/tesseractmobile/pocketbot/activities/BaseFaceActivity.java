@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.activities;
 
+import android.app.Dialog;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -25,6 +26,8 @@ import android.view.WindowManager;
 import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
@@ -145,10 +148,12 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             });
             ft.add(R.id.main_window, previewFragment, "PREVIEW");
 
-            //Create face tracking fragment
-            final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
-            faceTrackingFragment.setRobotInterface(this);
-            ft.add(R.id.main_window, faceTrackingFragment, "FACE_TRACKING");
+            if(checkGooglePlayServices()) {
+                //Create face tracking fragment
+                final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
+                faceTrackingFragment.setRobotInterface(this);
+                ft.add(R.id.main_window, faceTrackingFragment, "FACE_TRACKING");
+            }
 
             //Commit both fragments
             ft.commit();
@@ -163,6 +168,27 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+    }
+
+    /**
+     * Will direct user to play store to update Google Play Services if needed
+     * @return true if google play services is available
+     */
+    private boolean checkGooglePlayServices() {
+        final int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (status != ConnectionResult.SUCCESS) {
+            Log.e(TAG, GooglePlayServicesUtil.getErrorString(status));
+
+            // ask user to update google play services.
+            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, 1);
+            dialog.show();
+            return false;
+        } else {
+            Log.i(TAG, GooglePlayServicesUtil.getErrorString(status));
+            // google play services is updated.
+            //your code goes here...
+            return true;
+        }
     }
 
     @Override
