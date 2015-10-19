@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="@dimen/width_camera_preview"
+    android:layout_height="@dimen/height_camera_preview"
+    android:layout_gravity="bottom|center_horizontal"
     android:gravity="bottom|center_horizontal"
     android:orientation="vertical">
 
     <com.tesseractmobile.pocketbot.views.CameraSourcePreview
         android:id="@+id/preview"
-        android:layout_width="@dimen/width_camera_preview"
-        android:layout_height="@dimen/height_camera_preview"
-        android:visibility="invisible">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <com.tesseractmobile.pocketbot.views.GraphicOverlay
             android:id="@+id/faceOverlay"

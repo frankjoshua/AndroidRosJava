@@ -8,5 +8,5 @@
 	<dimen name="margin_top_mouth">75dp</dimen>
 	<dimen name="text_size_mouth">18dp</dimen>
 	<dimen name="width_camera_preview">240dp</dimen>
-	<dimen name="height_camera_preview">320dp</dimen>
+	<dimen name="height_camera_preview">240dp</dimen>
 </resources>

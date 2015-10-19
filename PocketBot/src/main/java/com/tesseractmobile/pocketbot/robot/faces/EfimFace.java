@@ -16,7 +16,7 @@ import android.view.View.OnClickListener;
 /**
  * Created by josh on 10/17/2015.
  */
-public class EfimFace implements RobotFace, OnClickListener, SpeechCompleteListener{
+public class EfimFace implements RobotFace, OnClickListener{
 
     private MouthView mouthView;
     private EyeView mLeftEye;
@@ -34,9 +34,6 @@ public class EfimFace implements RobotFace, OnClickListener, SpeechCompleteListe
         mouthView = (MouthView) view.findViewById(R.id.mouthView);
         mLeftEye = (EyeView) view.findViewById(R.id.eyeViewLeft);
         mRightEye = (EyeView) view.findViewById(R.id.eyeViewRight);
-
-        //Listen for end of speech
-        mouthView.setOnSpeechCompleteListener(this);
 
         // Setup click listeners
         mLeftEye.setOnClickListener(this);
@@ -149,8 +146,4 @@ public class EfimFace implements RobotFace, OnClickListener, SpeechCompleteListe
         mRightEye.squintLeft();
     }
 
-    @Override
-    public void onSpeechComplete() {
-
-    }
 }

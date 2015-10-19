@@ -13,7 +13,7 @@ import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 /**
  * Created by josh on 10/18/2015.
  */
-public class EfimFaceFragment extends FaceFragment implements RobotInterface {
+public class EfimFaceFragment extends FaceFragment {
 
     private EfimFace mRobotFace;
 
@@ -30,18 +30,4 @@ public class EfimFaceFragment extends FaceFragment implements RobotInterface {
         return view;
     }
 
-    @Override
-    public void listen() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public void humanSpotted(int id) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public void look(float x, float y, float z) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
 }

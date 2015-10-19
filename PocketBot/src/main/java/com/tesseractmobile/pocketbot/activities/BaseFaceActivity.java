@@ -134,6 +134,13 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.main_window, faceFragment, "FACE");
 
+            if(checkGooglePlayServices()) {
+                //Create face tracking fragment
+                final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
+                faceTrackingFragment.setRobotInterface(this);
+                ft.add(R.id.main_window, faceTrackingFragment, "FACE_TRACKING");
+            }
+
             //Create Preview Fragment
             final PreviewFragment previewFragment = new PreviewFragment();
             previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener(){
@@ -148,14 +155,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             });
             ft.add(R.id.main_window, previewFragment, "PREVIEW");
 
-            if(checkGooglePlayServices()) {
-                //Create face tracking fragment
-                final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
-                faceTrackingFragment.setRobotInterface(this);
-                ft.add(R.id.main_window, faceTrackingFragment, "FACE_TRACKING");
-            }
-
-            //Commit both fragments
+            //Commit all fragments
             ft.commit();
         }
 

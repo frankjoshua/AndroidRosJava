@@ -20,7 +20,7 @@ public class PreviewFragment extends CallbackFragment {
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.text_preview, null);
+        final View view = inflater.inflate(R.layout.text_preview, container, false);
         mTextListView = (ListView) view.findViewById(R.id.textList);
         return view;
     }

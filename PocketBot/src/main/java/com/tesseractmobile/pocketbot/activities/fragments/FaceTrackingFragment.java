@@ -56,18 +56,23 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
                 .setRequestedFps(30.0f)
                 .build();
 
-        if(PocketBotSettings.isShowPreview(activity)){
-            mPreview.setVisibility(View.VISIBLE);
-        }
         PocketBotSettings.registerOnSharedPreferenceChangeListener(activity, this);
     }
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.camera_preview, null);
+        final View view = inflater.inflate(R.layout.camera_preview, container, false);
         mPreview = (CameraSourcePreview) view.findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) view.findViewById(R.id.faceOverlay);
+        if(PocketBotSettings.isShowPreview(getActivity())){
+            mPreview.setVisibility(View.VISIBLE);
+        }
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
