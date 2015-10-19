@@ -5,14 +5,17 @@
 #include <PocketBot.h>
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
-//#include <RunningMedian.h>
+#include <RunningMedian.h>
 
-AndroidAccessory acc("Google, Inc.",
-		     "DemoKit",
-		     "DemoKit Arduino Board",
+/*
+* These parameters must match what the app expects
+*/
+AndroidAccessory acc("Tesseract Mobile LLC",
+		     "PocketBot",
+		     "",
 		     "1.0",
-		     "http://www.android.com",
-		     "0000000012345678");
+		     "http://pocketbot.io",
+		     "1");
 
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -20,14 +23,14 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *leftMotor = AFMS.getMotor(4);
 
-//RunningMedian avg(5);
+RunningMedian avg(5);
 
 PocketBot pocketBot;
 
 long mLastUpdate = 0;
 long mLastSensorRead = 0;
 boolean mRoamingMode = true;
-int mDistance = 0;
+const int SonarPin = A0;
 
 float mapfloat(float x, float in_min, float in_max, float out_min, float out_max){
  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -49,7 +52,8 @@ void setup(void){
     delay(250); 
   }
   
-  pinMode(6, OUTPUT);
+  // set pin for sonar
+  pinMode(SonarPin, INPUT);
 }
 
 void loop(void){
@@ -99,19 +103,9 @@ void loop(void){
             leftMotor->run(FORWARD);
             leftMotor->setSpeed(s);
           } else if (z > .3 && z < .45){
-            //Forward 
-            //Serial.println("Forward");
-            rightMotor->run(BACKWARD);
-            rightMotor->setSpeed(100);
-            leftMotor->run(BACKWARD);
-            leftMotor->setSpeed(100);
+            move(BACKWARD, 100);
           } else if ( z > .5) {
-            //Backward 
-            //Serial.println("Backward");
-            rightMotor->run(FORWARD);
-            rightMotor->setSpeed(100);
-            leftMotor->run(FORWARD);
-            leftMotor->setSpeed(100);
+            move(FORWARD, 100);
           }else {
             rightMotor->setSpeed(0);
             leftMotor->setSpeed(0);
@@ -129,26 +123,27 @@ void loop(void){
       mLastSensorRead = millis();
       //Read from sonar sensor
       //Add to running median
-      int pulse = pulseIn(6, HIGH) / 147;
-      if(pulse < 253){
-        //avg.add(pulse);
-        //mDistance = avg.getMedian();
-        mDistance = pulse;
-        Serial.println(mDistance);
-      }
+      //int pulse = analogRead(SonarPin);
+      avg.add(analogRead(SonarPin));
+      int mDistance = avg.getMedian() * 0.497;
+      Serial.println(mDistance);
       //If no obsticals move forward
-      if(mDistance > 12){
-         //Forward 
-        //Serial.println("Forward");
+      if(mDistance > 24){
+        //Forward
+         move(BACKWARD, 255);
+      } else if(mDistance > 12){
+        //slight turn  
         rightMotor->run(BACKWARD);
-        rightMotor->setSpeed(100);
+        rightMotor->setSpeed(200);
         leftMotor->run(BACKWARD);
-        leftMotor->setSpeed(100);
+        leftMotor->setSpeed(255);     
       } else {
+        //turn
         rightMotor->run(FORWARD);
         rightMotor->setSpeed(150);
         leftMotor->run(BACKWARD);
         leftMotor->setSpeed(150);
+        delay(350);
       }
     }
   } 
@@ -161,4 +156,10 @@ void loop(void){
   
 }
 
+void move(int dir, int speed){
+  rightMotor->run(dir);
+  rightMotor->setSpeed(speed);
+  leftMotor->run(dir);
+  leftMotor->setSpeed(speed);
+}
 

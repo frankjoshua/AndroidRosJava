@@ -82,7 +82,9 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
     public void sendJson(final String json){
         final Command command = new Command();
         command.jsonBytes = json.getBytes(Charset.forName("UTF-8"));
-        commandQueue.add(command);
+        synchronized (commandQueue){
+            commandQueue.add(command);
+        }
     }
 
     @Override
@@ -95,7 +97,6 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
 
         registerReceiver(usbReciever, filter);
 
-        //connectAccessory();
     }
 
     @Override
@@ -217,19 +218,8 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
             
             synchronized (commandQueue) {
                 if (commandQueue.isEmpty() == false) {
-                    //log("Running Commands");
                     final Command command = commandQueue.poll();
-//                    if(command.cmd != CommandContract.CMD_PAUSE){
-//                        sendCommand(command.cmd, command.tar, command.val, command.delay);
-//                    }
-//                    command.delay -= timeElapsed;
-//                    if (command.delay <= 0) {   
-//                        commandQueue.poll();
-//                    }
-//                    commandQueue.poll();
                     sendCommand(command.jsonBytes);
-                } else {
-                    //log("No Commands");
                 }
             }
             try {
