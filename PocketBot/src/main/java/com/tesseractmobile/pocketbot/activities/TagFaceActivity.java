@@ -75,10 +75,10 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
         //Start transmitting
         BeaconParser beaconParser = new BeaconParser()
                 .setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
-        beaconTransmitter = new BeaconTransmitter(getApplicationContext(), beaconParser);
-        beaconTransmitter.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);
-
-        createBeacon(TagGame.NOT_IT, mTagGame.getId());
+//        beaconTransmitter = new BeaconTransmitter(getApplicationContext(), beaconParser);
+//        beaconTransmitter.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);
+//
+//        createBeacon(TagGame.NOT_IT, mTagGame.getId());
     }
 
     /**
@@ -89,16 +89,16 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
      */
     private void createBeacon(final int type, final int id) {
         //Log.d(TAG, "Creating Beacon, type " + Integer.toString(type) + " Id " + Integer.toString(id));
-        beaconTransmitter.stopAdvertising();
-        beacon = new Beacon.Builder()
-                .setId1("2f234454-cf6d-4a0f-adf2-f4911ba9ffa6")
-                .setId2(Integer.toString(type))
-                .setId3(Integer.toString(id))
-                .setManufacturer(0x0118)
-                .setTxPower(-59)
-                .setDataFields(Arrays.asList(new Long[]{0l}))
-                .build();
-        beaconTransmitter.startAdvertising(beacon);
+//        beaconTransmitter.stopAdvertising();
+//        beacon = new Beacon.Builder()
+//                .setId1("2f234454-cf6d-4a0f-adf2-f4911ba9ffa6")
+//                .setId2(Integer.toString(type))
+//                .setId3(Integer.toString(id))
+//                .setManufacturer(0x0118)
+//                .setTxPower(-59)
+//                .setDataFields(Arrays.asList(new Long[]{0l}))
+//                .build();
+//        beaconTransmitter.startAdvertising(beacon);
     }
 
     @Override

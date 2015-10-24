@@ -16,6 +16,7 @@ public class SensorData {
     private float face_z;
     private int heading;
     private int destHeading;
+    private boolean proximity;
     //private long time;
 
 
@@ -84,4 +85,8 @@ public class SensorData {
         return BigDecimal.valueOf(d).setScale(decimalPlace,BigDecimal.ROUND_HALF_UP).floatValue();
     }
 
+    public void setProximity(boolean proximity) {
+        this.proximity = proximity;
+        update();
+    }
 }

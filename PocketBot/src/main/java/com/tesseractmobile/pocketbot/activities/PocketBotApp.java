@@ -11,6 +11,8 @@ import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by josh on 9/27/2015.
@@ -20,6 +22,7 @@ public class PocketBotApp extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         //Bind to voice recognition service to hold constant connection
         final ServiceConnection voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override

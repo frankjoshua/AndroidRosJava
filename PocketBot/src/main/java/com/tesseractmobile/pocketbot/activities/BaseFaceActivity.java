@@ -234,7 +234,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         //Start listening for orientation
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
-
+        //Listen to proximity sensor
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -521,6 +522,13 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             }
         }
 
+        if(event.sensor.getType() == Sensor.TYPE_PROXIMITY){
+            final float distance = event.values[0];
+            //Distance is either touching or not
+            mSensorData.setProximity(distance < 1.0f);
+            sendSensorData();
+            //Log.d(TAG, "Proximity " + Float.toString(distance));
+        }
     }
 
     private float[] lowPass(float[] input, float[] output) {
