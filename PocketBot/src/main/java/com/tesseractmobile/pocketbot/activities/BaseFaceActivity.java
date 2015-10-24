@@ -19,6 +19,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.util.Log;
@@ -59,10 +60,12 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     private static final int START_LISTENING = 1;
     private static final int START_LISTENING_AFTER_PROMPT = 2;
     public static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
+    public static final String FRAGMENT_FACE_TRACKING = "FACE_TRACKING";
+    public static final String FRAGMENT_FACE = "FACE";
+    public static final String FRAGMENT_PREVIEW = "PREVIEW";
 
 
     private RobotFace mRobotFace;
-    private ListView mTextListView;
     private SpeechAdapter mSpeechAdapter;
     private SensorData mSensorData = new SensorData();
 
@@ -121,42 +124,55 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
         setContentView(R.layout.main);
 
+        final boolean useFaceTracking = checkGooglePlayServices();
+        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        final PreviewFragment previewFragment;
+        final FaceFragment faceFragment;
+        final FaceTrackingFragment faceTrackingFragment;
         if(savedInstanceState == null){
-            //Create the face fragment
-            final FaceFragment faceFragment = new EfimFaceFragment();
-            //Set up a listener for when the view is created
-            faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
-                @Override
-                public void onComplete() {
-                    mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
-                }
-            });
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.main_window, faceFragment, "FACE");
+            FragmentTransaction ft = supportFragmentManager.beginTransaction();
 
-            if(checkGooglePlayServices()) {
+            //Create the face fragment
+            faceFragment = new EfimFaceFragment();
+            ft.add(R.id.main_window, faceFragment, FRAGMENT_FACE);
+
+            if(useFaceTracking) {
                 //Create face tracking fragment
-                final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
-                faceTrackingFragment.setRobotInterface(this);
-                ft.add(R.id.main_window, faceTrackingFragment, "FACE_TRACKING");
+                faceTrackingFragment = new FaceTrackingFragment();
+                ft.add(R.id.main_window, faceTrackingFragment, FRAGMENT_FACE_TRACKING);
+            } else {
+                faceTrackingFragment = null;
             }
 
             //Create Preview Fragment
-            final PreviewFragment previewFragment = new PreviewFragment();
-            previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener(){
-
-                @Override
-                public void onComplete() {
-                    mTextListView = previewFragment.getListView();
-                    //Setup list view for text
-                    mSpeechAdapter = new SpeechAdapter(BaseFaceActivity.this);
-                    mTextListView.setAdapter(mSpeechAdapter);
-                }
-            });
-            ft.add(R.id.main_window, previewFragment, "PREVIEW");
+            previewFragment = new PreviewFragment();
+            ft.add(R.id.main_window, previewFragment, FRAGMENT_PREVIEW);
 
             //Commit all fragments
             ft.commit();
+        } else {
+            //Find previous fragments
+            previewFragment = (PreviewFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_PREVIEW);
+            faceFragment = (FaceFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_FACE);
+            faceTrackingFragment = (FaceTrackingFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_FACE_TRACKING);
+        }
+
+        //Set up a listener for when the view is created
+        faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
+            @Override
+            public void onComplete() {
+                mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
+            }
+        });
+        previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener(){
+
+            @Override
+            public void onComplete() {
+                setupTextPreview(previewFragment);
+            }
+        });
+        if(useFaceTracking){
+            faceTrackingFragment.setRobotInterface(this);
         }
 
         //Start senors
@@ -168,6 +184,13 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+    }
+
+    private void setupTextPreview(final PreviewFragment previewFragment) {
+        //Setup list view for text
+        mSpeechAdapter = new SpeechAdapter(BaseFaceActivity.this);
+        ListView listView = previewFragment.getListView();
+        listView.setAdapter(mSpeechAdapter);
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,6 @@ abstract public class CallbackFragment extends Fragment{
 
     private OnCompleteListener mOnCompleteListener;
 
-    @Nullable
     @Override
     final public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = createView(inflater, container, savedInstanceState);
