@@ -100,13 +100,13 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
         @Override
         public boolean isConnected() {
-            return false;
+            return true;
         }
 
         @Override
         public void sendJson(String json) {
             //Do nothing
-            say("I can't feel my wheels!");
+            //say("I can't feel my wheels!");
         }
     };
     private SpeechState mSpeechState = SpeechState.READY;
@@ -280,17 +280,15 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     @Override
     public void look(final float x, final float y, float z) {
         mRobotFace.look(x, y, x);
-        if (mBodyInterface.isConnected()) {
-            mSensorData.setFace_x(x);
-            mSensorData.setFace_y(y);
-            mSensorData.setFace_z(z);
-            sendSensorData();
-        }
+        mSensorData.setFace_x(x);
+        mSensorData.setFace_y(y);
+        mSensorData.setFace_z(z);
+        sendSensorData();
     }
 
     protected void sendSensorData() {
         final long uptime = SystemClock.uptimeMillis();
-        if(mBodyInterface.isConnected() && uptime > mLastSensorTransmision + mSensorDelay) {
+        if(uptime > mLastSensorTransmision + mSensorDelay) {
             mLastSensorTransmision = uptime;
             sendData(mSensorData);
         }
@@ -302,16 +300,9 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      * @param data
      */
     final protected void sendData(final Object data) {
-        mBodyInterface.sendObject(data);
-    }
-
-    /**
-     * Sends JSON directly
-     *
-     * @param json
-     */
-    final protected void sendJson(final String json) {
-        mBodyInterface.sendJson(json);
+        if(mBodyInterface.isConnected()){
+            mBodyInterface.sendObject(data);
+        }
     }
 
     /**

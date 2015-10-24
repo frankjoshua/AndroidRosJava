@@ -56,6 +56,11 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
         if(Build.VERSION.SDK_INT < 18){
             return;
         }
+        //If bluetooth scanning is off just exit
+        //TODO ***** This needs to be improved
+        if(PocketBotSettings.isUseBluetooth(this) == false){
+            return;
+        }
         mTagGame = new TagGame(this);
 
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -73,12 +78,13 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
             e.printStackTrace();
         }
         //Start transmitting
+        //TODO Need to check if the phone supports this
         BeaconParser beaconParser = new BeaconParser()
                 .setBeaconLayout("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
-//        beaconTransmitter = new BeaconTransmitter(getApplicationContext(), beaconParser);
-//        beaconTransmitter.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);
-//
-//        createBeacon(TagGame.NOT_IT, mTagGame.getId());
+        beaconTransmitter = new BeaconTransmitter(getApplicationContext(), beaconParser);
+        beaconTransmitter.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY);
+
+        createBeacon(TagGame.NOT_IT, mTagGame.getId());
     }
 
     /**
@@ -88,17 +94,18 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
      * @param id
      */
     private void createBeacon(final int type, final int id) {
+        //TODO Need to check if the phone supports this
         //Log.d(TAG, "Creating Beacon, type " + Integer.toString(type) + " Id " + Integer.toString(id));
-//        beaconTransmitter.stopAdvertising();
-//        beacon = new Beacon.Builder()
-//                .setId1("2f234454-cf6d-4a0f-adf2-f4911ba9ffa6")
-//                .setId2(Integer.toString(type))
-//                .setId3(Integer.toString(id))
-//                .setManufacturer(0x0118)
-//                .setTxPower(-59)
-//                .setDataFields(Arrays.asList(new Long[]{0l}))
-//                .build();
-//        beaconTransmitter.startAdvertising(beacon);
+        beaconTransmitter.stopAdvertising();
+        beacon = new Beacon.Builder()
+                .setId1("2f234454-cf6d-4a0f-adf2-f4911ba9ffa6")
+                .setId2(Integer.toString(type))
+                .setId3(Integer.toString(id))
+                .setManufacturer(0x0118)
+                .setTxPower(-59)
+                .setDataFields(Arrays.asList(new Long[]{0l}))
+                .build();
+        beaconTransmitter.startAdvertising(beacon);
     }
 
     @Override

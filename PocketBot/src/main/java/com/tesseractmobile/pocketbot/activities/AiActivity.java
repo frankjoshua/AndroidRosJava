@@ -28,7 +28,6 @@ import ai.api.model.Result;
  */
 public class AiActivity extends BaseFaceActivity {
 
-    public static final String PARAM_NUMBER = "number";
     private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
     private final String SUBSCRIPTION_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     private final Handler handler = new Handler();
@@ -42,12 +41,6 @@ public class AiActivity extends BaseFaceActivity {
         mAiDataService = new AIDataService(this, aiConfig);
 
     }
-
-//    @Override
-//    protected void lauchListeningIntent(String prompt) {
-//        mAiService.startListening();
-//    }
-
 
     @Override
     protected void onHumanSpoted() {

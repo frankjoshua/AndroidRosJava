@@ -100,15 +100,15 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     }
 
     private void startScan(final UUID[] servicesToScan, final String deviceNameToScanFor) {
-        Log.d(TAG, "startScan");
-
-        // Stop current scanning (if needed)
-        stopScanning();
-
         if(mUseBluetooth == false){
             Log.d(TAG, "Bluetooth disabled not starting scan");
             return;
         }
+
+        Log.d(TAG, "startScan");
+
+        // Stop current scanning (if needed)
+        stopScanning();
 
         // Configure scanning
         BluetoothAdapter bluetoothAdapter = BleUtils.getBluetoothAdapter(getApplicationContext());
