@@ -13,8 +13,10 @@ public class PocketBotSettings {
 
     public static final String SHOW_PREVIEW = CommandContract.PARAM_PREVIEW;
     public static final String SHOW_TEXT_PREVIEW = CommandContract.PARAM_TEXT_PREVIEW;
+    public static final String USE_BLUETOOTH = CommandContract.PARAM_BLUETOOTH;
     public static final boolean DEFAULT_SHOW_TEXT_PREVIEW = true;
     public static final boolean DEFAULT_SHOW_PREVIEW = true;
+    public static final boolean DEFAULT_USE_BLUETOOTH = false;
 
     /**
      * True if preview window should be shown
@@ -28,11 +30,11 @@ public class PocketBotSettings {
     /**
      * Set to true to show preview window
      * @param context
-     * @param showPreview
+     * @param b
      * @return
      */
-    static public boolean setShowPreview(final Context context, final boolean showPreview){
-        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_PREVIEW, showPreview).commit();
+    static public boolean setShowPreview(final Context context, final boolean b){
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_PREVIEW, b).commit();
     }
 
     /**
@@ -47,11 +49,30 @@ public class PocketBotSettings {
     /**
      * Set to true to show preview window
      * @param context
-     * @param showPreview
+     * @param b
      * @return
      */
-    static public boolean setShowTextPreview(final Context context, final boolean showPreview){
-        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_TEXT_PREVIEW, showPreview).commit();
+    static public boolean setShowTextPreview(final Context context, final boolean b){
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_TEXT_PREVIEW, b).commit();
+    }
+
+    /**
+     * True if preview window should be shown
+     * @param context
+     * @return
+     */
+    static public boolean isUseBluetooth(final Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(USE_BLUETOOTH, DEFAULT_USE_BLUETOOTH);
+    }
+
+    /**
+     * Set to true to show preview window
+     * @param context
+     * @param b
+     * @return
+     */
+    static public boolean setUseBluetooth(final Context context, final boolean b){
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(USE_BLUETOOTH, b).commit();
     }
 
     /**
