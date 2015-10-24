@@ -56,7 +56,6 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
                 .setRequestedFps(30.0f)
                 .build();
 
-        PocketBotSettings.registerOnSharedPreferenceChangeListener(activity, this);
     }
 
     @Override
@@ -83,12 +82,14 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
         } catch (IOException e) {
             //Log.e(TAG, e.getMessage());
         }
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(getActivity(), this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         mCameraSource.stop();
+        PocketBotSettings.unregisterOnSharedPreferenceChangeListener(getActivity(), this);
     }
 
     public void setRobotInterface(RobotInterface mRobotInterface) {
