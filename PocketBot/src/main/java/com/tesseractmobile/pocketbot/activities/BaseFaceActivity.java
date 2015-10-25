@@ -92,6 +92,11 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
     private VoiceRecognitionService mVoiceRecognitionService;
 
+    //Storage for sensors
+    static private float ROTATION[] = new float[9];
+    static private float INCLINATION[] = new float[9];
+    static private float ORIENTATION[] = new float[3];
+
     protected BodyInterface mBodyInterface = new BodyInterface() {
         @Override
         public void sendObject(Object object) {
@@ -520,14 +525,12 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
             mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
         if (mGravity != null && mGeomagnetic != null) {
-            float R[] = new float[9];
-            float I[] = new float[9];
-            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+
+            boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
             if (success) {
-                float orientation[] = new float[3];
-                SensorManager.getOrientation(R, orientation);
+                SensorManager.getOrientation(INCLINATION, ORIENTATION);
                 //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
-                final int heading = (int) (Math.toDegrees(orientation[0]) + 360 + 180) % 360;
+                final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
                 if (Math.abs(heading - mSensorData.getHeading()) > 1) {
                     mSensorData.setHeading(heading);
                     sendSensorData();
