@@ -46,6 +46,8 @@ public class CommandContract {
     public static final String PARAM_DISTANCE = "distance";
     public static final String PARAM_EMOTION = "emotion";
     public static final String PARAM_PREVIEW = "preview";
+    public static final String PARAM_TEXT_PREVIEW = "text_preview";
+    public static final String PARAM_BLUETOOTH = "bluetooth";
     public static final String PARAM_PACKAGE = "package";
 
     //Emotion values from api.ai

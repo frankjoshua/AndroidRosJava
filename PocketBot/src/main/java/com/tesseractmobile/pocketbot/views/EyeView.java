@@ -25,7 +25,9 @@ import android.view.View;
 import com.tesseractmobile.pocketbot.R;
 
 public class EyeView extends View {
-    
+
+    public static final float WIDE_PUPIL_SIZE = .2f;
+    public static final float DEFAULT_PUPIL_SIZE = .15f;
     private final Handler mHandler = new Handler(){
 
         @Override
@@ -63,8 +65,8 @@ public class EyeView extends View {
     private float mCenterEyeYDest;
     private float mCenterEyeYSrc;
     private float mCenterEyeY = 1.0f;
-    private float mPupilSize = .26f;
-    private float mPupilSizeDst;
+    private float mPupilSize = DEFAULT_PUPIL_SIZE;
+    private float mPupilSizeDst = DEFAULT_PUPIL_SIZE;
     private float mPupilSizeSrc;
     private final ValueAnimator animation;
     
@@ -305,7 +307,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .8);
         mUpperEyeRotationDest = 30;
         mLowerEyeRotationDest = 0;
-        mPupilSizeDst = 0.1f;
+        mPupilSizeDst = DEFAULT_PUPIL_SIZE;
         startAnimation(500);
     }
 
@@ -315,7 +317,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) Math.round(mEyeCanvas.getHeight() * .8);
         mUpperEyeRotationDest = -30;
         mLowerEyeRotationDest = 0;
-        mPupilSizeDst = 0.1f;
+        mPupilSizeDst = DEFAULT_PUPIL_SIZE;
         startAnimation(500);
     }
     
@@ -327,7 +329,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = -10;
         mLowerEyeRotationDest = 10;
-        mPupilSizeDst = 0.2f;
+        mPupilSizeDst = WIDE_PUPIL_SIZE;
         //Create an animation
         startAnimation(250);
     }
@@ -340,7 +342,7 @@ public class EyeView extends View {
         mLowerEyelidRectDest.top = (int) (mEyeCanvas.getHeight() * .9);
         mUpperEyeRotationDest = 10;
         mLowerEyeRotationDest = -10;
-        mPupilSizeDst = 0.2f;
+        mPupilSizeDst = WIDE_PUPIL_SIZE;
         //Create an animation
         startAnimation(250);
     }

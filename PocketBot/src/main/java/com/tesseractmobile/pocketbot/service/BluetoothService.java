@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import com.google.gson.Gson;
 import com.tesseractmobile.ble.BleDevicesScanner;
 import com.tesseractmobile.ble.BleManager;
 import com.tesseractmobile.ble.BleUtils;
+import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
 
@@ -29,12 +31,13 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by josh on 8/29/2015.
  */
 @TargetApi(18)
-public class BluetoothService extends BodyService implements BleManager.BleManagerListener, Runnable {
+public class BluetoothService extends BodyService implements BleManager.BleManagerListener, Runnable, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = BluetoothService.class.getName();
 
@@ -56,18 +59,52 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     private Queue<byte[]> mMessageQueue = new LinkedList<byte[]>();
 
+    private boolean mUseBluetooth;
+
+    private AtomicBoolean mRunning = new AtomicBoolean(true);
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mUseBluetooth = PocketBotSettings.isUseBluetooth(this);
+
+        if(mUseBluetooth){
+            //Start thread
+            startThread();
+        }
+
+        //Listen for preference changes
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
+    }
+
+    private void startThread() {
+        mRunning.set(true);
         mBleManager = BleManager.getInstance(this);
         mBleManager.setBleListener(this);
-
-        //Start thread
         Thread thread = new Thread(this);
         thread.start();
     }
 
+    private void stopThread() {
+        //When false the thread will exit
+        mRunning.set(false);
+        mBleManager.disconnect();
+    }
+
+    /**
+     * Starts the scan with default settings
+     */
+    private void startScan() {
+        startScan(SERVICES_TO_SCAN, null);
+    }
+
     private void startScan(final UUID[] servicesToScan, final String deviceNameToScanFor) {
+        if(mUseBluetooth == false){
+            Log.d(TAG, "Bluetooth disabled not starting scan");
+            return;
+        }
+
         Log.d(TAG, "startScan");
 
         // Stop current scanning (if needed)
@@ -284,7 +321,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
             @Override
             public void run() {
                 mScannedDevices.clear();
-                startScan(SERVICES_TO_SCAN, null);
+                startScan();
             }
         }, 5000);
     }
@@ -348,12 +385,12 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
     @Override
     protected void bodyListenerRegistered() {
         Log.d(TAG, "bodyListenerRegistered");
-        startScan(SERVICES_TO_SCAN, null);
+        startScan();
     }
 
     @Override
     public void run() {
-        while(true){
+        while(mRunning.get()){
             final Queue<byte[]> messageQueue = mMessageQueue;
             if(messageQueue != null) {
                 byte[] message = messageQueue.poll();
@@ -370,6 +407,29 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
         }
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(PocketBotSettings.USE_BLUETOOTH.equals(key)){
+            final boolean useBlueTooth = sharedPreferences.getBoolean(key, PocketBotSettings.DEFAULT_USE_BLUETOOTH);
+            setUseBluetooth(useBlueTooth);
+        }
+    }
+
+    private void setUseBluetooth(boolean useBlueTooth) {
+        if(mUseBluetooth != useBlueTooth){
+            //Update setting
+            mUseBluetooth = useBlueTooth;
+            if(mUseBluetooth){
+                //Turn on bluetooth
+                startThread();
+                startScan();
+            } else {
+                //Turn off bluetooth
+                stopThread();
+                stopScanning();
+            }
+        }
+    }
 
     private class BluetoothDeviceData {
         public BluetoothDevice device;

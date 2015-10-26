@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="preview"
+        android:title="Preview"
+        android:summary="Video preview"
+        android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="text_preview"
+        android:title="Transcript"
+        android:summary="Text preview"
+        android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="bluetooth"
+        android:title="Bluetooth"
+        android:summary="Scan for Bluetooth devices"
+        android:defaultValue="false" />
+</PreferenceScreen>

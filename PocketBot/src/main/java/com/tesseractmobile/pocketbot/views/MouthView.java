@@ -8,10 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
-import android.graphics.Path;
 import android.graphics.RectF;
-import android.graphics.drawable.AnimationDrawable;
 import android.media.audiofx.Visualizer;
 import android.media.audiofx.Visualizer.OnDataCaptureListener;
 import android.os.Build;
@@ -35,6 +32,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     private final Paint mMouthPaint;
     private SpeechCompleteListener mSpeechCompleteListener;
 
+    static final private RectF DEST_RECT = new RectF();
     private HashMap<String, Boolean> mActiveUtterance = new HashMap<String, Boolean>();
 
     private Bitmap[] mMouthBitmaps;
@@ -102,9 +100,9 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
                 }
             }
         }
-        final RectF destRect = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.drawRoundRect(destRect, 50, 50, mMouthPaint);
-        canvas.drawBitmap(mMouthBitmaps[mCurrentBitmap], null, destRect, null);
+        DEST_RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
+        canvas.drawRoundRect(DEST_RECT, 50, 50, mMouthPaint);
+        canvas.drawBitmap(mMouthBitmaps[mCurrentBitmap], null, DEST_RECT, null);
         //Draw text
         //super.onDraw(canvas);
     }
