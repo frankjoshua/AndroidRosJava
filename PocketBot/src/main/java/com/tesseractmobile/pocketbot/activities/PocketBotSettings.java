@@ -14,9 +14,11 @@ public class PocketBotSettings {
     public static final String SHOW_PREVIEW = CommandContract.PARAM_PREVIEW;
     public static final String SHOW_TEXT_PREVIEW = CommandContract.PARAM_TEXT_PREVIEW;
     public static final String USE_BLUETOOTH = CommandContract.PARAM_BLUETOOTH;
+    public static final String SELECTED_FACE = "selected_face";
     public static final boolean DEFAULT_SHOW_TEXT_PREVIEW = true;
     public static final boolean DEFAULT_SHOW_PREVIEW = true;
     public static final boolean DEFAULT_USE_BLUETOOTH = false;
+    public static final int DEFAULT_FACE_ID = 0;
 
     /**
      * True if preview window should be shown
@@ -73,6 +75,25 @@ public class PocketBotSettings {
      */
     static public boolean setUseBluetooth(final Context context, final boolean b){
         return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(USE_BLUETOOTH, b).commit();
+    }
+
+    /**
+     *
+     * @param context
+     * @param faceId
+     * @return
+     */
+    static public boolean setSelectedFace(final Context context, final int faceId){
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(SELECTED_FACE, faceId).commit();
+    }
+
+    /**
+     *
+     * @param context
+     * @return
+     */
+    static public int getSelectedFace(final Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(SELECTED_FACE, 0);
     }
 
     /**

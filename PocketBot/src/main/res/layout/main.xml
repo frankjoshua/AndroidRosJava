@@ -11,7 +11,18 @@
     <FrameLayout
         android:id="@+id/main_window"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+        <LinearLayout
+            android:id="@+id/faceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+        <LinearLayout
+            android:id="@+id/overlayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+        </FrameLayout>
 
     <!-- Drawer -->
 

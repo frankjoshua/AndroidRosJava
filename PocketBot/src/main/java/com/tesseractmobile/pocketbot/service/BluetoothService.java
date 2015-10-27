@@ -316,14 +316,17 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
         Log.d(TAG, "onDisconnected");
         error(0, "Body interface lost");
         stopScanning();
-        //Retry scan in 5 seconds
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mScannedDevices.clear();
-                startScan();
-            }
-        }, 5000);
+        final ArrayList<BluetoothDeviceData> devices = mScannedDevices;
+        if(devices != null) {
+            //Retry scan in 5 seconds
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    devices.clear();
+                    startScan();
+                }
+            }, 5000);
+        }
     }
 
     @Override

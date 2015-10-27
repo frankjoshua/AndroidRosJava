@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,12 +18,16 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.preference.Preference;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
 
@@ -36,6 +41,7 @@ import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.ControlFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
@@ -53,7 +59,7 @@ import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface{
+public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -118,9 +124,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     private float[] mGravity;
     private float[] mGeomagnetic;
     private long mLastSensorTransmision;
-    private int mSensorDelay = 100;
+    private int mSensorDelay = 500;
     private int mHumanCount = 0;
-
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -128,60 +133,70 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.main);
+        findViewById(R.id.btnFace).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final int currentFaceId = PocketBotSettings.getSelectedFace(BaseFaceActivity.this);
+                final int nextFaceId;
+                if(currentFaceId == 0){
+                    nextFaceId = 1;
+                } else {
+                    nextFaceId = 0;
+                }
+                PocketBotSettings.setSelectedFace(BaseFaceActivity.this, nextFaceId);
+            }
+        });
+
+        //Setup face
+        switchFace(PocketBotSettings.getSelectedFace(this));
 
         final boolean useFaceTracking = checkGooglePlayServices();
-        FragmentManager supportFragmentManager = getSupportFragmentManager();
+        final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final PreviewFragment previewFragment;
-        final FaceFragment faceFragment;
         final FaceTrackingFragment faceTrackingFragment;
         if(savedInstanceState == null){
-            FragmentTransaction ft = supportFragmentManager.beginTransaction();
-
-            //Create the face fragment
-            faceFragment = new EfimFaceFragment();
-            ft.add(R.id.main_window, faceFragment, FRAGMENT_FACE);
+            final FragmentTransaction ft = supportFragmentManager.beginTransaction();
 
             if(useFaceTracking) {
                 //Create face tracking fragment
                 faceTrackingFragment = new FaceTrackingFragment();
-                ft.add(R.id.main_window, faceTrackingFragment, FRAGMENT_FACE_TRACKING);
+                ft.add(R.id.overlayView, faceTrackingFragment, FRAGMENT_FACE_TRACKING);
             } else {
                 faceTrackingFragment = null;
             }
 
             //Create Preview Fragment
             previewFragment = new PreviewFragment();
-            ft.add(R.id.main_window, previewFragment, FRAGMENT_PREVIEW);
+            ft.add(R.id.overlayView, previewFragment, FRAGMENT_PREVIEW);
 
             //Commit all fragments
             ft.commit();
         } else {
             //Find previous fragments
             previewFragment = (PreviewFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_PREVIEW);
-            faceFragment = (FaceFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_FACE);
             faceTrackingFragment = (FaceTrackingFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_FACE_TRACKING);
         }
 
         //Set up a listener for when the view is created
-        faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
-            @Override
-            public void onComplete() {
-                mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
-            }
-        });
-        previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener(){
+        if(previewFragment != null) {
+            previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
 
-            @Override
-            public void onComplete() {
-                setupTextPreview(previewFragment);
-            }
-        });
+                @Override
+                public void onComplete() {
+                    setupTextPreview(previewFragment);
+                }
+            });
+        }
+
         if(useFaceTracking){
             faceTrackingFragment.setRobotInterface(this);
         }
 
         //Start senors
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        //Listen for preference changes
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
 
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -284,16 +299,21 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
     @Override
     public void look(final float x, final float y, float z) {
-        mRobotFace.look(x, y, x);
+        mRobotFace.look(x, y, z);
         mSensorData.setFace_x(x);
         mSensorData.setFace_y(y);
         mSensorData.setFace_z(z);
-        sendSensorData();
+        sendSensorData(false);
     }
 
-    protected void sendSensorData() {
+    /**
+     * Sends sensor data if enough time has passed
+     * May drop data
+     * @param force true if data must be sent
+     */
+    protected void sendSensorData(final boolean force) {
         final long uptime = SystemClock.uptimeMillis();
-        if(uptime > mLastSensorTransmision + mSensorDelay) {
+        if(force || uptime > mLastSensorTransmision + mSensorDelay) {
             mLastSensorTransmision = uptime;
             sendData(mSensorData);
         }
@@ -466,7 +486,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
                 if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
                     onHumanLeft();
                 }
-                sendSensorData();
+                sendSensorData(true);
             }
             return;
         }
@@ -533,7 +553,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
                 final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
                 if (Math.abs(heading - mSensorData.getHeading()) > 1) {
                     mSensorData.setHeading(heading);
-                    sendSensorData();
+                    sendSensorData(false);
                     //Log.d(TAG, " New Heading " + mHeading);
                 }
             }
@@ -543,7 +563,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             final float distance = event.values[0];
             //Distance is either touching or not
             mSensorData.setProximity(distance < 1.0f);
-            sendSensorData();
+            sendSensorData(true);
             //Log.d(TAG, "Proximity " + Float.toString(distance));
         }
     }
@@ -556,7 +576,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         return output;
     }
 
-    protected SensorData getSensorData(){
+    @Override
+    public SensorData getSensorData(){
         return mSensorData;
     }
 
@@ -568,6 +589,43 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     @Override
     public void listen() {
         listen(null);
+    }
+
+    private void switchFace(int faceId){
+        final FragmentManager supportFragmentManager = getSupportFragmentManager();
+        final FragmentTransaction ft = supportFragmentManager.beginTransaction();
+        final FaceFragment faceFragment;
+        if(faceId != 0){
+            //Left to right
+            faceFragment = new ControlFaceFragment();
+        } else {
+            //Right to left
+            faceFragment = new EfimFaceFragment();
+        }
+        ft.replace(R.id.faceView, faceFragment, FRAGMENT_FACE);
+        ft.commit();
+        faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
+            @Override
+            public void onComplete() {
+                mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
+            }
+        });
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(PocketBotSettings.SELECTED_FACE.equals(key)){
+            final int faceId = sharedPreferences.getInt(key, PocketBotSettings.DEFAULT_FACE_ID);
+            switchFace(faceId);
+        }
+    }
+
+    /**
+     * Time between data sent to the robot
+     * @param i in millis
+     */
+    protected void setSensorDelay(int i) {
+        mSensorDelay = i;
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {

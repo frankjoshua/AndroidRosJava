@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 
@@ -27,9 +28,13 @@ public class UsbAccessoryActivity extends AiActivity {
                                                  //robotCommandInterface.reconnectRobot();
                                              }
                                          };
-    
 
-    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //Speed up sensor data
+        setSensorDelay(120);
+    }
 
     @Override
     protected void onStart() {

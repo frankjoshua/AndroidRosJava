@@ -151,8 +151,6 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
             super.onMissing(detections);
             //Face missed for a frame or more
             mOverlay.remove(mFaceGraphic);
-            mRobotInterface.humanSpotted(-1);
-            mRobotInterface.look(1.0f, 1.0f, 1.0f);
         }
 
         @Override

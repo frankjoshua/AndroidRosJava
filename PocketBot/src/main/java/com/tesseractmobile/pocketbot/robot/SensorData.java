@@ -5,9 +5,14 @@ import android.os.SystemClock;
 import java.math.BigDecimal;
 
 /**
+ * Data in this class is sent to the Arduino
+ * It is all converted to JSON so unused fields will still be accessed
+ *
  * Created by josh on 9/13/2015.
  */
 public class SensorData {
+
+    /** Face left or no face detected */
     public static final int NO_FACE = -1;
 
     private int face_id = NO_FACE;
@@ -17,6 +22,9 @@ public class SensorData {
     private int heading;
     private int destHeading;
     private boolean proximity;
+    private float joyX;
+    private float joyY;
+    private float joyZ;
     //private long time;
 
 
@@ -87,6 +95,13 @@ public class SensorData {
 
     public void setProximity(boolean proximity) {
         this.proximity = proximity;
+        update();
+    }
+
+    public void setJoystick(float x, float y, float z) {
+        this.joyX = round(x, 2);
+        this.joyY = round(y, 2);
+        this.joyZ = round(z, 2);
         update();
     }
 }

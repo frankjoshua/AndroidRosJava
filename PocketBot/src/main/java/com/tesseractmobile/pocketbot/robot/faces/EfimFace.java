@@ -16,7 +16,7 @@ import android.view.View.OnClickListener;
 /**
  * Created by josh on 10/17/2015.
  */
-public class EfimFace implements RobotFace, OnClickListener{
+public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
 
     private MouthView mouthView;
     private EyeView mLeftEye;
@@ -25,8 +25,6 @@ public class EfimFace implements RobotFace, OnClickListener{
     private BaseFaceActivity.Emotion mEmotion = BaseFaceActivity.Emotion.JOY;
 
     private Handler mHandler = new Handler();
-
-    private RobotInterface mRobotInterface;
 
     public EfimFace(final View view){
 
@@ -39,11 +37,6 @@ public class EfimFace implements RobotFace, OnClickListener{
         mLeftEye.setOnClickListener(this);
         mRightEye.setOnClickListener(this);
         mouthView.setOnClickListener(this);
-    }
-
-    @Override
-    public void setRobotInterface(final RobotInterface robotInterface){
-        this.mRobotInterface = robotInterface;
     }
 
     @Override

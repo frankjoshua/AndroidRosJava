@@ -45,7 +45,7 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
             //Update Tag game
             mTagGame.onMessageReceived(remoteState, remoteId, range);
             //Send new Data
-            sendSensorData();
+            sendSensorData(false);
         }
     };
 
