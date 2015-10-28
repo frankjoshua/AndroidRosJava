@@ -23,9 +23,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -204,6 +207,33 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    protected void peekDrawer(final DrawerLayout drawerLayout) {
+        drawerLayout.openDrawer(Gravity.LEFT);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                drawerLayout.closeDrawer(Gravity.LEFT);
+            }
+        }, 3000);
+//        final long downTime = SystemClock.uptimeMillis();
+//        final long eventTime = SystemClock.uptimeMillis() + 100;
+//        MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, 0, 100, 0);
+//        drawerLayout.dispatchTouchEvent(motionEvent);
+//        motionEvent.recycle();
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                final long downTime = SystemClock.uptimeMillis();
+//                final long eventTime = SystemClock.uptimeMillis() + 100;
+//                MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, 0, 100, 0);
+//                drawerLayout.dispatchTouchEvent(motionEvent);
+//                motionEvent.recycle();
+//            }
+//        }, (long) (2 * DateUtils.SECOND_IN_MILLIS));
     }
 
     private void setupTextPreview(final PreviewFragment previewFragment) {
@@ -603,7 +633,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             faceFragment = new EfimFaceFragment();
         }
         ft.replace(R.id.faceView, faceFragment, FRAGMENT_FACE);
-        ft.commit();
+        ft.commitAllowingStateLoss();
         faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
             @Override
             public void onComplete() {
