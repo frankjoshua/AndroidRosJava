@@ -12,6 +12,12 @@ public interface RobotInterface {
     void listen();
 
     /**
+     * Speak the text
+     * @param text
+     */
+    boolean say(final String text);
+
+    /**
      *
      * @param id of the face SensorData.NO_FACE if face was lost
      */
@@ -29,4 +35,10 @@ public interface RobotInterface {
      * @return reference to the sensor data
      */
     SensorData getSensorData();
+
+    /**
+     * Call after changing sensor data
+     * @param required false if data can be dropped
+     */
+    void sendSensorData(final boolean required);
 }

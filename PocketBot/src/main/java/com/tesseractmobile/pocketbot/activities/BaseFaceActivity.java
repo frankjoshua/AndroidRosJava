@@ -51,6 +51,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.PreviewFragment;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.PocketBotProtocol;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.SensorData;
@@ -59,6 +60,8 @@ import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
+
+import java.util.Arrays;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -122,12 +125,17 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             //Do nothing
             //say("I can't feel my wheels!");
         }
+
+        @Override
+        public void sendBytes(byte[] bytes) {
+
+        }
     };
     private SpeechState mSpeechState = SpeechState.READY;
     private float[] mGravity;
     private float[] mGeomagnetic;
     private long mLastSensorTransmision;
-    private int mSensorDelay = 500;
+    private int mSensorDelay = 0;
     private int mHumanCount = 0;
 
     @Override
@@ -341,22 +349,16 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      * May drop data
      * @param force true if data must be sent
      */
-    protected void sendSensorData(final boolean force) {
+    @Override
+    public void sendSensorData(final boolean force) {
         final long uptime = SystemClock.uptimeMillis();
-        if(force || uptime > mLastSensorTransmision + mSensorDelay) {
+        if(force || uptime >= mLastSensorTransmision + mSensorDelay) {
             mLastSensorTransmision = uptime;
-            sendData(mSensorData);
-        }
-    }
-
-    /**
-     * Sends data to the robot body
-     *
-     * @param data
-     */
-    final protected void sendData(final Object data) {
-        if(mBodyInterface.isConnected()){
-            mBodyInterface.sendObject(data);
+            if(mBodyInterface.isConnected()){
+                final PocketBotProtocol.PocketBotMessage data = SensorData.toPocketBotMessage(mSensorData);
+                //Send raw data
+                mBodyInterface.sendBytes(data.toByteArray());
+            }
         }
     }
 
@@ -365,7 +367,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      *
      * @return true is speech was sent to the mouth
      */
-    final synchronized protected boolean say(final String text) {
+    @Override
+    final synchronized public boolean say(final String text) {
         mLastHumanSpoted = SystemClock.uptimeMillis();
 
         if (mSpeechState != SpeechState.READY) {
@@ -401,6 +404,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      */
     private void setText(String text) {
         addTextToList(text, true);
+        mRobotFace.setOnSpeechCompleteListener(this);
         mRobotFace.say(text);
     }
 
@@ -575,16 +579,15 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
             mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
         if (mGravity != null && mGeomagnetic != null) {
-
             boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
             if (success) {
-                SensorManager.getOrientation(INCLINATION, ORIENTATION);
+                SensorManager.getOrientation(ROTATION, ORIENTATION);
                 //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
                 final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
                 if (Math.abs(heading - mSensorData.getHeading()) > 1) {
                     mSensorData.setHeading(heading);
                     sendSensorData(false);
-                    //Log.d(TAG, " New Heading " + mHeading);
+                    //Log.d(TAG, " New Heading " + heading);
                 }
             }
         }

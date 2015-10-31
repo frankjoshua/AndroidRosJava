@@ -1,7 +1,5 @@
 package com.tesseractmobile.pocketbot.robot;
 
-import android.os.SystemClock;
-
 import java.math.BigDecimal;
 
 /**
@@ -15,41 +13,51 @@ public class SensorData {
     /** Face left or no face detected */
     public static final int NO_FACE = -1;
 
-    private int face_id = NO_FACE;
-    private float face_x;
-    private float face_y;
-    private float face_z;
-    private int heading;
-    private int destHeading;
-    private boolean proximity;
-    private float joyX;
-    private float joyY;
-    private float joyZ;
+    /** FACE_ID */
+    private int f = NO_FACE;
+    /** FACE_X */
+    private float fx;
+    /** FACE_Y */
+    private float fy;
+    /** FACE_Z */
+    private float fz;
+    /** HEADING */
+    private int h;
+    /** HEADING_DESTINATION */
+    private int dh;
+    /** PROXIMITY */
+    private boolean p;
+    /** JOYSTICK_X */
+    private float jx;
+    /** JOYSTICK_Y */
+    private float jy;
+    /** JOYSTICK_Z */
+    private float jz;
     //private long time;
 
 
     public void setFace_x(float face_x) {
-        this.face_x = round(face_x, 2);
+        this.fx = round(face_x, 2);
         update();
     }
 
     public void setFace_y(float face_y) {
-        this.face_y = round(face_y, 2);
+        this.fy = round(face_y, 2);
         update();
     }
 
     public void setFace_z(float face_z) {
-        this.face_z = round(face_z, 2);
+        this.fz = round(face_z, 2);
         update();
     }
 
     public void setHeading(int heading) {
-        this.heading = heading;
+        this.h = heading;
         update();
     }
 
     public void setDestHeading(int heading) {
-        this.destHeading = heading;
+        this.dh = heading;
         update();
     }
 
@@ -59,27 +67,27 @@ public class SensorData {
     }
 
     public float getFace_x() {
-        return face_x;
+        return fx;
     }
 
     public float getFace_y() {
-        return face_y;
+        return fy;
     }
 
     public float getFace_z() {
-        return face_z;
+        return fz;
     }
 
     public int getHeading() {
-        return heading;
+        return h;
     }
 
-    public float getFace_id() {
-        return face_id;
+    public int getFace_id() {
+        return f;
     }
 
     public void setFace_id(int face_id) {
-        this.face_id = face_id;
+        this.f = face_id;
     }
 
     /**
@@ -94,14 +102,78 @@ public class SensorData {
     }
 
     public void setProximity(boolean proximity) {
-        this.proximity = proximity;
+        this.p = proximity;
         update();
     }
 
     public void setJoystick(float x, float y, float z) {
-        this.joyX = round(x, 2);
-        this.joyY = round(y, 2);
-        this.joyZ = round(z, 2);
+        this.jx = round(x, 2);
+        this.jy = round(y, 2);
+        this.jz = round(z, 2);
         update();
+    }
+
+    public float getJoyX() {
+        return jx;
+    }
+
+    public float getJoyY() {
+        return jy;
+    }
+
+    public float getJoyZ() {
+        return jz;
+    }
+
+    private boolean getProximity() {
+        return p;
+    }
+
+    public static PocketBotProtocol.PocketBotMessage toPocketBotMessage(SensorData sensorData) {
+        //Builders
+        final PocketBotProtocol.PocketBotMessage.Builder messageBuilder = PocketBotProtocol.PocketBotMessage.newBuilder();
+        final PocketBotProtocol.Face.Builder faceBuilder = PocketBotProtocol.Face.newBuilder();
+        final PocketBotProtocol.Control.Builder controlBuilder = PocketBotProtocol.Control.newBuilder();
+        final PocketBotProtocol.Sensor.Builder sensorBuilder = PocketBotProtocol.Sensor.newBuilder();
+        //Objects
+        final PocketBotProtocol.Face face = faceBuilder
+                .setFaceId(sensorData.getFace_id())
+                .setFaceX(sensorData.getFace_x())
+                .setFaceY(sensorData.getFace_y())
+                .setFaceZ(sensorData.getFace_z())
+                .build();
+        final PocketBotProtocol.Control control = controlBuilder
+                .setJoyX(sensorData.getJoyX())
+                .setJoyY(sensorData.getJoyY())
+                .setJoyZ(sensorData.getJoyZ())
+                .build();
+        final PocketBotProtocol.Sensor sensor = sensorBuilder
+                .setHeading(sensorData.getHeading())
+                .setProximity(sensorData.getProximity())
+                .build();
+        //Message
+        final PocketBotProtocol.PocketBotMessage pocketBotMessage = messageBuilder
+                .setFace(face)
+                .setControl(control)
+                .setSensor(sensor)
+                .build();
+        return pocketBotMessage;
+    }
+
+    /**
+     * Wrap message in the format that is expected by the Arduino
+     * @param data
+     * @return
+     */
+    public static byte[] wrapData(byte[] data) {
+        //Create message to be sent
+        final byte[] message = new byte[data.length + 2];
+        //Add start byte
+        message[0] = (byte) CommandContract.START_BYTE;
+        //Add data
+        System.arraycopy(data, 0, message, 1, data.length);
+        //Add stop byte
+        message[message.length - 1] = (byte) CommandContract.STOP_BYTE;
+        return message;
     }
 }

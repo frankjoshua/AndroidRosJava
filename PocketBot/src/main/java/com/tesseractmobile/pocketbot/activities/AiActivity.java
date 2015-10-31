@@ -78,7 +78,8 @@ public class AiActivity extends BaseFaceActivity {
         final Result result = aiResponse.getResult();
         final String action = result.getAction();
         if(action.equals(CommandContract.ACTION_ARDUINO)){
-            sendData(result);
+            throw new UnsupportedOperationException("Not implemeted");
+            //sendData(result);
         } else if(action.equals(CommandContract.ACTION_MOVE)){
             final String direction = result.getStringParameter(CommandContract.PARAM_DIRECTION);
             final String measurement = result.getStringParameter(CommandContract.PARAM_MEASUREMENT);

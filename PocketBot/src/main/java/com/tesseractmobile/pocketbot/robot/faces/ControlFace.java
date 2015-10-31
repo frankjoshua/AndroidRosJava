@@ -42,13 +42,7 @@ public class ControlFace extends BaseFace implements RobotFace, JoystickView.Joy
 
     @Override
     public void look(float x, float y, float z) {
-//        if(x == 1.0f){
-//            throw new UnsupportedOperationException();
-//        }
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        mHandler.sendEmptyMessage(0);
+
     }
 
     @Override
@@ -63,17 +57,26 @@ public class ControlFace extends BaseFace implements RobotFace, JoystickView.Joy
 
     @Override
     public void onPositionChange(float x, float y, float z) {
-        //mRobotInterface.look(x, y, z);
         final SensorData sensorData = mRobotInterface.getSensorData();
         sensorData.setJoystick(x, y, z);
+        mRobotInterface.sendSensorData(false);
+        this.x = sensorData.getJoyX();
+        this.y = sensorData.getJoyY();
+        this.z = sensorData.getJoyZ();
+        mHandler.sendEmptyMessage(0);
     }
 
     @Override
     public void onFocusChange(boolean hasFocus) {
-        if(hasFocus){
-            mRobotInterface.humanSpotted(0);
-        } else {
-            mRobotInterface.humanSpotted(SensorData.NO_FACE);
+        //Send message when user lets go of controls
+        if(hasFocus == false) {
+            final SensorData sensorData = mRobotInterface.getSensorData();
+            sensorData.setJoystick(0, 0, 0);
+            mRobotInterface.sendSensorData(false);
+            this.x = sensorData.getJoyX();
+            this.y = sensorData.getJoyY();
+            this.z = sensorData.getJoyZ();
+            mHandler.sendEmptyMessage(0);
         }
     }
 }

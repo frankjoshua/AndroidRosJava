@@ -20,7 +20,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
+import com.tesseractmobile.pocketbot.robot.SensorData;
 
 public class UsbConnectionService extends BodyService implements Runnable, BodyInterface{
 
@@ -82,6 +84,15 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
     public void sendJson(final String json){
         final Command command = new Command();
         command.jsonBytes = json.getBytes(Charset.forName("UTF-8"));
+        synchronized (commandQueue){
+            commandQueue.add(command);
+        }
+    }
+
+    @Override
+    public void sendBytes(byte[] bytes) {
+        final Command command = new Command();
+        command.jsonBytes = bytes;
         synchronized (commandQueue){
             commandQueue.add(command);
         }
@@ -171,10 +182,11 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
     private boolean sendCommand(byte[] buffer) {
         if (mOutputStream != null) {
             try {
-                for(int i = 0; i < buffer.length; i++){
-                    mOutputStream.write(buffer[i]);
+                final byte[] message = SensorData.wrapData(buffer);
+                //Write message
+                for(int i = 0; i < message.length; i++){
+                    mOutputStream.write(message[i]);
                 }
-                //log("Command: " + command + " Target: " + target + " Value: " + value);
                 return true;
             } catch (final IOException e) {
                 error(0, "write failed:" + e.getMessage());

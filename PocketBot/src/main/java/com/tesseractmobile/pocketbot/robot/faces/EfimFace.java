@@ -64,13 +64,13 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
 
         switch (viewId) {
             case R.id.eyeViewLeft:
-                say("Ouch");
+                mRobotInterface.say("Ouch");
                 fear();
                 // finish();
                 break;
             case R.id.eyeViewRight:
                 //say("I'm going to kill you in my sleep... Oh wait, your sleep");
-                say("Please don't poke my eye.");
+                mRobotInterface.say("Please don't poke my eye.");
                 anger();
                 break;
             case R.id.mouthView:

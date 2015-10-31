@@ -28,6 +28,8 @@ public class BluetoothActivity extends AiActivity{
             finish();
             return;
         }
+        //Slow down data rate
+        setSensorDelay(300);
     }
 
     @Override

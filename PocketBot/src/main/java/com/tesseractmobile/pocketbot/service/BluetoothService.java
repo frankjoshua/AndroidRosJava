@@ -24,6 +24,8 @@ import com.tesseractmobile.ble.BleUtils;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.CommandContract;
+import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -286,15 +288,12 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     public void sendData(byte[] data) {
         if (mUartService != null) {
+            final byte[] message = SensorData.wrapData(data);
+
             // Split the value into chunks (UART service has a maximum number of characters that can be written )
-            for (int i = 0; i < data.length; i += kTxMaxCharacters) {
-                final byte[] chunk = Arrays.copyOfRange(data, i, Math.min(i + kTxMaxCharacters, data.length));
+            for (int i = 0; i < message.length; i += kTxMaxCharacters) {
+                final byte[] chunk = Arrays.copyOfRange(message, i, Math.min(i + kTxMaxCharacters, message.length));
                 mBleManager.writeService(mUartService, UUID_TX, chunk);
-//                try {
-//                    Thread.sleep(1);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
             }
         } else {
             Log.w(TAG, "Uart Service not discovered. Unable to send data");
@@ -383,6 +382,11 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 //                return null;
 //            }
 //        }.execute();
+    }
+
+    @Override
+    public void sendBytes(byte[] bytes) {
+        mMessageQueue.add(bytes);
     }
 
     @Override

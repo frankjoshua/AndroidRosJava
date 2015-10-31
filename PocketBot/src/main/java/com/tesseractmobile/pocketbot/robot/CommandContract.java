@@ -7,6 +7,11 @@ package com.tesseractmobile.pocketbot.robot;
  * 
  */
 public class CommandContract {
+
+    //Data protocol
+    public static final int START_BYTE = 255;
+    public static final int STOP_BYTE = START_BYTE;
+
     // Targets
     public final static byte TAR_SERVO_PAN           = (byte) 0xa;    // 10
     public final static byte TAR_SERVO_TILT          = (byte) 0xb;    // 11
@@ -57,4 +62,5 @@ public class CommandContract {
     public static final String EMOTION_SURPRISED = "surprised";
     public static final String EMOTION_ACCEPTED = "accepted";
     public static final String EMOTION_AWARE = "aware";
+
 }

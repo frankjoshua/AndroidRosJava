@@ -76,12 +76,12 @@ public class JoystickView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE){
             mTouchPoint.set(Math.round(event.getX()), Math.round(event.getY()));
-            setHasFocus(true);
             update();
+            setHasFocus(true);
         } else if (event.getAction() == MotionEvent.ACTION_UP){
             mTouchPoint.set(mCenterPoint.x, mCenterPoint.y);
-            setHasFocus(false);
             update();
+            setHasFocus(false);
         }
         invalidate();
         return true;
@@ -91,8 +91,8 @@ public class JoystickView extends View {
         float cx = mTouchPoint.x / (float) getWidth();
         float cy = mTouchPoint.y / (float) getHeight();
 
-        float x = 2 - cx * 2f;
-        float y = cy * 2f;
+        float x = cx * 2 - 1;
+        float y = -(cy * 2 - 1);
 
         mJoystickListener.onPositionChange(x, y, 0);
     }

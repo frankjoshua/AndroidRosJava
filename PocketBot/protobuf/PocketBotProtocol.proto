@@ -1,0 +1,37 @@
+message PocketBotMessage {
+  optional Face face = 1;
+  optional Control control = 2;
+  optional Gps gps = 3;
+  optional Sensor sensor = 4;
+}
+
+message Face {
+  optional sint32 faceId = 1;
+  optional float faceX = 2;
+  optional float faceY = 3;
+  optional float faceZ = 4;
+}
+
+message Control {
+  optional float joyX = 1;
+  optional float joyY = 2;
+  optional float joyZ = 3;
+  optional bool buttonA = 4;
+  optional bool buttonB = 5;
+  optional int32 destHeading = 6;
+}
+
+message Gps {
+  optional float lat = 1;
+  optional float lon = 2;
+}
+
+message Sensor {
+	optional bool proximity = 1;
+	optional int32 heading = 2;
+}
+
+//Java
+//protoc.exe --java_out=. .\PocketBotProtocol.proto
+//Arduino
+//.\nanopb-0.3.4-windows-x86\generator-bin\protoc.exe --nanopb_out=. PocketBotProtocol.proto
