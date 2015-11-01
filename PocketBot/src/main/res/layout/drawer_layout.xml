@@ -10,12 +10,25 @@
         android:background="#770000ff"
         android:orientation="vertical">
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign In"
+            android:id="@+id/btnSignIn"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Telepresence Mode"
+        android:id="@+id/btnTelepresence"
+        android:layout_gravity="center_horizontal" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Change Face"
-            android:id="@+id/btnFace"
+            android:text="Control Mode"
+            android:id="@+id/btnControl"
             android:layout_gravity="center_horizontal" />
 
         <fragment
