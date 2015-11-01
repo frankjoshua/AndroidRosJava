@@ -1,10 +1,13 @@
 #include <SoftwareSerial.h>
 #include <RunningMedian.h>
+#include <SabertoothSimplified.h>
 
 #define MIN_SPEED -127
 #define MAX_SPEED 127
 #define MIN_INPUT 1010
 #define MAX_INPUT 1955
+#define LEFT 2
+#define RIGHT 1
 
 //RC Values
 #define CH1_PIN 3
@@ -19,12 +22,14 @@
 #define CH4 3
 #define CH5 4
 #define CH6 5
+
 #define CHANNELS 6
 #define SAMPLES 5
 
 int channels[CHANNELS];
 
-SoftwareSerial SWSerial(11, 12);
+SoftwareSerial SWSerial(NOT_A_PIN, 12);
+SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
 
 RunningMedian filter[CHANNELS]{
   RunningMedian(SAMPLES),
@@ -62,6 +67,8 @@ void loop() {
     Serial.print(powerL);
     Serial.print(" R: ");
     Serial.println(powerR);
+    ST.motor(RIGHT, powerR);
+    ST.motor(LEFT, powerL);
   }
 }
 

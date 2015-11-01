@@ -1,34 +1,34 @@
 message PocketBotMessage {
-  optional Face face = 1;
-  optional Control control = 2;
-  optional Gps gps = 3;
-  optional Sensor sensor = 4;
+  required Face face = 1;
+  required Control control = 2;
+  required Gps gps = 3;
+  required Sensor sensor = 4;
 }
 
 message Face {
-  optional sint32 faceId = 1;
-  optional float faceX = 2;
-  optional float faceY = 3;
-  optional float faceZ = 4;
+  required sint32 faceId = 1;
+  required float faceX = 2;
+  required float faceY = 3;
+  required float faceZ = 4;
 }
 
 message Control {
-  optional float joyX = 1;
-  optional float joyY = 2;
-  optional float joyZ = 3;
-  optional bool buttonA = 4;
-  optional bool buttonB = 5;
-  optional int32 destHeading = 6;
+  required float joyX = 1;
+  required float joyY = 2;
+  required float joyZ = 3;
+  required bool buttonA = 4;
+  required bool buttonB = 5;
+  required int32 destHeading = 6;
 }
 
 message Gps {
-  optional float lat = 1;
-  optional float lon = 2;
+  required float lat = 1;
+  required float lon = 2;
 }
 
 message Sensor {
-	optional bool proximity = 1;
-	optional int32 heading = 2;
+	required bool proximity = 1;
+	required int32 heading = 2;
 }
 
 //Java
