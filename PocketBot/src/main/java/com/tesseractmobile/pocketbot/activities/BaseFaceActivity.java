@@ -139,6 +139,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     private long mLastSensorTransmision;
     private int mSensorDelay = 0;
     private int mHumanCount = 0;
+    private boolean mFaceTrackingActive;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -150,51 +151,10 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         findViewById(R.id.btnTelepresence).setOnClickListener(this);
         findViewById(R.id.btnControl).setOnClickListener(this);
         findViewById(R.id.btnSignIn).setOnClickListener(this);
+        findViewById(R.id.btnFace).setOnClickListener(this);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
-
-        final boolean useFaceTracking = checkGooglePlayServices() && false;
-        final FragmentManager supportFragmentManager = getSupportFragmentManager();
-        final PreviewFragment previewFragment;
-        final FaceTrackingFragment faceTrackingFragment;
-        if(savedInstanceState == null){
-            final FragmentTransaction ft = supportFragmentManager.beginTransaction();
-
-            if(useFaceTracking) {
-                //Create face tracking fragment
-                faceTrackingFragment = new FaceTrackingFragment();
-                ft.add(R.id.overlayView, faceTrackingFragment, FRAGMENT_FACE_TRACKING);
-            } else {
-                faceTrackingFragment = null;
-            }
-
-            //Create Preview Fragment
-            previewFragment = new PreviewFragment();
-            ft.add(R.id.overlayView, previewFragment, FRAGMENT_PREVIEW);
-
-            //Commit all fragments
-            ft.commit();
-        } else {
-            //Find previous fragments
-            previewFragment = (PreviewFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_PREVIEW);
-            faceTrackingFragment = (FaceTrackingFragment) supportFragmentManager.findFragmentByTag(FRAGMENT_FACE_TRACKING);
-        }
-
-        //Set up a listener for when the view is created
-        if(previewFragment != null) {
-            previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
-
-                @Override
-                public void onComplete() {
-                    setupTextPreview(previewFragment);
-                }
-            });
-        }
-
-        if(useFaceTracking){
-            faceTrackingFragment.setRobotInterface(this);
-        }
 
         //Start senors
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -622,28 +582,74 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = supportFragmentManager.beginTransaction();
         final FaceFragment faceFragment;
+        final Boolean isUseFaceTracking;
         switch (faceId){
             case 0:
                 faceFragment = new EfimFaceFragment();
+                isUseFaceTracking = true && checkGooglePlayServices();
                 break;
             case 1:
                 faceFragment = new ControlFaceFragment();
+                isUseFaceTracking = false;
                 break;
             case 2:
                 faceFragment = new TelepresenceFaceFragment();
+                isUseFaceTracking = false;
                 break;
             default:
-                throw new UnsupportedOperationException("Unkown face id " + faceId);
+                throw new UnsupportedOperationException("Unknown face id " + faceId);
         }
 
-        ft.replace(R.id.faceView, faceFragment, FRAGMENT_FACE);
-        ft.commitAllowingStateLoss();
+        if(supportFragmentManager.findFragmentByTag(FRAGMENT_FACE) != null){
+            ft.replace(R.id.faceView, faceFragment, FRAGMENT_FACE);
+        } else {
+            ft.add(R.id.faceView, faceFragment, FRAGMENT_FACE);
+        }
+
         faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
             @Override
             public void onComplete() {
                 mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
             }
         });
+        if(isUseFaceTracking){
+            if(mFaceTrackingActive == false) {
+                mFaceTrackingActive = true;
+                final PreviewFragment previewFragment = new PreviewFragment();
+                final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
+                //Create FaceTrackingFragment
+                ft.add(R.id.overlayView, faceTrackingFragment, FRAGMENT_FACE_TRACKING);
+                //Create Preview Fragment
+                ft.add(R.id.overlayView, previewFragment, FRAGMENT_PREVIEW);
+                //Set up a listener for when the view is created
+                if (previewFragment != null) {
+                    previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
+
+                        @Override
+                        public void onComplete() {
+                            setupTextPreview(previewFragment);
+                        }
+                    });
+                }
+                if (faceTrackingFragment != null) {
+                    faceTrackingFragment.setRobotInterface(this);
+                }
+            }
+        } else {
+            if(mFaceTrackingActive) {
+                mFaceTrackingActive = false;
+                final Fragment faceTrackingFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_FACE_TRACKING);
+                if (faceFragment != null) {
+                    ft.remove(faceTrackingFragment);
+                }
+                final Fragment previewFragment = supportFragmentManager.findFragmentByTag(FRAGMENT_PREVIEW);
+                if (previewFragment != null) {
+                    ft.remove(previewFragment);
+                }
+            }
+        }
+        //Commit changes
+        ft.commitAllowingStateLoss();
     }
 
     @Override
@@ -677,6 +683,9 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
                 break;
             case R.id.btnControl:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 1);
+                break;
+            case R.id.btnFace:
+                PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 0);
                 break;
             default:
                 throw new UnsupportedOperationException("Not implemented");
