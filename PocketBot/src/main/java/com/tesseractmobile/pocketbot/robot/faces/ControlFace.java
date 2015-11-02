@@ -1,20 +1,37 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.model.QBSession;
+import com.quickblox.core.QBCallbackImpl;
+import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCSession;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
+import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.BaseFaceActivity;
+import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.JoystickView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by josh on 10/25/2015.
  */
-public class ControlFace extends BaseFace implements RobotFace, JoystickView.JoystickListener {
+public class ControlFace extends BaseFace implements JoystickView.JoystickListener {
 
     final Handler mHandler = new Handler(){
         @Override
@@ -23,7 +40,7 @@ public class ControlFace extends BaseFace implements RobotFace, JoystickView.Joy
         }
     };
 
-    final private TextView mFaceData;
+    private TextView mFaceData;
     private float x, y, z;
 
     public ControlFace(final View view){
@@ -79,4 +96,6 @@ public class ControlFace extends BaseFace implements RobotFace, JoystickView.Joy
             mHandler.sendEmptyMessage(0);
         }
     }
+
+
 }

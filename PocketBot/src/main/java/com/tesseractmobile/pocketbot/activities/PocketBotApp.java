@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
+import com.quickblox.core.QBSettings;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
@@ -22,7 +23,10 @@ public class PocketBotApp extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+        //Track errors
         Fabric.with(this, new Crashlytics());
+        //Setup Quickblox
+        QBSettings.getInstance().fastConfigInit("30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
         //Bind to voice recognition service to hold constant connection
         final ServiceConnection voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override

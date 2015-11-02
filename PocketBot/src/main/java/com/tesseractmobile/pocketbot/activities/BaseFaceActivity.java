@@ -49,6 +49,8 @@ import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.PreviewFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import com.tesseractmobile.pocketbot.robot.PocketBotProtocol;
@@ -65,7 +67,7 @@ import java.util.Arrays;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface, SharedPreferences.OnSharedPreferenceChangeListener {
+public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -144,24 +146,15 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.main);
-        findViewById(R.id.btnFace).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final int currentFaceId = PocketBotSettings.getSelectedFace(BaseFaceActivity.this);
-                final int nextFaceId;
-                if(currentFaceId == 0){
-                    nextFaceId = 1;
-                } else {
-                    nextFaceId = 0;
-                }
-                PocketBotSettings.setSelectedFace(BaseFaceActivity.this, nextFaceId);
-            }
-        });
+        //Set on click listeners
+        findViewById(R.id.btnTelepresence).setOnClickListener(this);
+        findViewById(R.id.btnControl).setOnClickListener(this);
+        findViewById(R.id.btnSignIn).setOnClickListener(this);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
 
-        final boolean useFaceTracking = checkGooglePlayServices();
+        final boolean useFaceTracking = checkGooglePlayServices() && false;
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final PreviewFragment previewFragment;
         final FaceTrackingFragment faceTrackingFragment;
@@ -205,9 +198,6 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
         //Start senors
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-        //Listen for preference changes
-        PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
 
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -294,6 +284,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             throw new UnsupportedOperationException("Error binding to service");
         }
 
+        //Listen for preference changes
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
     }
 
     @Override
@@ -307,6 +299,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             voiceRecognitionServiceConnection = null;
         }
 
+        //Listen for preference changes
+        PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);
     }
 
     @Override
@@ -628,13 +622,20 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = supportFragmentManager.beginTransaction();
         final FaceFragment faceFragment;
-        if(faceId != 0){
-            //Left to right
-            faceFragment = new ControlFaceFragment();
-        } else {
-            //Right to left
-            faceFragment = new EfimFaceFragment();
+        switch (faceId){
+            case 0:
+                faceFragment = new EfimFaceFragment();
+                break;
+            case 1:
+                faceFragment = new ControlFaceFragment();
+                break;
+            case 2:
+                faceFragment = new TelepresenceFaceFragment();
+                break;
+            default:
+                throw new UnsupportedOperationException("Unkown face id " + faceId);
         }
+
         ft.replace(R.id.faceView, faceFragment, FRAGMENT_FACE);
         ft.commitAllowingStateLoss();
         faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
@@ -659,6 +660,27 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      */
     protected void setSensorDelay(int i) {
         mSensorDelay = i;
+    }
+
+    @Override
+    public void onClick(View view) {
+        final int id = view.getId();
+        switch (id){
+            case R.id.btnSignIn:
+                //Launch sign in fragment
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.main_window, new SignInFragment(), "SIGN_IN_FRAGMENT");
+                fragmentTransaction.commit();
+                break;
+            case R.id.btnTelepresence:
+                PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 2);
+                break;
+            case R.id.btnControl:
+                PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 1);
+                break;
+            default:
+                throw new UnsupportedOperationException("Not implemented");
+        }
     }
 
     private class BotTask extends AsyncTask<String, Void, Void> {

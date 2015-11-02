@@ -1,9 +1,12 @@
 package com.tesseractmobile.pocketbot.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.support.v4.app.FragmentActivity;
 
+import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
 
 /**
@@ -19,6 +22,9 @@ public class PocketBotSettings {
     public static final boolean DEFAULT_SHOW_PREVIEW = true;
     public static final boolean DEFAULT_USE_BLUETOOTH = false;
     public static final int DEFAULT_FACE_ID = 0;
+    public static final String USER_NAME = "user_name";
+    public static final String PASSWORD = "password";
+    public static final String SIGNED_IN = "signed_in";
 
     /**
      * True if preview window should be shown
@@ -96,6 +102,35 @@ public class PocketBotSettings {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(SELECTED_FACE, 0);
     }
 
+    public static boolean setUserName(final Context context, final String userName) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(USER_NAME, userName).commit();
+    }
+
+    public static String getUserName(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(USER_NAME, "");
+    }
+
+    public static boolean setPassword(final Context context, final String password) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PASSWORD, password).commit();
+    }
+
+    public static String getPassword(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(PASSWORD, "");
+    }
+
+    public static boolean setSignedIn(final Context context, boolean b) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SIGNED_IN, b).commit();
+    }
+
+    /**
+     *
+     * @param context
+     * @return true if user is signed in
+     */
+    public static boolean isSignedIn(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SIGNED_IN, false);
+    }
+
     /**
      * Listen for preference changes
      * @param context
@@ -113,4 +148,5 @@ public class PocketBotSettings {
     public static void unregisterOnSharedPreferenceChangeListener(final Context context, final OnSharedPreferenceChangeListener onSharedPreferenceChangeListener) {
         PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
+
 }

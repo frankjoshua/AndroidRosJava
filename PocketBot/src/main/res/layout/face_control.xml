@@ -2,7 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:background="@drawable/background">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned"
+        android:ems="10"
+        android:id="@+id/edUserId"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect"
+        android:id="@+id/btnConnect"
+        android:layout_gravity="center_horizontal" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,9 +28,14 @@
         android:id="@+id/tvFaceData"
         android:layout_gravity="center_horizontal" />
 
+    <com.quickblox.videochat.webrtc.view.QBGLVideoView
+        android:id="@+id/remoteVideoView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"/>
+
     <com.tesseractmobile.pocketbot.views.JoystickView
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:id="@+id/joyStick"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="bottom|center_horizontal" />
 </LinearLayout>
