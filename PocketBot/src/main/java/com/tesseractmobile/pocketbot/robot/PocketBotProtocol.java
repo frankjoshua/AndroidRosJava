@@ -11,54 +11,54 @@ public final class PocketBotProtocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional .Face face = 1;</code>
+     * <code>required .Face face = 1;</code>
      */
     boolean hasFace();
     /**
-     * <code>optional .Face face = 1;</code>
+     * <code>required .Face face = 1;</code>
      */
     Face getFace();
     /**
-     * <code>optional .Face face = 1;</code>
+     * <code>required .Face face = 1;</code>
      */
     FaceOrBuilder getFaceOrBuilder();
 
     /**
-     * <code>optional .Control control = 2;</code>
+     * <code>required .Control control = 2;</code>
      */
     boolean hasControl();
     /**
-     * <code>optional .Control control = 2;</code>
+     * <code>required .Control control = 2;</code>
      */
     Control getControl();
     /**
-     * <code>optional .Control control = 2;</code>
+     * <code>required .Control control = 2;</code>
      */
     ControlOrBuilder getControlOrBuilder();
 
     /**
-     * <code>optional .Gps gps = 3;</code>
+     * <code>required .Gps gps = 3;</code>
      */
     boolean hasGps();
     /**
-     * <code>optional .Gps gps = 3;</code>
+     * <code>required .Gps gps = 3;</code>
      */
     Gps getGps();
     /**
-     * <code>optional .Gps gps = 3;</code>
+     * <code>required .Gps gps = 3;</code>
      */
     GpsOrBuilder getGpsOrBuilder();
 
     /**
-     * <code>optional .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 4;</code>
      */
     boolean hasSensor();
     /**
-     * <code>optional .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 4;</code>
      */
     Sensor getSensor();
     /**
-     * <code>optional .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 4;</code>
      */
     SensorOrBuilder getSensorOrBuilder();
   }
@@ -209,19 +209,19 @@ public final class PocketBotProtocol {
     public static final int FACE_FIELD_NUMBER = 1;
     private Face face_;
     /**
-     * <code>optional .Face face = 1;</code>
+     * <code>required .Face face = 1;</code>
      */
     public boolean hasFace() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .Face face = 1;</code>
+     * <code>required .Face face = 1;</code>
      */
     public Face getFace() {
       return face_;
     }
     /**
-     * <code>optional .Face face = 1;</code>
+     * <code>required .Face face = 1;</code>
      */
     public FaceOrBuilder getFaceOrBuilder() {
       return face_;
@@ -230,19 +230,19 @@ public final class PocketBotProtocol {
     public static final int CONTROL_FIELD_NUMBER = 2;
     private Control control_;
     /**
-     * <code>optional .Control control = 2;</code>
+     * <code>required .Control control = 2;</code>
      */
     public boolean hasControl() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional .Control control = 2;</code>
+     * <code>required .Control control = 2;</code>
      */
     public Control getControl() {
       return control_;
     }
     /**
-     * <code>optional .Control control = 2;</code>
+     * <code>required .Control control = 2;</code>
      */
     public ControlOrBuilder getControlOrBuilder() {
       return control_;
@@ -251,19 +251,19 @@ public final class PocketBotProtocol {
     public static final int GPS_FIELD_NUMBER = 3;
     private Gps gps_;
     /**
-     * <code>optional .Gps gps = 3;</code>
+     * <code>required .Gps gps = 3;</code>
      */
     public boolean hasGps() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional .Gps gps = 3;</code>
+     * <code>required .Gps gps = 3;</code>
      */
     public Gps getGps() {
       return gps_;
     }
     /**
-     * <code>optional .Gps gps = 3;</code>
+     * <code>required .Gps gps = 3;</code>
      */
     public GpsOrBuilder getGpsOrBuilder() {
       return gps_;
@@ -272,19 +272,19 @@ public final class PocketBotProtocol {
     public static final int SENSOR_FIELD_NUMBER = 4;
     private Sensor sensor_;
     /**
-     * <code>optional .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 4;</code>
      */
     public boolean hasSensor() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 4;</code>
      */
     public Sensor getSensor() {
       return sensor_;
     }
     /**
-     * <code>optional .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 4;</code>
      */
     public SensorOrBuilder getSensorOrBuilder() {
       return sensor_;
@@ -302,6 +302,38 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
+      if (!hasFace()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasControl()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasGps()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasSensor()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getFace().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getControl().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getGps().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getSensor().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -584,6 +616,38 @@ public final class PocketBotProtocol {
       }
 
       public final boolean isInitialized() {
+        if (!hasFace()) {
+          
+          return false;
+        }
+        if (!hasControl()) {
+          
+          return false;
+        }
+        if (!hasGps()) {
+          
+          return false;
+        }
+        if (!hasSensor()) {
+          
+          return false;
+        }
+        if (!getFace().isInitialized()) {
+          
+          return false;
+        }
+        if (!getControl().isInitialized()) {
+          
+          return false;
+        }
+        if (!getGps().isInitialized()) {
+          
+          return false;
+        }
+        if (!getSensor().isInitialized()) {
+          
+          return false;
+        }
         return true;
       }
 
@@ -610,13 +674,13 @@ public final class PocketBotProtocol {
       private com.google.protobuf.SingleFieldBuilder<
           Face, Face.Builder, FaceOrBuilder> faceBuilder_;
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public boolean hasFace() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public Face getFace() {
         if (faceBuilder_ == null) {
@@ -626,7 +690,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public Builder setFace(Face value) {
         if (faceBuilder_ == null) {
@@ -642,7 +706,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public Builder setFace(
           Face.Builder builderForValue) {
@@ -656,7 +720,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public Builder mergeFace(Face value) {
         if (faceBuilder_ == null) {
@@ -675,7 +739,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public Builder clearFace() {
         if (faceBuilder_ == null) {
@@ -688,7 +752,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public Face.Builder getFaceBuilder() {
         bitField0_ |= 0x00000001;
@@ -696,7 +760,7 @@ public final class PocketBotProtocol {
         return getFaceFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       public FaceOrBuilder getFaceOrBuilder() {
         if (faceBuilder_ != null) {
@@ -706,7 +770,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Face face = 1;</code>
+       * <code>required .Face face = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           Face, Face.Builder, FaceOrBuilder>
@@ -726,13 +790,13 @@ public final class PocketBotProtocol {
       private com.google.protobuf.SingleFieldBuilder<
           Control, Control.Builder, ControlOrBuilder> controlBuilder_;
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public boolean hasControl() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public Control getControl() {
         if (controlBuilder_ == null) {
@@ -742,7 +806,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public Builder setControl(Control value) {
         if (controlBuilder_ == null) {
@@ -758,7 +822,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public Builder setControl(
           Control.Builder builderForValue) {
@@ -772,7 +836,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public Builder mergeControl(Control value) {
         if (controlBuilder_ == null) {
@@ -791,7 +855,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public Builder clearControl() {
         if (controlBuilder_ == null) {
@@ -804,7 +868,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public Control.Builder getControlBuilder() {
         bitField0_ |= 0x00000002;
@@ -812,7 +876,7 @@ public final class PocketBotProtocol {
         return getControlFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       public ControlOrBuilder getControlOrBuilder() {
         if (controlBuilder_ != null) {
@@ -822,7 +886,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Control control = 2;</code>
+       * <code>required .Control control = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           Control, Control.Builder, ControlOrBuilder>
@@ -842,13 +906,13 @@ public final class PocketBotProtocol {
       private com.google.protobuf.SingleFieldBuilder<
           Gps, Gps.Builder, GpsOrBuilder> gpsBuilder_;
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public boolean hasGps() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public Gps getGps() {
         if (gpsBuilder_ == null) {
@@ -858,7 +922,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public Builder setGps(Gps value) {
         if (gpsBuilder_ == null) {
@@ -874,7 +938,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public Builder setGps(
           Gps.Builder builderForValue) {
@@ -888,7 +952,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public Builder mergeGps(Gps value) {
         if (gpsBuilder_ == null) {
@@ -907,7 +971,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public Builder clearGps() {
         if (gpsBuilder_ == null) {
@@ -920,7 +984,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public Gps.Builder getGpsBuilder() {
         bitField0_ |= 0x00000004;
@@ -928,7 +992,7 @@ public final class PocketBotProtocol {
         return getGpsFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       public GpsOrBuilder getGpsOrBuilder() {
         if (gpsBuilder_ != null) {
@@ -938,7 +1002,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Gps gps = 3;</code>
+       * <code>required .Gps gps = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           Gps, Gps.Builder, GpsOrBuilder>
@@ -958,13 +1022,13 @@ public final class PocketBotProtocol {
       private com.google.protobuf.SingleFieldBuilder<
           Sensor, Sensor.Builder, SensorOrBuilder> sensorBuilder_;
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public boolean hasSensor() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public Sensor getSensor() {
         if (sensorBuilder_ == null) {
@@ -974,7 +1038,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public Builder setSensor(Sensor value) {
         if (sensorBuilder_ == null) {
@@ -990,7 +1054,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public Builder setSensor(
           Sensor.Builder builderForValue) {
@@ -1004,7 +1068,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public Builder mergeSensor(Sensor value) {
         if (sensorBuilder_ == null) {
@@ -1023,7 +1087,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public Builder clearSensor() {
         if (sensorBuilder_ == null) {
@@ -1036,7 +1100,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public Sensor.Builder getSensorBuilder() {
         bitField0_ |= 0x00000008;
@@ -1044,7 +1108,7 @@ public final class PocketBotProtocol {
         return getSensorFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       public SensorOrBuilder getSensorOrBuilder() {
         if (sensorBuilder_ != null) {
@@ -1054,7 +1118,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>optional .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           Sensor, Sensor.Builder, SensorOrBuilder>
@@ -1086,38 +1150,38 @@ public final class PocketBotProtocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional sint32 faceId = 1;</code>
+     * <code>required sint32 faceId = 1;</code>
      */
     boolean hasFaceId();
     /**
-     * <code>optional sint32 faceId = 1;</code>
+     * <code>required sint32 faceId = 1;</code>
      */
     int getFaceId();
 
     /**
-     * <code>optional float faceX = 2;</code>
+     * <code>required float faceX = 2;</code>
      */
     boolean hasFaceX();
     /**
-     * <code>optional float faceX = 2;</code>
+     * <code>required float faceX = 2;</code>
      */
     float getFaceX();
 
     /**
-     * <code>optional float faceY = 3;</code>
+     * <code>required float faceY = 3;</code>
      */
     boolean hasFaceY();
     /**
-     * <code>optional float faceY = 3;</code>
+     * <code>required float faceY = 3;</code>
      */
     float getFaceY();
 
     /**
-     * <code>optional float faceZ = 4;</code>
+     * <code>required float faceZ = 4;</code>
      */
     boolean hasFaceZ();
     /**
-     * <code>optional float faceZ = 4;</code>
+     * <code>required float faceZ = 4;</code>
      */
     float getFaceZ();
   }
@@ -1236,13 +1300,13 @@ public final class PocketBotProtocol {
     public static final int FACEID_FIELD_NUMBER = 1;
     private int faceId_;
     /**
-     * <code>optional sint32 faceId = 1;</code>
+     * <code>required sint32 faceId = 1;</code>
      */
     public boolean hasFaceId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional sint32 faceId = 1;</code>
+     * <code>required sint32 faceId = 1;</code>
      */
     public int getFaceId() {
       return faceId_;
@@ -1251,13 +1315,13 @@ public final class PocketBotProtocol {
     public static final int FACEX_FIELD_NUMBER = 2;
     private float faceX_;
     /**
-     * <code>optional float faceX = 2;</code>
+     * <code>required float faceX = 2;</code>
      */
     public boolean hasFaceX() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional float faceX = 2;</code>
+     * <code>required float faceX = 2;</code>
      */
     public float getFaceX() {
       return faceX_;
@@ -1266,13 +1330,13 @@ public final class PocketBotProtocol {
     public static final int FACEY_FIELD_NUMBER = 3;
     private float faceY_;
     /**
-     * <code>optional float faceY = 3;</code>
+     * <code>required float faceY = 3;</code>
      */
     public boolean hasFaceY() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional float faceY = 3;</code>
+     * <code>required float faceY = 3;</code>
      */
     public float getFaceY() {
       return faceY_;
@@ -1281,13 +1345,13 @@ public final class PocketBotProtocol {
     public static final int FACEZ_FIELD_NUMBER = 4;
     private float faceZ_;
     /**
-     * <code>optional float faceZ = 4;</code>
+     * <code>required float faceZ = 4;</code>
      */
     public boolean hasFaceZ() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional float faceZ = 4;</code>
+     * <code>required float faceZ = 4;</code>
      */
     public float getFaceZ() {
       return faceZ_;
@@ -1305,6 +1369,22 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
+      if (!hasFaceId()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFaceX()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFaceY()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasFaceZ()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -1551,6 +1631,22 @@ public final class PocketBotProtocol {
       }
 
       public final boolean isInitialized() {
+        if (!hasFaceId()) {
+          
+          return false;
+        }
+        if (!hasFaceX()) {
+          
+          return false;
+        }
+        if (!hasFaceY()) {
+          
+          return false;
+        }
+        if (!hasFaceZ()) {
+          
+          return false;
+        }
         return true;
       }
 
@@ -1575,19 +1671,19 @@ public final class PocketBotProtocol {
 
       private int faceId_ ;
       /**
-       * <code>optional sint32 faceId = 1;</code>
+       * <code>required sint32 faceId = 1;</code>
        */
       public boolean hasFaceId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional sint32 faceId = 1;</code>
+       * <code>required sint32 faceId = 1;</code>
        */
       public int getFaceId() {
         return faceId_;
       }
       /**
-       * <code>optional sint32 faceId = 1;</code>
+       * <code>required sint32 faceId = 1;</code>
        */
       public Builder setFaceId(int value) {
         bitField0_ |= 0x00000001;
@@ -1596,7 +1692,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional sint32 faceId = 1;</code>
+       * <code>required sint32 faceId = 1;</code>
        */
       public Builder clearFaceId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1607,19 +1703,19 @@ public final class PocketBotProtocol {
 
       private float faceX_ ;
       /**
-       * <code>optional float faceX = 2;</code>
+       * <code>required float faceX = 2;</code>
        */
       public boolean hasFaceX() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional float faceX = 2;</code>
+       * <code>required float faceX = 2;</code>
        */
       public float getFaceX() {
         return faceX_;
       }
       /**
-       * <code>optional float faceX = 2;</code>
+       * <code>required float faceX = 2;</code>
        */
       public Builder setFaceX(float value) {
         bitField0_ |= 0x00000002;
@@ -1628,7 +1724,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float faceX = 2;</code>
+       * <code>required float faceX = 2;</code>
        */
       public Builder clearFaceX() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -1639,19 +1735,19 @@ public final class PocketBotProtocol {
 
       private float faceY_ ;
       /**
-       * <code>optional float faceY = 3;</code>
+       * <code>required float faceY = 3;</code>
        */
       public boolean hasFaceY() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional float faceY = 3;</code>
+       * <code>required float faceY = 3;</code>
        */
       public float getFaceY() {
         return faceY_;
       }
       /**
-       * <code>optional float faceY = 3;</code>
+       * <code>required float faceY = 3;</code>
        */
       public Builder setFaceY(float value) {
         bitField0_ |= 0x00000004;
@@ -1660,7 +1756,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float faceY = 3;</code>
+       * <code>required float faceY = 3;</code>
        */
       public Builder clearFaceY() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -1671,19 +1767,19 @@ public final class PocketBotProtocol {
 
       private float faceZ_ ;
       /**
-       * <code>optional float faceZ = 4;</code>
+       * <code>required float faceZ = 4;</code>
        */
       public boolean hasFaceZ() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional float faceZ = 4;</code>
+       * <code>required float faceZ = 4;</code>
        */
       public float getFaceZ() {
         return faceZ_;
       }
       /**
-       * <code>optional float faceZ = 4;</code>
+       * <code>required float faceZ = 4;</code>
        */
       public Builder setFaceZ(float value) {
         bitField0_ |= 0x00000008;
@@ -1692,7 +1788,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float faceZ = 4;</code>
+       * <code>required float faceZ = 4;</code>
        */
       public Builder clearFaceZ() {
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -1717,56 +1813,56 @@ public final class PocketBotProtocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional float joyX = 1;</code>
+     * <code>required float joyX = 1;</code>
      */
     boolean hasJoyX();
     /**
-     * <code>optional float joyX = 1;</code>
+     * <code>required float joyX = 1;</code>
      */
     float getJoyX();
 
     /**
-     * <code>optional float joyY = 2;</code>
+     * <code>required float joyY = 2;</code>
      */
     boolean hasJoyY();
     /**
-     * <code>optional float joyY = 2;</code>
+     * <code>required float joyY = 2;</code>
      */
     float getJoyY();
 
     /**
-     * <code>optional float joyZ = 3;</code>
+     * <code>required float joyZ = 3;</code>
      */
     boolean hasJoyZ();
     /**
-     * <code>optional float joyZ = 3;</code>
+     * <code>required float joyZ = 3;</code>
      */
     float getJoyZ();
 
     /**
-     * <code>optional bool buttonA = 4;</code>
+     * <code>required bool buttonA = 4;</code>
      */
     boolean hasButtonA();
     /**
-     * <code>optional bool buttonA = 4;</code>
+     * <code>required bool buttonA = 4;</code>
      */
     boolean getButtonA();
 
     /**
-     * <code>optional bool buttonB = 5;</code>
+     * <code>required bool buttonB = 5;</code>
      */
     boolean hasButtonB();
     /**
-     * <code>optional bool buttonB = 5;</code>
+     * <code>required bool buttonB = 5;</code>
      */
     boolean getButtonB();
 
     /**
-     * <code>optional int32 destHeading = 6;</code>
+     * <code>required int32 destHeading = 6;</code>
      */
     boolean hasDestHeading();
     /**
-     * <code>optional int32 destHeading = 6;</code>
+     * <code>required int32 destHeading = 6;</code>
      */
     int getDestHeading();
   }
@@ -1895,13 +1991,13 @@ public final class PocketBotProtocol {
     public static final int JOYX_FIELD_NUMBER = 1;
     private float joyX_;
     /**
-     * <code>optional float joyX = 1;</code>
+     * <code>required float joyX = 1;</code>
      */
     public boolean hasJoyX() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional float joyX = 1;</code>
+     * <code>required float joyX = 1;</code>
      */
     public float getJoyX() {
       return joyX_;
@@ -1910,13 +2006,13 @@ public final class PocketBotProtocol {
     public static final int JOYY_FIELD_NUMBER = 2;
     private float joyY_;
     /**
-     * <code>optional float joyY = 2;</code>
+     * <code>required float joyY = 2;</code>
      */
     public boolean hasJoyY() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional float joyY = 2;</code>
+     * <code>required float joyY = 2;</code>
      */
     public float getJoyY() {
       return joyY_;
@@ -1925,13 +2021,13 @@ public final class PocketBotProtocol {
     public static final int JOYZ_FIELD_NUMBER = 3;
     private float joyZ_;
     /**
-     * <code>optional float joyZ = 3;</code>
+     * <code>required float joyZ = 3;</code>
      */
     public boolean hasJoyZ() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional float joyZ = 3;</code>
+     * <code>required float joyZ = 3;</code>
      */
     public float getJoyZ() {
       return joyZ_;
@@ -1940,13 +2036,13 @@ public final class PocketBotProtocol {
     public static final int BUTTONA_FIELD_NUMBER = 4;
     private boolean buttonA_;
     /**
-     * <code>optional bool buttonA = 4;</code>
+     * <code>required bool buttonA = 4;</code>
      */
     public boolean hasButtonA() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional bool buttonA = 4;</code>
+     * <code>required bool buttonA = 4;</code>
      */
     public boolean getButtonA() {
       return buttonA_;
@@ -1955,13 +2051,13 @@ public final class PocketBotProtocol {
     public static final int BUTTONB_FIELD_NUMBER = 5;
     private boolean buttonB_;
     /**
-     * <code>optional bool buttonB = 5;</code>
+     * <code>required bool buttonB = 5;</code>
      */
     public boolean hasButtonB() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional bool buttonB = 5;</code>
+     * <code>required bool buttonB = 5;</code>
      */
     public boolean getButtonB() {
       return buttonB_;
@@ -1970,13 +2066,13 @@ public final class PocketBotProtocol {
     public static final int DESTHEADING_FIELD_NUMBER = 6;
     private int destHeading_;
     /**
-     * <code>optional int32 destHeading = 6;</code>
+     * <code>required int32 destHeading = 6;</code>
      */
     public boolean hasDestHeading() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int32 destHeading = 6;</code>
+     * <code>required int32 destHeading = 6;</code>
      */
     public int getDestHeading() {
       return destHeading_;
@@ -1996,6 +2092,30 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
+      if (!hasJoyX()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasJoyY()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasJoyZ()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasButtonA()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasButtonB()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasDestHeading()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -2274,6 +2394,30 @@ public final class PocketBotProtocol {
       }
 
       public final boolean isInitialized() {
+        if (!hasJoyX()) {
+          
+          return false;
+        }
+        if (!hasJoyY()) {
+          
+          return false;
+        }
+        if (!hasJoyZ()) {
+          
+          return false;
+        }
+        if (!hasButtonA()) {
+          
+          return false;
+        }
+        if (!hasButtonB()) {
+          
+          return false;
+        }
+        if (!hasDestHeading()) {
+          
+          return false;
+        }
         return true;
       }
 
@@ -2298,19 +2442,19 @@ public final class PocketBotProtocol {
 
       private float joyX_ ;
       /**
-       * <code>optional float joyX = 1;</code>
+       * <code>required float joyX = 1;</code>
        */
       public boolean hasJoyX() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional float joyX = 1;</code>
+       * <code>required float joyX = 1;</code>
        */
       public float getJoyX() {
         return joyX_;
       }
       /**
-       * <code>optional float joyX = 1;</code>
+       * <code>required float joyX = 1;</code>
        */
       public Builder setJoyX(float value) {
         bitField0_ |= 0x00000001;
@@ -2319,7 +2463,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float joyX = 1;</code>
+       * <code>required float joyX = 1;</code>
        */
       public Builder clearJoyX() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -2330,19 +2474,19 @@ public final class PocketBotProtocol {
 
       private float joyY_ ;
       /**
-       * <code>optional float joyY = 2;</code>
+       * <code>required float joyY = 2;</code>
        */
       public boolean hasJoyY() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional float joyY = 2;</code>
+       * <code>required float joyY = 2;</code>
        */
       public float getJoyY() {
         return joyY_;
       }
       /**
-       * <code>optional float joyY = 2;</code>
+       * <code>required float joyY = 2;</code>
        */
       public Builder setJoyY(float value) {
         bitField0_ |= 0x00000002;
@@ -2351,7 +2495,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float joyY = 2;</code>
+       * <code>required float joyY = 2;</code>
        */
       public Builder clearJoyY() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2362,19 +2506,19 @@ public final class PocketBotProtocol {
 
       private float joyZ_ ;
       /**
-       * <code>optional float joyZ = 3;</code>
+       * <code>required float joyZ = 3;</code>
        */
       public boolean hasJoyZ() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional float joyZ = 3;</code>
+       * <code>required float joyZ = 3;</code>
        */
       public float getJoyZ() {
         return joyZ_;
       }
       /**
-       * <code>optional float joyZ = 3;</code>
+       * <code>required float joyZ = 3;</code>
        */
       public Builder setJoyZ(float value) {
         bitField0_ |= 0x00000004;
@@ -2383,7 +2527,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float joyZ = 3;</code>
+       * <code>required float joyZ = 3;</code>
        */
       public Builder clearJoyZ() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -2394,19 +2538,19 @@ public final class PocketBotProtocol {
 
       private boolean buttonA_ ;
       /**
-       * <code>optional bool buttonA = 4;</code>
+       * <code>required bool buttonA = 4;</code>
        */
       public boolean hasButtonA() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional bool buttonA = 4;</code>
+       * <code>required bool buttonA = 4;</code>
        */
       public boolean getButtonA() {
         return buttonA_;
       }
       /**
-       * <code>optional bool buttonA = 4;</code>
+       * <code>required bool buttonA = 4;</code>
        */
       public Builder setButtonA(boolean value) {
         bitField0_ |= 0x00000008;
@@ -2415,7 +2559,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional bool buttonA = 4;</code>
+       * <code>required bool buttonA = 4;</code>
        */
       public Builder clearButtonA() {
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -2426,19 +2570,19 @@ public final class PocketBotProtocol {
 
       private boolean buttonB_ ;
       /**
-       * <code>optional bool buttonB = 5;</code>
+       * <code>required bool buttonB = 5;</code>
        */
       public boolean hasButtonB() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional bool buttonB = 5;</code>
+       * <code>required bool buttonB = 5;</code>
        */
       public boolean getButtonB() {
         return buttonB_;
       }
       /**
-       * <code>optional bool buttonB = 5;</code>
+       * <code>required bool buttonB = 5;</code>
        */
       public Builder setButtonB(boolean value) {
         bitField0_ |= 0x00000010;
@@ -2447,7 +2591,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional bool buttonB = 5;</code>
+       * <code>required bool buttonB = 5;</code>
        */
       public Builder clearButtonB() {
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -2458,19 +2602,19 @@ public final class PocketBotProtocol {
 
       private int destHeading_ ;
       /**
-       * <code>optional int32 destHeading = 6;</code>
+       * <code>required int32 destHeading = 6;</code>
        */
       public boolean hasDestHeading() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional int32 destHeading = 6;</code>
+       * <code>required int32 destHeading = 6;</code>
        */
       public int getDestHeading() {
         return destHeading_;
       }
       /**
-       * <code>optional int32 destHeading = 6;</code>
+       * <code>required int32 destHeading = 6;</code>
        */
       public Builder setDestHeading(int value) {
         bitField0_ |= 0x00000020;
@@ -2479,7 +2623,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional int32 destHeading = 6;</code>
+       * <code>required int32 destHeading = 6;</code>
        */
       public Builder clearDestHeading() {
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -2504,20 +2648,20 @@ public final class PocketBotProtocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional float lat = 1;</code>
+     * <code>required float lat = 1;</code>
      */
     boolean hasLat();
     /**
-     * <code>optional float lat = 1;</code>
+     * <code>required float lat = 1;</code>
      */
     float getLat();
 
     /**
-     * <code>optional float lon = 2;</code>
+     * <code>required float lon = 2;</code>
      */
     boolean hasLon();
     /**
-     * <code>optional float lon = 2;</code>
+     * <code>required float lon = 2;</code>
      */
     float getLon();
   }
@@ -2626,13 +2770,13 @@ public final class PocketBotProtocol {
     public static final int LAT_FIELD_NUMBER = 1;
     private float lat_;
     /**
-     * <code>optional float lat = 1;</code>
+     * <code>required float lat = 1;</code>
      */
     public boolean hasLat() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional float lat = 1;</code>
+     * <code>required float lat = 1;</code>
      */
     public float getLat() {
       return lat_;
@@ -2641,13 +2785,13 @@ public final class PocketBotProtocol {
     public static final int LON_FIELD_NUMBER = 2;
     private float lon_;
     /**
-     * <code>optional float lon = 2;</code>
+     * <code>required float lon = 2;</code>
      */
     public boolean hasLon() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional float lon = 2;</code>
+     * <code>required float lon = 2;</code>
      */
     public float getLon() {
       return lon_;
@@ -2663,6 +2807,14 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
+      if (!hasLat()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasLon()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -2877,6 +3029,14 @@ public final class PocketBotProtocol {
       }
 
       public final boolean isInitialized() {
+        if (!hasLat()) {
+          
+          return false;
+        }
+        if (!hasLon()) {
+          
+          return false;
+        }
         return true;
       }
 
@@ -2901,19 +3061,19 @@ public final class PocketBotProtocol {
 
       private float lat_ ;
       /**
-       * <code>optional float lat = 1;</code>
+       * <code>required float lat = 1;</code>
        */
       public boolean hasLat() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional float lat = 1;</code>
+       * <code>required float lat = 1;</code>
        */
       public float getLat() {
         return lat_;
       }
       /**
-       * <code>optional float lat = 1;</code>
+       * <code>required float lat = 1;</code>
        */
       public Builder setLat(float value) {
         bitField0_ |= 0x00000001;
@@ -2922,7 +3082,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float lat = 1;</code>
+       * <code>required float lat = 1;</code>
        */
       public Builder clearLat() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -2933,19 +3093,19 @@ public final class PocketBotProtocol {
 
       private float lon_ ;
       /**
-       * <code>optional float lon = 2;</code>
+       * <code>required float lon = 2;</code>
        */
       public boolean hasLon() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional float lon = 2;</code>
+       * <code>required float lon = 2;</code>
        */
       public float getLon() {
         return lon_;
       }
       /**
-       * <code>optional float lon = 2;</code>
+       * <code>required float lon = 2;</code>
        */
       public Builder setLon(float value) {
         bitField0_ |= 0x00000002;
@@ -2954,7 +3114,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional float lon = 2;</code>
+       * <code>required float lon = 2;</code>
        */
       public Builder clearLon() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2979,20 +3139,20 @@ public final class PocketBotProtocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional bool proximity = 1;</code>
+     * <code>required bool proximity = 1;</code>
      */
     boolean hasProximity();
     /**
-     * <code>optional bool proximity = 1;</code>
+     * <code>required bool proximity = 1;</code>
      */
     boolean getProximity();
 
     /**
-     * <code>optional int32 heading = 2;</code>
+     * <code>required int32 heading = 2;</code>
      */
     boolean hasHeading();
     /**
-     * <code>optional int32 heading = 2;</code>
+     * <code>required int32 heading = 2;</code>
      */
     int getHeading();
   }
@@ -3101,13 +3261,13 @@ public final class PocketBotProtocol {
     public static final int PROXIMITY_FIELD_NUMBER = 1;
     private boolean proximity_;
     /**
-     * <code>optional bool proximity = 1;</code>
+     * <code>required bool proximity = 1;</code>
      */
     public boolean hasProximity() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional bool proximity = 1;</code>
+     * <code>required bool proximity = 1;</code>
      */
     public boolean getProximity() {
       return proximity_;
@@ -3116,13 +3276,13 @@ public final class PocketBotProtocol {
     public static final int HEADING_FIELD_NUMBER = 2;
     private int heading_;
     /**
-     * <code>optional int32 heading = 2;</code>
+     * <code>required int32 heading = 2;</code>
      */
     public boolean hasHeading() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional int32 heading = 2;</code>
+     * <code>required int32 heading = 2;</code>
      */
     public int getHeading() {
       return heading_;
@@ -3138,6 +3298,14 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
+      if (!hasProximity()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasHeading()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -3352,6 +3520,14 @@ public final class PocketBotProtocol {
       }
 
       public final boolean isInitialized() {
+        if (!hasProximity()) {
+          
+          return false;
+        }
+        if (!hasHeading()) {
+          
+          return false;
+        }
         return true;
       }
 
@@ -3376,19 +3552,19 @@ public final class PocketBotProtocol {
 
       private boolean proximity_ ;
       /**
-       * <code>optional bool proximity = 1;</code>
+       * <code>required bool proximity = 1;</code>
        */
       public boolean hasProximity() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional bool proximity = 1;</code>
+       * <code>required bool proximity = 1;</code>
        */
       public boolean getProximity() {
         return proximity_;
       }
       /**
-       * <code>optional bool proximity = 1;</code>
+       * <code>required bool proximity = 1;</code>
        */
       public Builder setProximity(boolean value) {
         bitField0_ |= 0x00000001;
@@ -3397,7 +3573,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional bool proximity = 1;</code>
+       * <code>required bool proximity = 1;</code>
        */
       public Builder clearProximity() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -3408,19 +3584,19 @@ public final class PocketBotProtocol {
 
       private int heading_ ;
       /**
-       * <code>optional int32 heading = 2;</code>
+       * <code>required int32 heading = 2;</code>
        */
       public boolean hasHeading() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional int32 heading = 2;</code>
+       * <code>required int32 heading = 2;</code>
        */
       public int getHeading() {
         return heading_;
       }
       /**
-       * <code>optional int32 heading = 2;</code>
+       * <code>required int32 heading = 2;</code>
        */
       public Builder setHeading(int value) {
         bitField0_ |= 0x00000002;
@@ -3429,7 +3605,7 @@ public final class PocketBotProtocol {
         return this;
       }
       /**
-       * <code>optional int32 heading = 2;</code>
+       * <code>required int32 heading = 2;</code>
        */
       public Builder clearHeading() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -3484,15 +3660,15 @@ public final class PocketBotProtocol {
   static {
     String[] descriptorData = {
       "\n\027PocketBotProtocol.proto\"n\n\020PocketBotMe" +
-      "ssage\022\023\n\004face\030\001 \001(\0132\005.Face\022\031\n\007control\030\002 " +
-      "\001(\0132\010.Control\022\021\n\003gps\030\003 \001(\0132\004.Gps\022\027\n\006sens" +
-      "or\030\004 \001(\0132\007.Sensor\"C\n\004Face\022\016\n\006faceId\030\001 \001(" +
-      "\021\022\r\n\005faceX\030\002 \001(\002\022\r\n\005faceY\030\003 \001(\002\022\r\n\005faceZ" +
-      "\030\004 \001(\002\"j\n\007Control\022\014\n\004joyX\030\001 \001(\002\022\014\n\004joyY\030" +
-      "\002 \001(\002\022\014\n\004joyZ\030\003 \001(\002\022\017\n\007buttonA\030\004 \001(\010\022\017\n\007" +
-      "buttonB\030\005 \001(\010\022\023\n\013destHeading\030\006 \001(\005\"\037\n\003Gp" +
-      "s\022\013\n\003lat\030\001 \001(\002\022\013\n\003lon\030\002 \001(\002\",\n\006Sensor\022\021\n" +
-      "\tproximity\030\001 \001(\010\022\017\n\007heading\030\002 \001(\005"
+      "ssage\022\023\n\004face\030\001 \002(\0132\005.Face\022\031\n\007control\030\002 " +
+      "\002(\0132\010.Control\022\021\n\003gps\030\003 \002(\0132\004.Gps\022\027\n\006sens" +
+      "or\030\004 \002(\0132\007.Sensor\"C\n\004Face\022\016\n\006faceId\030\001 \002(" +
+      "\021\022\r\n\005faceX\030\002 \002(\002\022\r\n\005faceY\030\003 \002(\002\022\r\n\005faceZ" +
+      "\030\004 \002(\002\"j\n\007Control\022\014\n\004joyX\030\001 \002(\002\022\014\n\004joyY\030" +
+      "\002 \002(\002\022\014\n\004joyZ\030\003 \002(\002\022\017\n\007buttonA\030\004 \002(\010\022\017\n\007" +
+      "buttonB\030\005 \002(\010\022\023\n\013destHeading\030\006 \002(\005\"\037\n\003Gp" +
+      "s\022\013\n\003lat\030\001 \002(\002\022\013\n\003lon\030\002 \002(\002\",\n\006Sensor\022\021\n" +
+      "\tproximity\030\001 \002(\010\022\017\n\007heading\030\002 \002(\005"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
