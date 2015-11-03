@@ -363,7 +363,11 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     }
 
     private void addTextToList(final String text, final boolean isPocketBot) {
-        mSpeechAdapter.addText(text, isPocketBot);
+
+        final SpeechAdapter speechAdapter = this.mSpeechAdapter;
+        if(speechAdapter != null){
+            speechAdapter.addText(text, isPocketBot);
+        }
     }
 
     /**
@@ -466,6 +470,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
     @Override
     final synchronized public void humanSpotted(final int id) {
+        mSensorData.setFace_id(id);
         final long uptimeMillis = SystemClock.uptimeMillis();
         if(id == SensorData.NO_FACE){
             mHumanCount--;
@@ -479,7 +484,6 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             return;
         }
         mHumanCount++;
-        mSensorData.setFace_id(id);
         //Check if no human has been spotted for 10 seconds
         if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
             onHumanSpoted();

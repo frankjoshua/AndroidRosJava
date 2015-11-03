@@ -43,9 +43,6 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
     public void look(float x, float y, float z) {
         mLeftEye.look(x, y);
         mRightEye.look(x, y);
-        if (z > .55f) {
-            setEmotion(BaseFaceActivity.Emotion.FEAR);
-        }
     }
 
     @Override
