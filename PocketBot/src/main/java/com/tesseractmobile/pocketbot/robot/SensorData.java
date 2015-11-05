@@ -33,6 +33,10 @@ public class SensorData {
     private float jy;
     /** JOYSTICK_Z */
     private float jz;
+    private boolean mButtonA;
+    private boolean mButtonB;
+    private float mLat;
+    private float mLon;
     //private long time;
 
 
@@ -135,6 +139,7 @@ public class SensorData {
         final PocketBotProtocol.Face.Builder faceBuilder = PocketBotProtocol.Face.newBuilder();
         final PocketBotProtocol.Control.Builder controlBuilder = PocketBotProtocol.Control.newBuilder();
         final PocketBotProtocol.Sensor.Builder sensorBuilder = PocketBotProtocol.Sensor.newBuilder();
+        final PocketBotProtocol.Gps.Builder gpsBuilder = PocketBotProtocol.Gps.newBuilder();
         //Objects
         final PocketBotProtocol.Face face = faceBuilder
                 .setFaceId(sensorData.getFace_id())
@@ -146,18 +151,46 @@ public class SensorData {
                 .setJoyX(sensorData.getJoyX())
                 .setJoyY(sensorData.getJoyY())
                 .setJoyZ(sensorData.getJoyZ())
+                .setButtonA(sensorData.getButtonA())
+                .setButtonB(sensorData.getButtonB())
+                .setDestHeading(sensorData.getDestHeading())
                 .build();
         final PocketBotProtocol.Sensor sensor = sensorBuilder
                 .setHeading(sensorData.getHeading())
                 .setProximity(sensorData.getProximity())
+                .build();
+        final PocketBotProtocol.Gps gps = gpsBuilder
+                .setLat(sensorData.getLat())
+                .setLon(sensorData.getLon())
                 .build();
         //Message
         final PocketBotProtocol.PocketBotMessage pocketBotMessage = messageBuilder
                 .setFace(face)
                 .setControl(control)
                 .setSensor(sensor)
+                .setGps(gps)
                 .build();
         return pocketBotMessage;
+    }
+
+    private float getLat() {
+        return mLat;
+    }
+
+    private float getLon() {
+        return mLon;
+    }
+
+    private int getDestHeading() {
+        return dh;
+    }
+
+    private boolean getButtonA() {
+        return mButtonA;
+    }
+
+    private boolean getButtonB() {
+        return mButtonB;
     }
 
     /**

@@ -6,8 +6,8 @@
 #define MAX_SPEED 127
 #define MIN_INPUT 1010
 #define MAX_INPUT 1955
-#define LEFT 2
-#define RIGHT 1
+#define LEFT 1
+#define RIGHT 2
 
 //RC Values
 #define CH1_PIN 3
@@ -94,7 +94,7 @@ void readRc(){
 void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
   Serial.begin(115200);
-  SWSerial.begin(115200);
+  SWSerial.begin(9600);
 }
 
 void initRc(){

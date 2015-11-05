@@ -33,7 +33,7 @@ public class UsbAccessoryActivity extends AiActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Speed up sensor data
-        setSensorDelay(0);
+        setSensorDelay(30);
     }
 
     @Override
