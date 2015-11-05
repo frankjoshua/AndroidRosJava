@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.pubnub.api.Callback;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -18,6 +19,7 @@ import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.faces.ControlFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
@@ -68,7 +70,8 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     }
 
     private void connectToRemoteRobot() {
-        QBUser user = new QBUser("josh", "12345678");
+        //Connect to QuickBlox
+        QBUser user = new QBUser(PocketBotSettings.getUserName(getActivity()), PocketBotSettings.getPassword(getActivity()));
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession result, Bundle params) {
@@ -97,7 +100,13 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 throw new UnsupportedOperationException(errors.toString());
             }
         });
-
+        //Connect to PubNub
+        pubnub.publish(mRemoteUserId.getText().toString(), "Hello", new Callback() {
+            @Override
+            public void successCallback(String channel, Object message) {
+                super.successCallback(channel, message);
+            }
+        });
     }
 
     @Override

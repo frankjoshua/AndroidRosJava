@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.pubnub.api.Pubnub;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 abstract public class QuickBloxFragment extends FaceFragment implements QBRTCClientSessionCallbacks, QBRTCClientConnectionCallbacks, QBRTCClientVideoTracksCallbacks {
 
-
+    protected Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe ");
     private QBChatService chatService;
 
     @Override

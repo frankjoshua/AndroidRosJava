@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.pubnub.api.Callback;
+import com.pubnub.api.PubnubException;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
@@ -100,7 +102,22 @@ public class TelepresenceFaceFragment extends QuickBloxFragment {
             }
         });
 
-
+        //Subscribe to PubNub
+        try {
+            pubnub.subscribe(mUserId.getText().toString(), new Callback() {
+                @Override
+                public void successCallback(String channel, final Object message, String timetoken) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mUserId.setText((String) message);
+                        }
+                    });
+                }
+            });
+        } catch (PubnubException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

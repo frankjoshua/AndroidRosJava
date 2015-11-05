@@ -80,4 +80,5 @@ dependencies {
         transitive = true;
     }
     compile 'org.altbeacon:android-beacon-library:2+'
+    compile 'com.pubnub:pubnub-android:3.7.5'
 }
