@@ -23,7 +23,7 @@ void setup()
 { 
   Serial.begin(115200);
   Serial.println("Starting...");
-  initServos();
+  
   
   SWSerial.begin(COM_SPEED);
   clientTarget.begin(NEO_PIN, &SWSerial);
@@ -31,6 +31,9 @@ void setup()
   //Register as Listener
   clientTarget.registerListener(TARGET_SERVO_PAN);
   clientTarget.registerListener(TARGET_SERVO_TILT); 
+  
+  initServos();
+  Serial.println("Ready...");
 } 
  
 void loop() 
@@ -38,6 +41,7 @@ void loop()
   delay(10);
   
   if(clientTarget.receiveData()){
+    Serial.println("...");
     int target = clientTarget.getTarget();
     int cmd = clientTarget.getCommand();
     int val = clientTarget.getValue();
@@ -85,12 +89,13 @@ Servo getServo(int target){
 }
 
 void initServos(){
-  servos[0].attach(SERVO1);
-  servos[1].attach(SERVO2);
+  
   setServo(TARGET_SERVO_PAN, 90);
   servoDest[0] = 90;
   setServo(TARGET_SERVO_TILT, 90);
   servoDest[1] = 90;
+  servos[0].attach(SERVO1);
+  servos[1].attach(SERVO2);
 }
 
 void setServo(int servo, int pos){

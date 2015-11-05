@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tesseractmobile.pocketbot"
-    android:versionCode="2"
-    android:versionName="1.0.1" >
+    android:versionCode="3"
+    android:versionName="1.0.2" >
 
     <uses-feature android:name="android.hardware.usb.accessory" />
     <uses-feature
@@ -80,7 +80,7 @@
         </service>
 
         <service android:name=".service.VoiceRecognitionService"/>
-        <service android:name=".service.BluetoothService"/>
+        <service android:name=".service.BluetoothService"/>1
         <service android:name=".service.RobotService"/>
 
         <meta-data
