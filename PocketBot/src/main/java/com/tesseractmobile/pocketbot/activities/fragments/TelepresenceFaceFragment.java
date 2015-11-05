@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.pubnub.api.Callback;
+import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
@@ -36,6 +37,7 @@ import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.robot.faces.TelePresenceFace;
 
+import org.json.JSONObject;
 import org.webrtc.VideoRenderer;
 
 import java.util.HashMap;
@@ -106,11 +108,16 @@ public class TelepresenceFaceFragment extends QuickBloxFragment {
         try {
             pubnub.subscribe(mUserId.getText().toString(), new Callback() {
                 @Override
+                public void errorCallback(String channel, PubnubError error) {
+                    throw new UnsupportedOperationException(error.getErrorString());
+                }
+
+                @Override
                 public void successCallback(String channel, final Object message, String timetoken) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mUserId.setText((String) message);
+                            mUserId.setText(((JSONObject) message).toString());
                         }
                     });
                 }

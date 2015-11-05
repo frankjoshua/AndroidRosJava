@@ -3,10 +3,13 @@ package com.tesseractmobile.pocketbot.robot.faces;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.pubnub.api.Callback;
+import com.pubnub.api.Pubnub;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBCallbackImpl;
@@ -23,6 +26,9 @@ import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.JoystickView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +38,10 @@ import java.util.Map;
  * Created by josh on 10/25/2015.
  */
 public class ControlFace extends BaseFace implements JoystickView.JoystickListener {
+
+    private Pubnub mPubnub;
+    private String mChannel;
+    private long mLastUpdate = SystemClock.uptimeMillis();
 
     final Handler mHandler = new Handler(){
         @Override
@@ -81,6 +91,28 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         this.y = sensorData.getJoyY();
         this.z = sensorData.getJoyZ();
         mHandler.sendEmptyMessage(0);
+        updatePubNub(false);
+    }
+
+    /**
+     * Send control data to PubNub
+     * @param force true if data must be sent
+     */
+    private void updatePubNub(boolean force) {
+
+        if(force || SystemClock.uptimeMillis() - mLastUpdate > 100){
+            mLastUpdate = SystemClock.uptimeMillis();
+            final JSONObject json = new JSONObject();
+            try {
+                json.put("JoyX", x);
+                json.put("JoyY", y);
+                json.put("JoyZ", z);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            mPubnub.publish(mChannel, json, new Callback() {
+            });
+        }
     }
 
     @Override
@@ -94,8 +126,12 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
             this.y = sensorData.getJoyY();
             this.z = sensorData.getJoyZ();
             mHandler.sendEmptyMessage(0);
+            updatePubNub(true);
         }
     }
 
-
+    public void setPubNub(final Pubnub pubNub, final String channel){
+        mPubnub = pubNub;
+        mChannel = channel;
+    }
 }

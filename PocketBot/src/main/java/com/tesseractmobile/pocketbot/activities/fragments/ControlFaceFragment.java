@@ -8,6 +8,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.pubnub.api.Callback;
+import com.pubnub.api.PubnubError;
+import com.pubnub.api.PubnubException;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -92,7 +94,9 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
                 //Start call
                 session.startCall(userInfo);
-                //throw new UnsupportedOperationException();
+
+                //Connect to PubNub
+                ((ControlFace) mRobotFace).setPubNub(pubnub, mRemoteUserId.getText().toString());
             }
 
             @Override
@@ -100,13 +104,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 throw new UnsupportedOperationException(errors.toString());
             }
         });
-        //Connect to PubNub
-        pubnub.publish(mRemoteUserId.getText().toString(), "Hello", new Callback() {
-            @Override
-            public void successCallback(String channel, Object message) {
-                super.successCallback(channel, message);
-            }
-        });
+
     }
 
     @Override
