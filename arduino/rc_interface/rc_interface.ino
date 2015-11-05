@@ -1,3 +1,6 @@
+#include <TargetRegistration.h>
+#include <Adafruit_NeoPixel.h>
+#include <EasyTransfer.h>
 #include <SoftwareSerial.h>
 #include <RunningMedian.h>
 
@@ -6,13 +9,20 @@
 #define MIN_INPUT 1010
 #define MAX_INPUT 1955
 
+//START Easy Transfer
+EasyTransfer etDataInterface;
+
+//give a name to the group of data
+COM_DATA_STRUCTURE data;
+//END Easy Transfer
+
 //RC Values
-#define CH1_PIN 3
-#define CH2_PIN 4
-#define CH3_PIN 5
-#define CH4_PIN 6
-#define CH5_PIN 7
-#define CH6_PIN 8
+#define CH1_PIN 8
+#define CH2_PIN 7
+#define CH3_PIN 6
+#define CH4_PIN 5
+#define CH5_PIN 4
+#define CH6_PIN 3
 #define CH1 0
 #define CH2 1
 #define CH3 2
@@ -54,14 +64,34 @@ void loop() {
     int maxSpeed =  constrain(map(channels[CH5], MIN_INPUT, MAX_INPUT, 0, MAX_SPEED), MIN_SPEED, MAX_SPEED);
     int mSpeed = map(channels[CH2], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
     int dir = map(channels[CH1], MAX_INPUT, MIN_INPUT, minSpeed, maxSpeed);
-    int powerR = constrain(mSpeed + dir, minSpeed, maxSpeed);
-    int powerL = constrain(mSpeed - dir, minSpeed, maxSpeed);
+    int powerL = constrain(mSpeed + dir, minSpeed, maxSpeed);
+    int powerR = constrain(mSpeed - dir, minSpeed, maxSpeed);
     
 
     Serial.print("L: ");
     Serial.print(powerL);
     Serial.print(" R: ");
     Serial.println(powerR);
+    
+    data.tar = TARGET_MOTOR_LEFT;
+    data.val = powerL;
+    etDataInterface.sendData();
+    data.tar = TARGET_MOTOR_RIGHT;
+    data.val = powerR;
+    etDataInterface.sendData();
+  } else if(channels[CH5] > 1100){
+    data.tar = TARGET_SERVO_PAN;
+    int dir = map(channels[CH1], MAX_INPUT, MIN_INPUT, 0, 10);
+    if(dir > 7) {
+      data.cmd = COMMAND_LEFT;
+      Serial.println("Left");
+    } else if (dir < 3){
+      data.cmd = COMMAND_RIGHT;
+      Serial.println("Right");
+    }
+    data.val = 1;
+    etDataInterface.sendData();
+    
   }
 }
 
@@ -88,6 +118,7 @@ void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
   Serial.begin(115200);
   SWSerial.begin(115200);
+  etDataInterface.begin(details(data), &SWSerial); 
 }
 
 void initRc(){
