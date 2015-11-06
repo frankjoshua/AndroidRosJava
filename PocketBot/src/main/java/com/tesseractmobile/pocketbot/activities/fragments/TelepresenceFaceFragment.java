@@ -117,7 +117,9 @@ public class TelepresenceFaceFragment extends QuickBloxFragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mUserId.setText(((JSONObject) message).toString());
+                            final JSONObject jsonObject = (JSONObject) message;
+                            mUserId.setText(jsonObject.toString());
+                            ((TelePresenceFace) mRobotFace).sendJson(jsonObject);
                         }
                     });
                 }

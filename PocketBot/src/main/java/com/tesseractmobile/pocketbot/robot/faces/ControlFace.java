@@ -39,6 +39,9 @@ import java.util.Map;
  */
 public class ControlFace extends BaseFace implements JoystickView.JoystickListener {
 
+    public static final String JOY_X = "JoyX";
+    public static final String JOY_Y = "JoyY";
+    public static final String JOY_Z = "JoyZ";
     private Pubnub mPubnub;
     private String mChannel;
     private long mLastUpdate = SystemClock.uptimeMillis();
@@ -99,18 +102,22 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
      * @param force true if data must be sent
      */
     private void updatePubNub(boolean force) {
-
+        final Pubnub pubNub = mPubnub;
+        if(pubNub == null){
+            //Exit if not connected
+            return;
+        }
         if(force || SystemClock.uptimeMillis() - mLastUpdate > 100){
             mLastUpdate = SystemClock.uptimeMillis();
             final JSONObject json = new JSONObject();
             try {
-                json.put("JoyX", x);
-                json.put("JoyY", y);
-                json.put("JoyZ", z);
+                json.put(JOY_X, x);
+                json.put(JOY_Y, y);
+                json.put(JOY_Z, z);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            mPubnub.publish(mChannel, json, new Callback() {
+            pubNub.publish(mChannel, json, new Callback() {
             });
         }
     }
