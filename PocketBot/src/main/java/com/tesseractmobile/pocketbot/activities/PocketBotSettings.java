@@ -25,6 +25,7 @@ public class PocketBotSettings {
     public static final String USER_NAME = "user_name";
     public static final String PASSWORD = "password";
     public static final String SIGNED_IN = "signed_in";
+    private static final String USER_ID = "user_id";
 
     /**
      * True if preview window should be shown
@@ -149,4 +150,16 @@ public class PocketBotSettings {
         PreferenceManager.getDefaultSharedPreferences(context).unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
+    /**
+     * Return last user ID
+     * @param context
+     * @return
+     */
+    public static String getLastUserId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(USER_ID, "");
+    }
+
+    public static boolean setLastUserId(Context context, String userId) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(USER_ID, userId).commit();
+    }
 }

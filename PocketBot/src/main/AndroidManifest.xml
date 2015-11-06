@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tesseractmobile.pocketbot"
     android:versionCode="3"
-    android:versionName="1.0.2" >
+    android:versionName="1.0.2">
 
     <uses-feature android:name="android.hardware.usb.accessory" />
     <uses-feature
@@ -36,37 +36,11 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-        <activity
-            android:name=".activities.BaseFaceActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-
-        </activity>
-        <activity
-            android:name=".activities.AiActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-        </activity>
-        <activity
-            android:name=".activities.BluetoothActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-         </activity>
-        <activity
-            android:name=".activities.TagFaceActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-
-        </activity>
-        <activity
-            android:name=".activities.FirebaseFaceActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
-        </activity>
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activities.UsbAccessoryActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
@@ -75,13 +49,31 @@
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />
         </activity>
+        <activity
+            android:name=".activities.BluetoothActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
-        <service android:name=".service.UsbConnectionService" >
-        </service>
+        </activity>
+        <activity
+            android:name=".activities.TagFaceActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
 
-        <service android:name=".service.VoiceRecognitionService"/>
-        <service android:name=".service.BluetoothService"/>1
-        <service android:name=".service.RobotService"/>
+        </activity>
+        <activity
+            android:name=".activities.FirebaseFaceActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"></activity>
+
+
+        <service android:name=".service.UsbConnectionService"></service>
+
+        <service android:name=".service.VoiceRecognitionService" />
+        <service android:name=".service.BluetoothService" />1
+        <service android:name=".service.RobotService" />
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
