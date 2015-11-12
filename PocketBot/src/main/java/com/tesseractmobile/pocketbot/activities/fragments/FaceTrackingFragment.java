@@ -50,9 +50,8 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
         final View view = inflater.inflate(R.layout.camera_preview, container, false);
         mPreview = (CameraSourcePreview) view.findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) view.findViewById(R.id.faceOverlay);
-        if(PocketBotSettings.isShowPreview(getActivity())){
-            mPreview.setVisibility(View.VISIBLE);
-        }
+        updateView(PocketBotSettings.isShowPreview(getActivity()));
+
         FaceDetector detector = new FaceDetector.Builder(getActivity().getApplicationContext())
                 .setTrackingEnabled(true)
                 .setMode(FaceDetector.ACCURATE_MODE)
@@ -104,11 +103,16 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals(PocketBotSettings.SHOW_PREVIEW)){
-            if(sharedPreferences.getBoolean(key, false)){
-                mPreview.setVisibility(View.VISIBLE);
-            } else {
-                mPreview.setVisibility(View.INVISIBLE);
-            }
+            final boolean showPreview = sharedPreferences.getBoolean(key, false);
+            updateView(showPreview);
+        }
+    }
+
+    private void updateView(boolean showPreview) {
+        if(showPreview){
+            mPreview.setVisibility(View.VISIBLE);
+        } else {
+            mPreview.setVisibility(View.INVISIBLE);
         }
     }
 
