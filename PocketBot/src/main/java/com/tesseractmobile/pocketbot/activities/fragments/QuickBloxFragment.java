@@ -69,9 +69,13 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             @Override
             public void onError(List<String> errors) {
                 //error
-                throw new UnsupportedOperationException(errors.toString());
+                error(errors.toString());
             }
         });
+    }
+
+    private void error(String s) {
+        Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
     }
 
     private void setUpQB(final QBSession session, final QBUser user, final Activity activity) {
@@ -110,7 +114,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             @Override
             public void onError(List errors) {
                 //error
-                throw new UnsupportedOperationException(errors.toString());
+                error(errors.toString());
             }
         });
     }

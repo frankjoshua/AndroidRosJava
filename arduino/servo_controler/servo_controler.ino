@@ -10,11 +10,11 @@
 #define  SERVO1         10
 #define  SERVO2         11
 
-ClientTarget clientTarget;
-
 Servo servos[2];
 int servoPos[2];
 int servoDest[2];
+
+ClientTarget clientTarget;
 
 SoftwareSerial SWSerial(4, 5);
 

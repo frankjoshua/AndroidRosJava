@@ -54,6 +54,7 @@ void setup()
   Serial.println(F("Waiting for Android device..."));
   while(adk.isReady() == false){
      Usb.Task();
+     delay(5);
   }
   Serial.println("");
   Serial.println(F("Connected"));
