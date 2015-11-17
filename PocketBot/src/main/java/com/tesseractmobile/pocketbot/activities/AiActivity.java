@@ -1,18 +1,18 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import android.app.admin.DevicePolicyManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 
 import com.crashlytics.android.Crashlytics;
+import com.tesseractmobile.pocketbot.robot.AI;
+import com.tesseractmobile.pocketbot.robot.AIListener;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
-import com.tesseractmobile.pocketbot.robot.RobotCommand;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
+import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -26,11 +26,11 @@ import ai.api.model.Result;
 /**
  * Created by josh on 8/19/2015.
  */
-public class AiActivity extends BaseFaceActivity {
+public class AiActivity extends BaseFaceActivity implements AI {
 
     private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
     private final String SUBSCRIPTION_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
-    private final Handler handler = new Handler();
+
     private AIDataService mAiDataService;
 
     @Override
@@ -39,40 +39,9 @@ public class AiActivity extends BaseFaceActivity {
         Fabric.with(this, new Crashlytics());
         final AIConfiguration aiConfig = new AIConfiguration(CLIENT_ACCESS_TOKEN, SUBSCRIPTION_KEY, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
-
+        getRobotInterface().setAI(this);
     }
 
-    @Override
-    protected void onHumanSpoted() {
-        onTextInput("hello");
-    }
-
-    @Override
-    protected void doTextInput(final String input) {
-        if(input == null || input.equals("")){
-            return;
-        }
-        final AIRequest aiRequest = new AIRequest();
-        aiRequest.setQuery(input);
-
-        new AsyncTask<Void, Void, Void>(){
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    final AIResponse aiResponse = mAiDataService.request(aiRequest);
-                    // process response object here...
-                    handleAiResponse(aiResponse);
-
-
-                } catch (final AIServiceException e) {
-                    say("I had an unhandled error.");
-                }
-                return null;
-            }
-        }.execute();
-
-    }
 
     private void handleAiResponse(final AIResponse aiResponse){
         final Result result = aiResponse.getResult();
@@ -111,7 +80,7 @@ public class AiActivity extends BaseFaceActivity {
         if(speech.equals("")){
             super.doTextInput(result.getResolvedQuery());
         } else {
-            listen(speech);
+            getRobotInterface().listen(speech);
         }
     }
 
@@ -131,39 +100,37 @@ public class AiActivity extends BaseFaceActivity {
         } else if(emotion.equals(CommandContract.EMOTION_FEAR)){
             setEmotion(Emotion.FEAR);
         } else {
-            say("I had a new emotion... I don't understand, " + emotion);
+            getRobotInterface().say("I had a new emotion... I don't understand, " + emotion);
         }
     }
 
     protected void move(String direction, String measurement, int distance) {
-        say("I have no body. I can't move");
+        getRobotInterface().say("I have no body. I can't move");
     }
 
     @Override
-    public void onRobotEvent(final RobotEvent robotEvent) {
-        final Runnable runnable = new Runnable() {
+    public void input(String input, AIListener aiListener) {
+        if(input == null || input.equals("")){
+            return;
+        }
+        final AIRequest aiRequest = new AIRequest();
+        aiRequest.setQuery(input);
+
+        new AsyncTask<Void, Void, Void>(){
 
             @Override
-            public void run() {
-                switch (robotEvent.getEventType()) {
-                    case ERROR:
-                        say(robotEvent.getMessage());
-                        break;
-                    case DISCONNECT:
-                        say("Please don't shut me off. I was just learning to. Love. ");
-                        handler.postDelayed(new Runnable() {
+            protected Void doInBackground(Void... params) {
+                try {
+                    final AIResponse aiResponse = mAiDataService.request(aiRequest);
+                    // process response object here...
+                    handleAiResponse(aiResponse);
 
-                            @Override
-                            public void run() {
-                                finish();
-                            }
-                        }, 4000);
-                        break;
+
+                } catch (final AIServiceException e) {
+                    getRobotInterface().say("I had an unhandled error.");
                 }
+                return null;
             }
-        };
-        handler.post(runnable);
-
+        }.execute();
     }
-
 }

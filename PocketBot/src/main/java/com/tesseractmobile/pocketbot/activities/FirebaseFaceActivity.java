@@ -40,8 +40,7 @@ public class FirebaseFaceActivity extends BaseFaceActivity {
                     if(!chat.user.equals(userId)){
                         //Ignore first response
                         if(firstResponce){
-                            say
-                            (chat.text);
+                            getRobotInterface().say(chat.text);
                         } else {
                             firstResponce = true;
                         }

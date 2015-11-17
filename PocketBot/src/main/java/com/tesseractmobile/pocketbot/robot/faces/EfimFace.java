@@ -1,10 +1,7 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
-import android.app.Activity;
-import android.content.Context;
-
 import com.tesseractmobile.pocketbot.R;
-import com.tesseractmobile.pocketbot.activities.BaseFaceActivity;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
@@ -22,7 +19,7 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
     private EyeView mLeftEye;
     private EyeView mRightEye;
 
-    private BaseFaceActivity.Emotion mEmotion = BaseFaceActivity.Emotion.JOY;
+    private Emotion mEmotion = Emotion.JOY;
 
     private Handler mHandler = new Handler();
 
@@ -77,7 +74,7 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
     }
 
     @Override
-    public void setEmotion(final BaseFaceActivity.Emotion emotion) {
+    public void setEmotion(final Emotion emotion) {
         if (mEmotion != emotion) {
             mEmotion = emotion;
             mHandler.post(new Runnable() {

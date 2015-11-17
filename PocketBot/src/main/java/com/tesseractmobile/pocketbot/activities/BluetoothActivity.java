@@ -45,7 +45,7 @@ public class BluetoothActivity extends AiActivity{
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 final BodyService blueToothService = ((BodyService.LocalBinder) service).getService();
-                blueToothService.registerBodyConnectionListener(BluetoothActivity.this);
+                blueToothService.registerBodyConnectionListener(getRobotInterface().getBodyConnectionListener());
             }
 
             @Override

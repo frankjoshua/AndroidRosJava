@@ -1,6 +1,6 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
-import com.tesseractmobile.pocketbot.activities.BaseFaceActivity;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
 /**
@@ -11,7 +11,7 @@ public interface RobotFace {
      * Display this emotion
      * @param emotion
      */
-    void setEmotion(BaseFaceActivity.Emotion emotion);
+    void setEmotion(Emotion emotion);
 
     /**
      * Direction to look in

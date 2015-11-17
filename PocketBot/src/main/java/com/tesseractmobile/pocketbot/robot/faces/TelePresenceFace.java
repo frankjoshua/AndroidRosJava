@@ -2,7 +2,7 @@ package com.tesseractmobile.pocketbot.robot.faces;
 
 import android.view.View;
 
-import com.tesseractmobile.pocketbot.activities.BaseFaceActivity;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
@@ -19,7 +19,7 @@ public class TelePresenceFace extends BaseFace {
     }
 
     @Override
-    public void setEmotion(BaseFaceActivity.Emotion emotion) {
+    public void setEmotion(Emotion emotion) {
 
     }
 

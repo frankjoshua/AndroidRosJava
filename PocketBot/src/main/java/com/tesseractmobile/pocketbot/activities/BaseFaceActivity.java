@@ -18,18 +18,14 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
-import android.preference.Preference;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
-import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
@@ -53,8 +49,9 @@ import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.PocketBotProtocol;
-import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
@@ -63,88 +60,44 @@ import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
-import java.util.Arrays;
-
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognitionListener, BodyConnectionListener,  SensorEventListener, SpeechCompleteListener, RobotInterface, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
+public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
-    private static final int START_LISTENING = 1;
-    private static final int START_LISTENING_AFTER_PROMPT = 2;
-    public static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
+
+
     public static final String FRAGMENT_FACE_TRACKING = "FACE_TRACKING";
     public static final String FRAGMENT_FACE = "FACE";
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
 
 
-    private RobotFace mRobotFace;
+    //private RobotFace mRobotFace;
     private SpeechAdapter mSpeechAdapter;
-    private SensorData mSensorData = new SensorData();
+
 
     //Device sensor manager
     private SensorManager mSensorManager;
-
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == START_LISTENING) {
-                mSpeechState = SpeechState.LISTENING;
-                mVoiceRecognitionService.startListening();
-            } else if (msg.what == START_LISTENING_AFTER_PROMPT) {
-                startListening((String) msg.obj);
-            }
-        }
-
-    };
-
-
-    private long mLastHumanSpoted;
-    private ServiceConnection voiceRecognitionServiceConnection;
-
-    private VoiceRecognitionService mVoiceRecognitionService;
 
     //Storage for sensors
     static private float ROTATION[] = new float[9];
     static private float INCLINATION[] = new float[9];
     static private float ORIENTATION[] = new float[3];
 
-    protected BodyInterface mBodyInterface = new BodyInterface() {
-        @Override
-        public void sendObject(Object object) {
-            sendJson(null);
-        }
-
-        @Override
-        public boolean isConnected() {
-            return true;
-        }
-
-        @Override
-        public void sendJson(String json) {
-            //Do nothing
-            //say("I can't feel my wheels!");
-        }
-
-        @Override
-        public void sendBytes(byte[] bytes) {
-
-        }
-    };
-    private SpeechState mSpeechState = SpeechState.READY;
     private float[] mGravity;
     private float[] mGeomagnetic;
-    private long mLastSensorTransmision;
-    private int mSensorDelay = 0;
-    private int mHumanCount = 0;
+
     private boolean mFaceTrackingActive;
+
+    private RobotInterface mRobotInterFace;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
+
+        mRobotInterFace = Robot.get();
 
         setContentView(R.layout.main);
         //Set on click listeners
@@ -170,7 +123,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
 
     protected void peekDrawer(final DrawerLayout drawerLayout) {
         drawerLayout.openDrawer(Gravity.LEFT);
-        mHandler.postDelayed(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 drawerLayout.closeDrawer(Gravity.LEFT);
@@ -225,24 +178,6 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     @Override
     protected void onStart() {
         super.onStart();
-        //Bind to voice recognition service
-        voiceRecognitionServiceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                mVoiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
-                mVoiceRecognitionService.registerVoiceRecognitionListener(BaseFaceActivity.this);
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        };
-
-        final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
-        if (bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false) {
-            throw new UnsupportedOperationException("Error binding to service");
-        }
 
         //Listen for preference changes
         PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
@@ -251,13 +186,6 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
     @Override
     protected void onStop() {
         super.onStop();
-        //Unbind from voice recognition service
-        final VoiceRecognitionService voiceRecognitionService = this.mVoiceRecognitionService;
-        if (voiceRecognitionService != null) {
-            voiceRecognitionService.unregisterVoiceRecognitionListener(this);
-            unbindService(voiceRecognitionServiceConnection);
-            voiceRecognitionServiceConnection = null;
-        }
 
         //Listen for preference changes
         PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);
@@ -286,69 +214,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      * @param emotion
      */
     final public void setEmotion(final Emotion emotion) {
-        mRobotFace.setEmotion(emotion);
-    }
-
-    @Override
-    public void look(final float x, final float y, float z) {
-        mRobotFace.look(x, y, z);
-        mSensorData.setFace_x(x);
-        mSensorData.setFace_y(y);
-        mSensorData.setFace_z(z);
-        sendSensorData(false);
-    }
-
-    /**
-     * Sends sensor data if enough time has passed
-     * May drop data
-     * @param force true if data must be sent
-     */
-    @Override
-    public void sendSensorData(final boolean force) {
-        final long uptime = SystemClock.uptimeMillis();
-        if(force || uptime >= mLastSensorTransmision + mSensorDelay) {
-            mLastSensorTransmision = uptime;
-            if(mBodyInterface.isConnected()){
-                final PocketBotProtocol.PocketBotMessage data = SensorData.toPocketBotMessage(mSensorData);
-                //Send raw data
-                mBodyInterface.sendBytes(data.toByteArray());
-            }
-        }
-    }
-
-    /**
-     * Speak the text
-     *
-     * @return true is speech was sent to the mouth
-     */
-    @Override
-    final synchronized public boolean say(final String text) {
-        mLastHumanSpoted = SystemClock.uptimeMillis();
-
-        if (mSpeechState != SpeechState.READY) {
-            Log.d(TAG, "Could not speak \'" + text + "\', state is " + mSpeechState);
-            return false;
-        }
-        mSpeechState = SpeechState.TALKING;
-
-        //Unmute Audio
-//        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-//        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-
-        //Check if we are on the UI thread
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            setText(text);
-        } else {
-            //If not post a runnable on th UI thread
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    setText(text);
-                }
-            });
-        }
-        return true;
+        mRobotInterFace.setEmotion(emotion);
     }
 
     /**
@@ -358,8 +224,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      */
     private void setText(String text) {
         addTextToList(text, true);
-        mRobotFace.setOnSpeechCompleteListener(this);
-        mRobotFace.say(text);
+        //mRobotFace.setOnSpeechCompleteListener(this);
+        mRobotInterFace.say(text);
     }
 
     private void addTextToList(final String text, final boolean isPocketBot) {
@@ -369,61 +235,6 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
             speechAdapter.addText(text, isPocketBot);
         }
     }
-
-    /**
-     * Speak the text then listen for a response<br>
-     * Pass null to just start listening
-     *
-     * @param prompt null is OK
-     */
-    final synchronized protected void listen(final String prompt) {
-        mLastHumanSpoted = SystemClock.uptimeMillis();
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            startListening(prompt);
-        } else {
-            final Message msg = Message.obtain();
-            msg.obj = prompt;
-            msg.what = START_LISTENING_AFTER_PROMPT;
-            mHandler.sendMessage(msg);
-        }
-    }
-
-    /**
-     * Must be run on the UI thread
-     *
-     * @param prompt
-     */
-    private void startListening(final String prompt) {
-        //setEmotion(Emotion.SUPRISED);
-        if (prompt != null) {
-            mRobotFace.setOnSpeechCompleteListener(this);
-            if (say(prompt)) {
-                mSpeechState = SpeechState.WAITING_TO_LISTEN;
-            }
-        } else {
-            //Call service here
-            mSpeechState = SpeechState.LISTENING;
-            mVoiceRecognitionService.startListening();
-        }
-
-    }
-
-
-//    @Override
-//    protected synchronized void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-//        mIsListening = false;
-//        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
-//            if (resultCode == RESULT_OK) {
-//                proccessSpeech(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
-//            } else {
-//                onError(resultCode);
-//            }
-//        } else {
-//            say("I had an unhandled error.");
-//        }
-//
-//        super.onActivityResult(requestCode, resultCode, data);
-//    }
 
 
     /**
@@ -444,107 +255,38 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         new BotTask().execute(input);
     }
 
-    @Override
-    public void onVoiceRecognitionStateChange(VoiceRecognitionState state) {
-        //Any state change is not listening
-        if (state == VoiceRecognitionState.READY) {
-            onSpeechComplete();
-        }
-    }
 
-    @Override
-    public void onVoiceRecognitionError(String text) {
-        say(text);
-    }
 
-    @Override
-    public boolean onProccessInput(final String input) {
-        if (input.contains("game")) {
-            say("My favorite game is solitaire");
-            final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
-            startActivity(launchIntent);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    final synchronized public void humanSpotted(final int id) {
-        mSensorData.setFace_id(id);
-        final long uptimeMillis = SystemClock.uptimeMillis();
-        if(id == SensorData.NO_FACE){
-            mHumanCount--;
-            if(mHumanCount == 0){
-                mSensorData.setFace_id(id);
-                if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
-                    onHumanLeft();
-                }
-                sendSensorData(true);
-            }
-            return;
-        }
-        mHumanCount++;
-        //Check if no human has been spotted for 10 seconds
-        if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
-            onHumanSpoted();
-        }
-        mLastHumanSpoted = uptimeMillis;
-    }
-
-    private void onHumanLeft() {
-        say("Goodbye");
-    }
-
-    protected void onHumanSpoted() {
-        listen("Hello human.");
-    }
-
-    @Override
-    public void onBluetoothDeviceFound() {
-        say("Bluetooth device found");
-    }
-
-    @Override
-    public void onError(int i, String error) {
-        say(error);
-    }
-
-    @Override
-    public void onBodyConnected(BodyInterface bodyInterface) {
-        this.mBodyInterface = bodyInterface;
-        say("Body interface established");
-    }
-
-    @Override
-    public void onRobotEvent(RobotEvent robotEvent) {
-
-    }
-
-    @Override
-    public void onSpeechComplete() {
-        if (mSpeechState == SpeechState.WAITING_TO_LISTEN) {
-            mHandler.sendEmptyMessage(START_LISTENING);
-        } else {
-            mSpeechState = SpeechState.READY;
-        }
-    }
+//    @Override
+//    public boolean onProccessInput(final String input) {
+//        if (input.contains("game")) {
+//            say("My favorite game is solitaire");
+//            final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
+//            startActivity(launchIntent);
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
             mGravity = lowPass(event.values.clone(), mGravity);
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+        }
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
             mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
+        }
+        SensorData sensorData = mRobotInterFace.getSensorData();
         if (mGravity != null && mGeomagnetic != null) {
             boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
             if (success) {
                 SensorManager.getOrientation(ROTATION, ORIENTATION);
                 //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
                 final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
-                if (Math.abs(heading - mSensorData.getHeading()) > 1) {
-                    mSensorData.setHeading(heading);
-                    sendSensorData(false);
+                if (Math.abs(heading - sensorData.getHeading()) > 1) {
+                    sensorData.setHeading(heading);
+                    mRobotInterFace.sendSensorData(false);
                     //Log.d(TAG, " New Heading " + heading);
                 }
             }
@@ -553,8 +295,8 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         if(event.sensor.getType() == Sensor.TYPE_PROXIMITY){
             final float distance = event.values[0];
             //Distance is either touching or not
-            mSensorData.setProximity(distance < 1.0f);
-            sendSensorData(true);
+            sensorData.setProximity(distance < 1.0f);
+            mRobotInterFace.sendSensorData(true);
             //Log.d(TAG, "Proximity " + Float.toString(distance));
         }
     }
@@ -567,20 +309,12 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         return output;
     }
 
-    @Override
-    public SensorData getSensorData(){
-        return mSensorData;
-    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
 
-    @Override
-    public void listen() {
-        listen(null);
-    }
 
     private void switchFace(int faceId){
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
@@ -613,7 +347,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
             @Override
             public void onComplete() {
-                mRobotFace = faceFragment.getRobotFace(BaseFaceActivity.this);
+                mRobotInterFace.setRobotFace(faceFragment.getRobotFace(mRobotInterFace));
             }
         });
         if(isUseFaceTracking){
@@ -636,7 +370,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
                     });
                 }
                 if (faceTrackingFragment != null) {
-                    faceTrackingFragment.setRobotInterface(this);
+                    faceTrackingFragment.setRobotInterface(mRobotInterFace);
                 }
             }
         } else {
@@ -669,7 +403,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
      * @param i in millis
      */
     protected void setSensorDelay(int i) {
-        mSensorDelay = i;
+        mRobotInterFace.setSensorDelay(i);
     }
 
     @Override
@@ -696,6 +430,10 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
         }
     }
 
+    protected RobotInterface getRobotInterface() {
+        return mRobotInterFace;
+    }
+
     private class BotTask extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -710,7 +448,7 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
                 // bot1 = factory.create(ChatterBotType.CLEVERBOT);
                 // bot1 = factory.create(ChatterBotType.JABBERWACKY);
             } catch (final Exception e) {
-                say("There was an error loading ChatterBotFactory()");
+                mRobotInterFace.say("There was an error loading ChatterBotFactory()");
                 return null;
             }
             final ChatterBotSession bot1session = bot1.createSession();
@@ -736,23 +474,19 @@ public class BaseFaceActivity extends FragmentActivity implements  VoiceRecognit
                 }
             } catch (final Exception e) {
                 // Tell user what went wrong
-                say("Error in BotTask.doInBackground");
+                mRobotInterFace.say("Error in BotTask.doInBackground");
                 Log.e("BotTask", e.toString());
                 return null;
             }
             if (response.length() != 0) {
                 //Speak the text and listen for a response
-                listen(response);
+                mRobotInterFace.listen(response);
             } else {
-                say("I can't think of anything to say.");
+                mRobotInterFace.say("I can't think of anything to say.");
             }
 
             return null;
         }
-    }
-
-    public enum Emotion {
-        JOY, ACCEPTED, AWARE, ANGER, SADNESS, REJECTED, SUPRISED, FEAR
     }
 
 

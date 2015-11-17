@@ -24,7 +24,7 @@ public class UsbAccessoryActivity extends AiActivity {
                                              @Override
                                              public void onServiceConnected(final ComponentName name, final IBinder service) {
                                                  final BodyService bodyService = ((BodyService.LocalBinder) service).getService();
-                                                 bodyService.registerBodyConnectionListener(UsbAccessoryActivity.this);
+                                                 bodyService.registerBodyConnectionListener(getRobotInterface().getBodyConnectionListener());
                                                  //robotCommandInterface.reconnectRobot();
                                              }
                                          };

@@ -11,6 +11,8 @@ import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.quickblox.core.QBSettings;
+import com.tesseractmobile.pocketbot.robot.Robot;
+import com.tesseractmobile.pocketbot.service.RobotService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
@@ -25,13 +27,17 @@ public class PocketBotApp extends Application{
         super.onCreate();
         //Track errors
         Fabric.with(this, new Crashlytics());
+        //Init Robot
+        Robot.init();
         //Setup Quickblox
         QBSettings.getInstance().fastConfigInit("30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
         //Bind to voice recognition service to hold constant connection
         final ServiceConnection voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-
+                VoiceRecognitionService voiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
+                voiceRecognitionService.registerVoiceRecognitionListener(Robot.get().getVoiceRecognitionListener());
+                Robot.get().setVoiceRecognitionService(voiceRecognitionService);
             }
 
             @Override
@@ -44,6 +50,26 @@ public class PocketBotApp extends Application{
         if (bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false) {
             throw new UnsupportedOperationException("Error binding to service");
         }
+
+        //Bind to robot service
+//        final ServiceConnection robotServiceConnection = new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName componentName) {
+//
+//            }
+//        };
+//
+//        final Intent robotIntent = new Intent(this, RobotService.class);
+//        if(bindService(robotIntent, robotServiceConnection, Service.BIND_AUTO_CREATE) == false){
+//            throw new UnsupportedOperationException("Error binding to service");
+//        }
+
+
     }
 
     @Override

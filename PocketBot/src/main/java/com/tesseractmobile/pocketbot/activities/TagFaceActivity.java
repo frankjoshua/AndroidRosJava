@@ -45,7 +45,7 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
             //Update Tag game
             mTagGame.onMessageReceived(remoteState, remoteId, range);
             //Send new Data
-            sendSensorData(false);
+            getRobotInterface().sendSensorData(false);
         }
     };
 
@@ -135,17 +135,17 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
                         obtain.arg2 = Integer.parseInt(transimitedId);
                         hander.sendMessage(obtain);
                         //Update heading estimate
-                        mHeadingEstimate.newData(getSensorData().getHeading(), distanceChange);
+                        mHeadingEstimate.newData(getRobotInterface().getSensorData().getHeading(), distanceChange);
                         if(mTagGame.getState() == TagGame.IT) {
                             //Chase
-                            getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
+                            getRobotInterface().getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
                         } else {
                             //Run Away
                             int direction = mHeadingEstimate.getHeadingEstimate() - 180;
                             if(direction < 0){
                                 direction += 360;
                             }
-                            getSensorData().setDestHeading(direction);
+                            getRobotInterface().getSensorData().setDestHeading(direction);
                         }
                     }
                 }
@@ -161,9 +161,9 @@ public class TagFaceActivity extends BluetoothActivity implements BeaconConsumer
     @Override
     public void onTagGameUpdate(int state, int id) {
         if(state == TagGame.SAFE){
-            say("Tag your it!");
+            getRobotInterface().say("Tag your it!");
         } else if (state == TagGame.IT){
-            say("You got me!");
+            getRobotInterface().say("You got me!");
         }
         createBeacon(state, id);
     }

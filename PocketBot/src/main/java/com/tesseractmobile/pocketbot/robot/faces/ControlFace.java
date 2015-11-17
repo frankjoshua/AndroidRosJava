@@ -1,38 +1,21 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
-import com.quickblox.auth.QBAuth;
-import com.quickblox.auth.model.QBSession;
-import com.quickblox.core.QBCallbackImpl;
-import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.users.model.QBUser;
-import com.quickblox.videochat.webrtc.QBRTCClient;
-import com.quickblox.videochat.webrtc.QBRTCSession;
-import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.tesseractmobile.pocketbot.R;
-import com.tesseractmobile.pocketbot.activities.BaseFaceActivity;
-import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.JoystickView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by josh on 10/25/2015.
@@ -66,7 +49,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     @Override
-    public void setEmotion(BaseFaceActivity.Emotion emotion) {
+    public void setEmotion(Emotion emotion) {
 
     }
 

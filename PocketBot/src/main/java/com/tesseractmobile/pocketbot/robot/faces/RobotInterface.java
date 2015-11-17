@@ -1,6 +1,11 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
+import com.tesseractmobile.pocketbot.robot.AI;
+import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
+import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
+import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 
 /**
  * Created by josh on 10/17/2015.
@@ -10,6 +15,12 @@ public interface RobotInterface {
      * Start voice recognition
      */
     void listen();
+
+    /**
+     * Speek the text then listen for the response
+     * @param prompt
+     */
+    void listen(final String prompt);
 
     /**
      * Speak the text
@@ -41,4 +52,26 @@ public interface RobotInterface {
      * @param required false if data can be dropped
      */
     void sendSensorData(final boolean required);
+
+    /**
+     * Set the current emotional state
+     * @param emotion
+     */
+    void setEmotion(final Emotion emotion);
+
+    /**
+     * Set the active robot face
+     * @param robotFace
+     */
+    void setRobotFace(final RobotFace robotFace);
+
+    VoiceRecognitionListener getVoiceRecognitionListener();
+
+    void setSensorDelay(int delay);
+
+    void setAI(final AI ai);
+
+    BodyConnectionListener getBodyConnectionListener();
+
+    void setVoiceRecognitionService(VoiceRecognitionService voiceRecognitionService);
 }
