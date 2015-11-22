@@ -225,7 +225,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         if (data != null && data.size() > 0) {
             final String response = data.get(0);
             if (response != null) {
-                proccessInput(response);
+                onTextInput(response);
             } else {
                 // Something went wrong
                 error("Pardon? " + SPEECH_INSTRUTIONS);

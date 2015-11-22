@@ -9,4 +9,15 @@ public class AIRobot extends BaseRobot {
     public void setAI(final AI ai){
         mAI = ai;
     }
+
+    @Override
+    public boolean onProccessInput(String text) {
+        say(text);
+        return true;
+    }
+
+    @Override
+    public void onTextInput(String text) {
+        mAI.input(text, null);
+    }
 }

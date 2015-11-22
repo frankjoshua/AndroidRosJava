@@ -201,16 +201,6 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     }
 
     @Override
-    public boolean onProccessInput(String text) {
-        return false;
-    }
-
-    @Override
-    public void onTextInput(String text) {
-
-    }
-
-    @Override
     public void onBluetoothDeviceFound() {
 
     }

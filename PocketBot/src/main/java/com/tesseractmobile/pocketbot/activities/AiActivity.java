@@ -28,8 +28,6 @@ import ai.api.model.Result;
  */
 public class AiActivity extends BaseFaceActivity implements AI {
 
-    private final String CLIENT_ACCESS_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
-    private final String SUBSCRIPTION_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
 
     private AIDataService mAiDataService;
 
@@ -37,7 +35,9 @@ public class AiActivity extends BaseFaceActivity implements AI {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
-        final AIConfiguration aiConfig = new AIConfiguration(CLIENT_ACCESS_TOKEN, SUBSCRIPTION_KEY, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
+        final String token = PocketBotSettings.getApiAiToken(this);
+        final String key = PocketBotSettings.getApiAiKey(this);
+        final AIConfiguration aiConfig = new AIConfiguration(token, key, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
         getRobotInterface().setAI(this);
     }
