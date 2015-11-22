@@ -39,6 +39,7 @@ import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.activities.fragments.ApiAiKeyDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.ControlFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
@@ -105,6 +106,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         findViewById(R.id.btnControl).setOnClickListener(this);
         findViewById(R.id.btnSignIn).setOnClickListener(this);
         findViewById(R.id.btnFace).setOnClickListener(this);
+        findViewById(R.id.btnApiAi).setOnClickListener(this);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
@@ -424,6 +426,11 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
                 break;
             case R.id.btnFace:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 0);
+                break;
+            case R.id.btnApiAi:
+                FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
+                ApiAiKeyDialog apiAiKeyDialog = new ApiAiKeyDialog();
+                apiAiKeyDialog.show(fragmentTransaction2, "API_AI_FRAGMENT");
                 break;
             default:
                 throw new UnsupportedOperationException("Not implemented");

@@ -27,9 +27,9 @@ public class PocketBotSettings {
     public static final String SIGNED_IN = "signed_in";
     private static final String USER_ID = "user_id";
     private static final String API_AI_KEY = "api_ai_key";
-    private static final String API_AI_DEFAULT_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
+    public static final String API_AI_DEFAULT_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     private static final String API_AI_TOKEN = "api_ai_token";
-    private static final String API_AI_DEFAULT_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
+    public static final String API_AI_DEFAULT_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
 
     /**
      * True if preview window should be shown
