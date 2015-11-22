@@ -1,1 +1,1 @@
-include ':openCVLibrary300'
+include ':openCVLibrary300', ':usbSerialForAndroid'

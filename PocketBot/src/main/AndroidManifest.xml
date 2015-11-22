@@ -50,6 +50,18 @@
                 android:resource="@xml/accessory_filter" />
         </activity>
         <activity
+            android:name=".activities.UsbSerialActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/android_filter" />
+        </activity>
+        <activity
             android:name=".activities.BluetoothActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
@@ -70,7 +82,7 @@
 
 
         <service android:name=".service.UsbConnectionService"></service>
-
+        <service android:name=".service.UsbSerialService"></service>
         <service android:name=".service.VoiceRecognitionService" />
         <service android:name=".service.BluetoothService" />1
         <service android:name=".service.RobotService" />

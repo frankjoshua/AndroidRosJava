@@ -29,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId "com.tesseractmobile.pocketbot"
-        minSdkVersion 11
+        minSdkVersion 12
         targetSdkVersion 18
 
         // Enabling multidex support.
@@ -81,4 +81,5 @@ dependencies {
     }
     compile 'org.altbeacon:android-beacon-library:2+'
     compile 'com.pubnub:pubnub-android:3.7.5'
+    compile project(':usbSerialForAndroid')
 }
