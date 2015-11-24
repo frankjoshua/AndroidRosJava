@@ -32,14 +32,16 @@ public class UsbSerialActivity extends AiActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Speed up sensor data
-        setSensorDelay(0);
+        setSensorDelay(25);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         final Intent bindIntent = new Intent(this, UsbSerialService.class);
-        bindService(bindIntent, conn, Service.BIND_AUTO_CREATE);
+        if(bindService(bindIntent, conn, Service.BIND_AUTO_CREATE) == false){
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override

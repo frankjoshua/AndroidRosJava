@@ -4,6 +4,7 @@
     android:versionName="1.1.2">
 
     <uses-feature android:name="android.hardware.usb.accessory" />
+    <uses-feature android:name="android.hardware.usb.host" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

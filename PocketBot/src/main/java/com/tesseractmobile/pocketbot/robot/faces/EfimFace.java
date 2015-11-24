@@ -7,6 +7,7 @@ import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -21,7 +22,14 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
 
     private Emotion mEmotion = Emotion.JOY;
 
-    private Handler mHandler = new Handler();
+    private String mTempText;
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            mouthView.setText(mTempText);
+        }
+    };
 
     public EfimFace(final View view){
 
@@ -43,8 +51,9 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
     }
 
     @Override
-    public void say(String text) {
-         mouthView.setText(text);
+    public void say(final String text) {
+         mTempText = text;
+         mHandler.sendEmptyMessage(0);
     }
 
     @Override

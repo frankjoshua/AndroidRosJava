@@ -10,6 +10,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,18 +30,6 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
     public void onCreate() {
         super.onCreate();
 
-        final UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
-        final UsbSerialPort usbSerialPort = drivers.get(0).getPorts().get(0);
-        UsbDeviceConnection connection = mUsbManager.openDevice(usbSerialPort.getDriver().getDevice());
-        try {
-            usbSerialPort.open(connection);
-            usbSerialPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-        } catch (IOException e) {
-
-        }
-        mSerialIoManager = new SerialInputOutputManager(usbSerialPort, this);
-        mExecutor.submit(mSerialIoManager);
     }
 
     private void startThread() {
@@ -65,13 +54,31 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
 
     @Override
     public void sendBytes(byte[] bytes) {
-        mSerialIoManager.writeAsync(bytes);
+        Log.d("UsbSerialService", "Data " + bytes.length);
+        mSerialIoManager.writeAsync(SensorData.wrapData(bytes));
     }
 
     @Override
     public void run() {
+        final UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
+        final UsbSerialPort usbSerialPort = drivers.get(0).getPorts().get(0);
+        UsbDeviceConnection connection = mUsbManager.openDevice(usbSerialPort.getDriver().getDevice());
+        try {
+            usbSerialPort.open(connection);
+            usbSerialPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        mSerialIoManager = new SerialInputOutputManager(usbSerialPort, this);
+        mExecutor.submit(mSerialIoManager);
+        bodyReady();
         while(true){
-
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
