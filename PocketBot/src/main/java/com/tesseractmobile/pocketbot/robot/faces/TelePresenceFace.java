@@ -1,7 +1,9 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
 import android.view.View;
+import android.widget.TextView;
 
+import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.MouthView;
@@ -9,13 +11,19 @@ import com.tesseractmobile.pocketbot.views.MouthView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.NumberFormat;
+
 /**
  * Created by josh on 10/31/2015.
  */
 public class TelePresenceFace extends BaseFace {
 
-    public TelePresenceFace(View view) {
+    private TextView mUserId;
+    private NumberFormat numberFormat = NumberFormat.getNumberInstance();
 
+    public TelePresenceFace(View view) {
+        numberFormat.setMinimumFractionDigits(2);
+        mUserId = (TextView) view.findViewById(R.id.tvUserId);
     }
 
     @Override
@@ -46,6 +54,10 @@ public class TelePresenceFace extends BaseFace {
             final float z = (float) jsonObject.getDouble(ControlFace.JOY_Z);
             sensorData.setJoystick(x, y, z);
             mRobotInterface.sendSensorData(false);
+            //Show joystick data in text view
+            final String data =  "JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
+            mUserId.setText(data);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
