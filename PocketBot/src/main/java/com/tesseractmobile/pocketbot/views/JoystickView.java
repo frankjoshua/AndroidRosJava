@@ -94,6 +94,10 @@ public class JoystickView extends View {
         float x = cx * 2 - 1;
         float y = -(cy * 2 - 1);
 
+        //Constrain values between -1 and 1
+        x = Math.max(-1.0f, Math.min(1.0f, x));
+        y = Math.max(-1.0f, Math.min(1.0f, y));
+
         mJoystickListener.onPositionChange(x, y, 0);
     }
 
