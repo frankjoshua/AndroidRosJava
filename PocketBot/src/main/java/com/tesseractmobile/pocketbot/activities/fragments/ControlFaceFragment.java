@@ -99,6 +99,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
             mSession.hangUp(null);
             setRemoteState(RemoteState.NOT_CONNECTED);
         }
+        ((ControlFace) mRobotFace).setPubNub(null, null);
     }
 
     private void connectToRemoteRobot() {
@@ -149,14 +150,17 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
             case CONNECTING:
                 mConnectButton.setEnabled(false);
                 mConnectButton.setText("Connecting");
+                mRemoteUserId.setVisibility(View.INVISIBLE);
                 break;
             case CONNECTED:
                 mConnectButton.setEnabled(true);
                 mConnectButton.setText("Disconnect");
+                mRemoteUserId.setVisibility(View.INVISIBLE);
                 break;
             case NOT_CONNECTED:
                 mConnectButton.setEnabled(true);
                 mConnectButton.setText("Connect");
+                mRemoteUserId.setVisibility(View.VISIBLE);
                 break;
         }
     }

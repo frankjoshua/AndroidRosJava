@@ -17,6 +17,8 @@ import com.tesseractmobile.pocketbot.views.MouthView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.NumberFormat;
+
 /**
  * Created by josh on 10/25/2015.
  */
@@ -25,6 +27,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY_X = "JoyX";
     public static final String JOY_Y = "JoyY";
     public static final String JOY_Z = "JoyZ";
+    private NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private Pubnub mPubnub;
     private String mChannel;
     private long mLastUpdate = SystemClock.uptimeMillis();
@@ -40,12 +43,14 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private float x, y, z;
 
     public ControlFace(final View view){
+        numberFormat.setMinimumFractionDigits(2);
         mFaceData = (TextView) view.findViewById(R.id.tvFaceData);
         ((JoystickView) view.findViewById(R.id.joyStick)).setJoystickListener(this);
     }
 
     private void handleMessage(Message msg) {
-        mFaceData.setText(Float.toString(x) + "," + Float.toString(y) + "," + Float.toString(z));
+        final String data =  "JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
+        mFaceData.setText(data);
     }
 
     @Override

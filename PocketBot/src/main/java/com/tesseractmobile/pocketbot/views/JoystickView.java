@@ -33,9 +33,10 @@ public class JoystickView extends View {
 
         mCirclePaint = new Paint();
         mCirclePaint.setColor(Color.parseColor("#bcb9e5"));
+        mCirclePaint.setAlpha(150);
         mTouchPaint = new Paint();
         mTouchPaint.setColor(Color.parseColor("#e59100"));
-
+        mTouchPaint.setAlpha(200);
         mCenterPoint = new Point();
         mTouchPoint = new Point();
     }
