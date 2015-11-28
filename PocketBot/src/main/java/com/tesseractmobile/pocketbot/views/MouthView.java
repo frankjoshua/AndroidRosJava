@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.media.audiofx.Visualizer;
 import android.media.audiofx.Visualizer.OnDataCaptureListener;
@@ -36,8 +37,13 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     private HashMap<String, Boolean> mActiveUtterance = new HashMap<String, Boolean>();
 
     private Bitmap[] mMouthBitmaps;
+    private Bitmap[] mMouthStaticBitmaps;
     private int mCurrentBitmap = 0;
     private long mLastChange;
+    private Path mTeethPath;
+    private Paint mTeethPaint;
+    private int mMouthDx = 100;
+    private int mMouthDy = 100;
 
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -79,8 +85,18 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         mMouthPaint = new Paint();
         mMouthPaint.setColor(Color.WHITE);
 
+        mTeethPaint = new Paint();
+        mTeethPaint.setStrokeWidth(10);
+        mTeethPaint.setStyle(Paint.Style.STROKE);
+        mTeethPaint.setColor(Color.BLACK);
+
+        mMouthStaticBitmaps = new Bitmap[3];
+        mMouthStaticBitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.staticmouth);
+        mMouthStaticBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.staticmouthhappy);
+        mMouthStaticBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.staticmouthsad);
+
         mMouthBitmaps = new Bitmap[4];
-        mMouthBitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.staticmouthhappy);
+        mMouthBitmaps[0] = mMouthStaticBitmaps[1];
         mMouthBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth1);
         mMouthBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth2);
         mMouthBitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth3);
@@ -89,20 +105,31 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     
     @Override
     protected void onDraw(final Canvas canvas) {
-
+        DEST_RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
         if(mState == State.TALKING){
             invalidate();
             if(SystemClock.uptimeMillis() - mLastChange > 75){
                 mLastChange = SystemClock.uptimeMillis();
                 mCurrentBitmap++;
                 if(mCurrentBitmap > 3){
-                    mCurrentBitmap = 1;
+                    mCurrentBitmap = 0;
                 }
             }
+            if(mMouthDx < canvas.getWidth()){
+                mMouthDx += 30;
+            }
+            canvas.drawRoundRect(DEST_RECT, mMouthDx, mMouthDy, mMouthPaint);
+        } else {
+            if(mMouthDx > 100){
+                mMouthDx -= 30;
+                invalidate();
+            }
+            canvas.drawRoundRect(DEST_RECT, mMouthDx, mMouthDy, mMouthPaint);
         }
-        DEST_RECT.set(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.drawRoundRect(DEST_RECT, 50, 50, mMouthPaint);
+
         canvas.drawBitmap(mMouthBitmaps[mCurrentBitmap], null, DEST_RECT, null);
+        //Draw teeth
+        canvas.drawPath(mTeethPath, mTeethPaint);
         //Draw text
         //super.onDraw(canvas);
     }
@@ -114,6 +141,17 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         final Visualizer mVisualizer = new Visualizer(0);
         mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
         mVisualizer.setEnabled(true);
+
+        //Create path for teeth
+        mTeethPath = new Path();
+        final int teeth = 6;
+        final int toothWidth = Math.round(w * 1.2f / teeth);
+        for(int i = 1; i < teeth; i++){
+            int x = Math.round(toothWidth * i - w * .1f);
+            mTeethPath.moveTo(x, 0);
+            mTeethPath.lineTo(x, h);
+        }
+
     }
 
 
@@ -171,6 +209,21 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
             }
         }
         postInvalidate();
+    }
+
+    public void smile() {
+        mMouthBitmaps[0] = mMouthStaticBitmaps[1];
+        invalidate();
+    }
+
+    public void frown() {
+        mMouthBitmaps[0] = mMouthStaticBitmaps[2];
+        invalidate();
+    }
+
+    public void nuetral(){
+        mMouthBitmaps[0] = mMouthStaticBitmaps[0];
+        invalidate();
     }
 
     private enum State {

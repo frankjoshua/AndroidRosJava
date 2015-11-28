@@ -94,31 +94,38 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
                         case ACCEPTED:
                             mLeftEye.squint();
                             mRightEye.squint();
+                            mouthView.smile();
                             break;
                         case SUPRISED:
                             mLeftEye.open();
                             mRightEye.open();
                             mLeftEye.blink();
                             mRightEye.blink();
+                            mouthView.smile();
                             break;
                         case AWARE:
                             mLeftEye.open();
                             mRightEye.squint();
+                            mouthView.nuetral();
                             break;
                         case JOY:
                             mLeftEye.wideOpenLeft();
                             mRightEye.wideOpenRight();
+                            mouthView.smile();
                             break;
                         case FEAR:
                             fear();
+                            mouthView.frown();
                             break;
                         case ANGER:
                             anger();
+                            mouthView.frown();
                             break;
                         default:
                             mLeftEye.squint();
                             mRightEye.squint();
-                            //say("I don't under stand the emotion " + emotion + ".");
+                            mouthView.frown();
+                            say("I don't under stand the emotion " + emotion + ".");
                             break;
                     }
                 }
