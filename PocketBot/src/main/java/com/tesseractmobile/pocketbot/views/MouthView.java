@@ -23,8 +23,11 @@ import android.view.Gravity;
 import android.widget.TextView;
 
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.activities.SpeechState;
+import com.tesseractmobile.pocketbot.robot.Robot;
+import com.tesseractmobile.pocketbot.robot.SpeechStateListener;
 
-public class MouthView extends TextView implements OnInitListener, OnDataCaptureListener{
+public class MouthView extends TextView implements OnInitListener, OnDataCaptureListener, SpeechStateListener{
 
     final Handler handler = new Handler();
     private final TextToSpeech mTts;
@@ -38,12 +41,15 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
 
     private Bitmap[] mMouthBitmaps;
     private Bitmap[] mMouthStaticBitmaps;
+    private Bitmap mMicrophoneBitmap;
+    private Paint mMicrophonePaint;
     private int mCurrentBitmap = 0;
     private long mLastChange;
     private Path mTeethPath;
     private Paint mTeethPaint;
     private int mMouthDx = 100;
     private int mMouthDy = 100;
+    private boolean mListening = false;
 
     public MouthView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -100,6 +106,13 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         mMouthBitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth1);
         mMouthBitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth2);
         mMouthBitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.normalmouth3);
+
+        mMicrophoneBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.microphone);
+        mMicrophonePaint = new Paint();
+        mMicrophonePaint.setAlpha(100);
+
+        //Listen for speech state changes
+        Robot.get().registerSpeechChangeListener(this);
     }
 
     
@@ -130,6 +143,10 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         canvas.drawBitmap(mMouthBitmaps[mCurrentBitmap], null, DEST_RECT, null);
         //Draw teeth
         canvas.drawPath(mTeethPath, mTeethPaint);
+        //Draw microphone if listening
+        if(mListening){
+            canvas.drawBitmap(mMicrophoneBitmap, canvas.getWidth() / 2 - mMicrophoneBitmap.getWidth() / 2, canvas.getHeight() / 2 - mMicrophoneBitmap.getHeight() / 2, mMicrophonePaint);
+        }
         //Draw text
         //super.onDraw(canvas);
     }
@@ -226,6 +243,16 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         invalidate();
     }
 
+    @Override
+    public void onSpeechStateChange(SpeechState speechState) {
+        if(speechState == SpeechState.LISTENING){
+            mListening = true;
+        } else {
+            mListening = false;
+        }
+        invalidate();
+    }
+
     private enum State {
         TALKING, NOT_TALKING
     }
@@ -252,7 +279,9 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     public void onFftDataCapture(final Visualizer visualizer, final byte[] fft, final int samplingRate) {
         updateWave(fft);
     }
-    
+
+
+
     public interface SpeechCompleteListener {
         public void onSpeechComplete();
     }

@@ -4,8 +4,10 @@ import com.tesseractmobile.pocketbot.robot.AI;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.robot.SpeechStateListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.views.MouthView;
 
 /**
  * Created by josh on 10/17/2015.
@@ -74,4 +76,8 @@ public interface RobotInterface {
     BodyConnectionListener getBodyConnectionListener();
 
     void setVoiceRecognitionService(VoiceRecognitionService voiceRecognitionService);
+
+    void registerSpeechChangeListener(SpeechStateListener speechStateListener);
+
+    void unregisterSpeechChangeListener(SpeechStateListener speechStateListener);
 }

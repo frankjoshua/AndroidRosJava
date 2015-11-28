@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.Log;
 
 import com.tesseractmobile.pocketbot.activities.SpeechState;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
@@ -13,6 +12,8 @@ import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 import com.tesseractmobile.pocketbot.views.MouthView;
+
+import java.util.ArrayList;
 
 /**
  * Created by josh on 11/16/2015.
@@ -28,6 +29,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     private Emotion mEmotion;
     private RobotFace mRobotFace;
     private SpeechState mSpeechState = SpeechState.READY;
+    private ArrayList<SpeechStateListener> mSpeechStateListeners = new ArrayList<SpeechStateListener>();
     private VoiceRecognitionService mVoiceRecognitionService;
     final private SensorData mSensorData = new SensorData();
     protected BodyInterface mBodyInterface = new BodyInterface() {
@@ -62,7 +64,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == START_LISTENING) {
-                mSpeechState = SpeechState.LISTENING;
+                setSpeechState(SpeechState.LISTENING);
                 mVoiceRecognitionService.startListening();
             } else if (msg.what == START_LISTENING_AFTER_PROMPT) {
                 startListening((String) msg.obj);
@@ -110,7 +112,9 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
 
     @Override
     public void listen() {
-        mVoiceRecognitionService.startListening();
+        final Message msg = Message.obtain();
+        msg.what = START_LISTENING;
+        mHandler.sendMessage(msg);
     }
 
     @Override
@@ -122,7 +126,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
             //Log.d(TAG, "Could not speak \'" + text + "\', state is " + mSpeechState);
             return false;
         }
-        mSpeechState = SpeechState.TALKING;
+        setSpeechState(SpeechState.TALKING);
 
         mRobotFace.setOnSpeechCompleteListener(this);
         mRobotFace.say(text);
@@ -158,7 +162,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
         if (mSpeechState == SpeechState.WAITING_TO_LISTEN) {
             mHandler.sendEmptyMessage(START_LISTENING);
         } else {
-            mSpeechState = SpeechState.READY;
+            setSpeechState(SpeechState.READY);
         }
     }
 
@@ -172,12 +176,11 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
         if (prompt != null) {
             mRobotFace.setOnSpeechCompleteListener(this);
             if (say(prompt)) {
-                mSpeechState = SpeechState.WAITING_TO_LISTEN;
+                setSpeechState(SpeechState.WAITING_TO_LISTEN);
             }
         } else {
             //Call service here
-            mSpeechState = SpeechState.LISTENING;
-            mVoiceRecognitionService.startListening();
+            listen();
         }
 
     }
@@ -276,5 +279,30 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public void setVoiceRecognitionService(VoiceRecognitionService voiceRecognitionService) {
         mVoiceRecognitionService = voiceRecognitionService;
+    }
+
+    private synchronized void setSpeechState(SpeechState mSpeechState) {
+        this.mSpeechState = mSpeechState;
+        for(SpeechStateListener speechStateListener : mSpeechStateListeners){
+            speechStateListener.onSpeechStateChange(mSpeechState);
+        }
+    }
+
+    /**
+     * Listen for speech state changes
+     * @param speechStateListener
+     */
+    @Override
+    public synchronized void registerSpeechChangeListener(final SpeechStateListener speechStateListener){
+        mSpeechStateListeners.add(speechStateListener);
+    }
+
+    /**
+     * Stop listening for speech state changes
+     * @param speechStateListener
+     */
+    @Override
+    public synchronized void unregisterSpeechChangeListener(final SpeechStateListener speechStateListener){
+        mSpeechStateListeners.remove(speechStateListener);
     }
 }
