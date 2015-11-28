@@ -41,7 +41,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="api. settings"
+            android:text="api.ai settings"
             android:id="@+id/btnApiAi"
             android:layout_gravity="center_horizontal" />
 
@@ -49,6 +49,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:name="com.tesseractmobile.pocketbot.activities.fragments.SettingsFragment"
-            android:id="@+id/fragment" />
+            android:id="@+id/settingsFragment" />
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.tesseractmobile.pocketbot.activities.fragments.EmotionsFragment"
+            android:id="@+id/emotionsFragment" />
     </LinearLayout>
 </merge>

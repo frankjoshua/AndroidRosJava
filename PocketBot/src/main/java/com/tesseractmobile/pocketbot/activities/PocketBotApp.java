@@ -12,7 +12,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.quickblox.core.QBSettings;
 import com.tesseractmobile.pocketbot.robot.Robot;
-import com.tesseractmobile.pocketbot.service.RobotService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
@@ -51,23 +50,6 @@ public class PocketBotApp extends Application{
             throw new UnsupportedOperationException("Error binding to service");
         }
 
-        //Bind to robot service
-//        final ServiceConnection robotServiceConnection = new ServiceConnection() {
-//            @Override
-//            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-//
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName componentName) {
-//
-//            }
-//        };
-//
-//        final Intent robotIntent = new Intent(this, RobotService.class);
-//        if(bindService(robotIntent, robotServiceConnection, Service.BIND_AUTO_CREATE) == false){
-//            throw new UnsupportedOperationException("Error binding to service");
-//        }
 
 
     }

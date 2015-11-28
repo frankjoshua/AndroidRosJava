@@ -86,7 +86,6 @@
         <service android:name=".service.UsbSerialService"></service>
         <service android:name=".service.VoiceRecognitionService" />
         <service android:name=".service.BluetoothService" />1
-        <service android:name=".service.RobotService" />
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
