@@ -250,7 +250,7 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
         } else {
             mListening = false;
         }
-        invalidate();
+        postInvalidate();
     }
 
     private enum State {

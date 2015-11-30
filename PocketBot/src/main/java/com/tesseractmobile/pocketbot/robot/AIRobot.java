@@ -6,18 +6,43 @@ package com.tesseractmobile.pocketbot.robot;
 public class AIRobot extends BaseRobot {
     private AI mAI;
 
+    private SpeechListener mSpeechListener;
+
+    /**
+     * Set the AI service to use
+     * @param ai
+     */
     public void setAI(final AI ai){
         mAI = ai;
     }
 
     @Override
-    public boolean onProccessInput(String text) {
-        say(text);
-        return true;
+    public boolean onProccessInput(final String text) {
+        //Report to the SpeechListener
+        if(mSpeechListener != null){
+            mSpeechListener.onSpeechOut(text);
+        }
+        //Not handled completely
+        return false;
     }
 
     @Override
-    public void onTextInput(String text) {
+    public void onTextInput(final String text) {
         mAI.input(text, null);
+        //Report to the SpeechListener
+        if(mSpeechListener != null){
+            mSpeechListener.onSpeechIn(text);
+        }
     }
+
+    @Override
+    public void registerSpeechListener(final SpeechListener speechListener){
+        mSpeechListener = speechListener;
+    }
+
+    @Override
+    public void unregisterSpeechListener(final SpeechListener speechListener){
+        mSpeechListener = null;
+    }
+
 }

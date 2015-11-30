@@ -59,14 +59,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         }
     }
 
-    private void proccessInput(final String text){
-        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
-        if(voiceRecognitionListener != null) {
-            if(voiceRecognitionListener.onProccessInput(text) == false){
-                onTextInput(text);
-            }
-        }
-    }
 
     private void onTextInput(final String text){
         final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;

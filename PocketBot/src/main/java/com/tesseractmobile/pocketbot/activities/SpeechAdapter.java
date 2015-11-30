@@ -25,6 +25,7 @@ public class SpeechAdapter extends BaseAdapter {
 
     public SpeechAdapter(final Context context){
         mContext = context;
+        mSpeechList.add(new Speech("Ready...", true));
     }
 
     @Override

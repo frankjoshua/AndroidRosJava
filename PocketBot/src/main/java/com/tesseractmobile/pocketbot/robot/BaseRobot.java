@@ -118,18 +118,20 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     }
 
     @Override
-    public boolean say(String text) {
+    final public boolean say(String text) {
+        //Check if handled by onPoccessInput
+        if(onProccessInput(text) == false) {
+            mLastHumanSpoted = SystemClock.uptimeMillis();
 
-        mLastHumanSpoted = SystemClock.uptimeMillis();
+            if (mSpeechState != SpeechState.READY) {
+                //Log.d(TAG, "Could not speak \'" + text + "\', state is " + mSpeechState);
+                return false;
+            }
+            setSpeechState(SpeechState.TALKING);
 
-        if (mSpeechState != SpeechState.READY) {
-            //Log.d(TAG, "Could not speak \'" + text + "\', state is " + mSpeechState);
-            return false;
+            mRobotFace.setOnSpeechCompleteListener(this);
+            mRobotFace.say(text);
         }
-        setSpeechState(SpeechState.TALKING);
-
-        mRobotFace.setOnSpeechCompleteListener(this);
-        mRobotFace.say(text);
         return true;
     }
 

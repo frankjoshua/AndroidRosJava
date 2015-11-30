@@ -1,10 +1,6 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Dialog;
-import android.app.Service;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -14,10 +10,6 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -45,25 +37,18 @@ import com.tesseractmobile.pocketbot.activities.fragments.ControlFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.PreviewFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
-import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
-import com.tesseractmobile.pocketbot.robot.BodyInterface;
 import com.tesseractmobile.pocketbot.robot.Emotion;
-import com.tesseractmobile.pocketbot.robot.PocketBotProtocol;
 import com.tesseractmobile.pocketbot.robot.Robot;
-import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
-import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
+public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -149,10 +134,10 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
 //        }, (long) (2 * DateUtils.SECOND_IN_MILLIS));
     }
 
-    private void setupTextPreview(final PreviewFragment previewFragment) {
+    private void setupTextPreview(final TextPreviewFragment textPreviewFragment) {
         //Setup list view for text
         mSpeechAdapter = new SpeechAdapter(BaseFaceActivity.this);
-        ListView listView = previewFragment.getListView();
+        ListView listView = textPreviewFragment.getListView();
         listView.setAdapter(mSpeechAdapter);
     }
 
@@ -180,17 +165,19 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
     @Override
     protected void onStart() {
         super.onStart();
-
         //Listen for preference changes
         PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
+        //Listen for speech to update preview
+        mRobotInterFace.registerSpeechListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
         //Listen for preference changes
         PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);
+        //Stop listening for speech to update preview
+        mRobotInterFace.unregisterSpeechListener(this);
     }
 
     @Override
@@ -201,6 +188,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
         //Listen to proximity sensor
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_UI);
+
     }
 
     @Override
@@ -219,16 +207,17 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         mRobotInterFace.setEmotion(emotion);
     }
 
-    /**
-     * Send the text ot the mouth view and adds text to the preview view
-     *
-     * @param text
-     */
-    private void setText(String text) {
-        addTextToList(text, true);
-        //mRobotFace.setOnSpeechCompleteListener(this);
-        mRobotInterFace.say(text);
+
+    @Override
+    public void onSpeechIn(String speech) {
+        addTextToList(speech, false);
     }
+
+    @Override
+    public void onSpeechOut(String speech) {
+        addTextToList(speech, true);
+    }
+
 
     private void addTextToList(final String text, final boolean isPocketBot) {
 
@@ -236,21 +225,6 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         if(speechAdapter != null){
             speechAdapter.addText(text, isPocketBot);
         }
-    }
-
-
-    /**
-     * @param input
-     */
-    final public void onTextInput(final String input) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                addTextToList(input, false);
-            }
-        });
-
-        doTextInput(input);
     }
 
     protected void doTextInput(String input) {
@@ -355,19 +329,19 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         if(isUseFaceTracking){
             if(mFaceTrackingActive == false) {
                 mFaceTrackingActive = true;
-                final PreviewFragment previewFragment = new PreviewFragment();
+                final TextPreviewFragment textPreviewFragment = new TextPreviewFragment();
                 final FaceTrackingFragment faceTrackingFragment = new FaceTrackingFragment();
                 //Create FaceTrackingFragment
                 ft.add(R.id.overlayView, faceTrackingFragment, FRAGMENT_FACE_TRACKING);
                 //Create Preview Fragment
-                ft.add(R.id.overlayView, previewFragment, FRAGMENT_PREVIEW);
+                ft.add(R.id.topOverlayView, textPreviewFragment, FRAGMENT_PREVIEW);
                 //Set up a listener for when the view is created
-                if (previewFragment != null) {
-                    previewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
+                if (textPreviewFragment != null) {
+                    textPreviewFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
 
                         @Override
                         public void onComplete() {
-                            setupTextPreview(previewFragment);
+                            setupTextPreview(textPreviewFragment);
                         }
                     });
                 }
@@ -440,6 +414,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
     protected RobotInterface getRobotInterface() {
         return mRobotInterFace;
     }
+
 
     private class BotTask extends AsyncTask<String, Void, Void> {
 

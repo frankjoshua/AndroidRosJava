@@ -4,6 +4,7 @@ import com.tesseractmobile.pocketbot.robot.AI;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.SpeechStateListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
@@ -80,4 +81,8 @@ public interface RobotInterface {
     void registerSpeechChangeListener(SpeechStateListener speechStateListener);
 
     void unregisterSpeechChangeListener(SpeechStateListener speechStateListener);
+
+    void registerSpeechListener(final SpeechListener speechListener);
+
+    void unregisterSpeechListener(final SpeechListener speechListener);
 }
