@@ -2,6 +2,8 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -53,7 +55,9 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         final String password = PocketBotSettings.getPassword(activity);
 
         if(TextUtils.isEmpty(login) || TextUtils.isEmpty(password)){
-            Toast.makeText(activity, "Username or Password missing!", Toast.LENGTH_LONG).show();
+            //Launch sign in fragment
+            FragmentTransaction fragmentTransaction = ((FragmentActivity) activity).getSupportFragmentManager().beginTransaction();
+            new SignInFragment().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
             return;
         }
 

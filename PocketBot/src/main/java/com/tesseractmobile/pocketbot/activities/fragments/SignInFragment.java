@@ -1,5 +1,8 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,19 +25,24 @@ import java.util.List;
 /**
  * Created by josh on 11/1/2015.
  */
-public class SignInFragment extends Fragment implements View.OnClickListener {
+public class SignInFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener {
     private EditText mEmail;
     private EditText mPassword;
 
-    @Nullable
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.sign_in_layout, null);
         view.findViewById(R.id.btnSignIn).setOnClickListener(this);
         mEmail = (EditText) view.findViewById(R.id.etEmail);
         mPassword = (EditText) view.findViewById(R.id.etPassword);
         mEmail.setText(PocketBotSettings.getUserName(getActivity()));
-        return view;
+
+        return new AlertDialog.Builder(getActivity())
+                .setTitle("Sign In for Telepresence")
+                .setView(view)
+                .create();
     }
 
     @Override

@@ -389,9 +389,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
             case R.id.btnSignIn:
                 //Launch sign in fragment
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.main_window, new SignInFragment(), "SIGN_IN_FRAGMENT");
-                fragmentTransaction.commit();
-                break;
+                new SignInFragment().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
             case R.id.btnTelepresence:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 2);
                 break;
