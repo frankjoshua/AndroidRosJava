@@ -7,10 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
 
 import com.quickblox.core.QBSettings;
+import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.crashlytics.android.Crashlytics;
@@ -50,6 +49,8 @@ public class PocketBotApp extends Application{
             throw new UnsupportedOperationException("Error binding to service");
         }
 
+        //Start up remote control service
+        RemoteControl.init("1");
 
 
     }

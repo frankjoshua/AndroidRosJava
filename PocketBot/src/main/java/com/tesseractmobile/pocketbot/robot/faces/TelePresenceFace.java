@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ public class TelePresenceFace extends BaseFace {
 
     private TextView mUserId;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
+    private Handler mHandler = new Handler();
 
     public TelePresenceFace(View view) {
         numberFormat.setMinimumFractionDigits(2);
@@ -56,7 +58,12 @@ public class TelePresenceFace extends BaseFace {
             mRobotInterface.sendSensorData(false);
             //Show joystick data in text view
             final String data =  "JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
-            mUserId.setText(data);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mUserId.setText(data);
+                }
+            });
 
         } catch (JSONException e) {
             e.printStackTrace();

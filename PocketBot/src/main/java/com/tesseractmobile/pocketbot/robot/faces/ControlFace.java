@@ -6,10 +6,9 @@ import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
 
-import com.pubnub.api.Callback;
-import com.pubnub.api.Pubnub;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.JoystickView;
 import com.tesseractmobile.pocketbot.views.MouthView;
@@ -27,8 +26,10 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY_X = "JoyX";
     public static final String JOY_Y = "JoyY";
     public static final String JOY_Z = "JoyZ";
+    /** PubNub message delay in millis */
+    public static final int PUBNUB_MAX_TRANSMIT_SPEED = 100;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
-    private Pubnub mPubnub;
+    //Channel that the remote robot is listening on
     private String mChannel;
     private long mLastUpdate = SystemClock.uptimeMillis();
 
@@ -82,20 +83,15 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         this.y = sensorData.getJoyY();
         this.z = sensorData.getJoyZ();
         mHandler.sendEmptyMessage(0);
-        updatePubNub(false);
+        updateRemote(false);
     }
 
     /**
      * Send control data to PubNub
      * @param force true if data must be sent
      */
-    private void updatePubNub(boolean force) {
-        final Pubnub pubNub = mPubnub;
-        if(pubNub == null){
-            //Exit if not connected
-            return;
-        }
-        if(force || SystemClock.uptimeMillis() - mLastUpdate > 100){
+    private void updateRemote(boolean force) {
+        if(force || SystemClock.uptimeMillis() - mLastUpdate > PUBNUB_MAX_TRANSMIT_SPEED){
             mLastUpdate = SystemClock.uptimeMillis();
             final JSONObject json = new JSONObject();
             try {
@@ -105,8 +101,10 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            pubNub.publish(mChannel, json, new Callback() {
-            });
+            //Send to the remote robot
+            if(mChannel != null){
+                RemoteControl.get().send(mChannel, json);
+            }
         }
     }
 
@@ -116,17 +114,16 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         if(hasFocus == false) {
             final SensorData sensorData = mRobotInterface.getSensorData();
             sensorData.setJoystick(0, 0, 0);
-            mRobotInterface.sendSensorData(false);
+            mRobotInterface.sendSensorData(true);
             this.x = sensorData.getJoyX();
             this.y = sensorData.getJoyY();
             this.z = sensorData.getJoyZ();
             mHandler.sendEmptyMessage(0);
-            updatePubNub(true);
+            updateRemote(true);
         }
     }
 
-    public void setPubNub(final Pubnub pubNub, final String channel){
-        mPubnub = pubNub;
+    public void setChannel(final String channel){
         mChannel = channel;
     }
 }

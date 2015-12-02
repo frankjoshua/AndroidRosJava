@@ -99,7 +99,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
             mSession.hangUp(null);
             setRemoteState(RemoteState.NOT_CONNECTED);
         }
-        ((ControlFace) mRobotFace).setPubNub(null, null);
+        ((ControlFace) mRobotFace).setChannel(null);
     }
 
     private void connectToRemoteRobot() {
@@ -127,7 +127,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 mSession.startCall(userInfo);
 
                 //Connect to PubNub
-                ((ControlFace) mRobotFace).setPubNub(pubnub, mRemoteUserId.getText().toString());
+                ((ControlFace) mRobotFace).setChannel(mRemoteUserId.getText().toString());
 
                 //Save UserId
                 PocketBotSettings.setLastUserId(getActivity(), mRemoteUserId.getText().toString());

@@ -10,6 +10,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
     private static final String TAG = UsbSerialService.class.getSimpleName();
     private SerialInputOutputManager mSerialIoManager;
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+    private boolean mErrorState = false;
 
     @Override
     public void onCreate() {
@@ -54,6 +56,11 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
 
     @Override
     public void sendBytes(byte[] bytes) {
+        //Check for error
+        if(mErrorState){
+            return;
+        }
+        //Send data to the Serial Manager
         Log.d("UsbSerialService", "Data " + bytes.length);
         mSerialIoManager.writeAsync(SensorData.wrapData(bytes));
     }
@@ -89,6 +96,7 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
 
     @Override
     public void onRunError(Exception e) {
-
+        //This probally means USB was disconected
+        mErrorState = true;
     }
 }
