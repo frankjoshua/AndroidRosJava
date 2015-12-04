@@ -1,5 +1,7 @@
 package com.tesseractmobile.pocketbot.robot;
 
+import android.util.Log;
+
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
@@ -8,6 +10,7 @@ import com.pubnub.api.PubnubException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by josh on 12/1/2015.
@@ -76,20 +79,34 @@ public class RemoteControl {
             pubnub.subscribe(id, new Callback() {
                 @Override
                 public void errorCallback(String channel, PubnubError error) {
-                    throw new UnsupportedOperationException(error.getErrorString());
+                    Log.e("PUBNUB", error.getErrorString());
                 }
 
                 @Override
-                public void successCallback(String channel, final Object message, String timetoken) {
+                public void successCallback(String channel, final Object message, String timeToken) {
                     //Update listeners
-                    for(RemoteListener remoteListener : mRemoteListeners){
-                        remoteListener.onMessageReceived(message);
+                    final long timeElapsed = timeElapsed(timeToken);
+                    if(timeElapsed < 500) {
+                        for (RemoteListener remoteListener : mRemoteListeners) {
+                            remoteListener.onMessageReceived(message);
+                        }
+                    } else {
+                        Log.e("PUBNUB", "Old Packet " + Long.toString(timeElapsed));
                     }
+                    //Log.d("PUBNUB", Long.toString(timeElapsed(timeToken)));
                 }
             });
         } catch (PubnubException e) {
             e.printStackTrace();
         }
+    }
+
+    private long timeElapsed(final String timeToken) {
+        final Date now = new Date();
+        final Date then = new Date(Long.valueOf(timeToken) / 10000);
+        //Log.d("PUBNUB", "Now " + Long.toString(now.getTime()));
+        //Log.d("PUBNUB", "Then " + Long.toString(then.getTime()));
+        return now.getTime() - then.getTime();
     }
 
     /**

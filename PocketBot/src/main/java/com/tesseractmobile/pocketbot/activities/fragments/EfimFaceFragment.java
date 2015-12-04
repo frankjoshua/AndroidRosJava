@@ -6,16 +6,33 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.robot.RemoteControl;
+import com.tesseractmobile.pocketbot.robot.RemoteListener;
 import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
+import org.json.JSONObject;
+
 /**
  * Created by josh on 10/18/2015.
  */
-public class EfimFaceFragment extends FaceFragment {
+public class EfimFaceFragment extends FaceFragment implements RemoteListener {
 
     private EfimFace mRobotFace;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        RemoteControl.get().setId("012345");
+        RemoteControl.get().registerRemoteListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        RemoteControl.get().unregisterRemoteListener(this);
+        super.onDestroy();
+    }
 
     @Override
     public RobotFace getRobotFace(final RobotInterface robotInterface) {
@@ -30,4 +47,8 @@ public class EfimFaceFragment extends FaceFragment {
         return view;
     }
 
+    @Override
+    public void onMessageReceived(Object message) {
+        ((EfimFace) mRobotFace).sendJson((JSONObject) message);
+    }
 }

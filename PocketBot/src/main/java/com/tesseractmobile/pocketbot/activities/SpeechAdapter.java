@@ -2,6 +2,8 @@ package com.tesseractmobile.pocketbot.activities;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,14 @@ public class SpeechAdapter extends BaseAdapter {
 
     private ArrayList<Speech> mSpeechList = new ArrayList<Speech>();
     private Context mContext;
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            notifyDataSetChanged();
+        }
+    };
 
     public SpeechAdapter(final Context context){
         mContext = context;
@@ -70,7 +80,7 @@ public class SpeechAdapter extends BaseAdapter {
 
     public void addText(String text, final boolean isPocketBot) {
         mSpeechList.add(new Speech(text, isPocketBot));
-        notifyDataSetChanged();
+        mHandler.sendEmptyMessage(0);
     }
 
     static private class ViewHolder {

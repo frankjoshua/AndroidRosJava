@@ -15,4 +15,9 @@
         android:title="Bluetooth"
         android:summary="Scan for Bluetooth devices"
         android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="fast_tracking"
+        android:title="Fast Face Tracking"
+        android:summary="Turns off smile and landmark detection"
+        android:defaultValue="true" />
 </PreferenceScreen>

@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pubnub.api.Callback;
 import com.pubnub.api.PubnubError;
@@ -87,7 +88,12 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     public void onClick(View view) {
         if(view.getId() == R.id.btnConnect){
             if(mRemoteState == RemoteState.NOT_CONNECTED){
-                connectToRemoteRobot();
+                //Connect if we have an ID
+                if(mRemoteUserId.getText().equals("") == false){
+                    connectToRemoteRobot();
+                } else {
+                    Toast.makeText(getActivity(), "Remote ID missing", Toast.LENGTH_LONG).show();
+                }
             } else if (mRemoteState == RemoteState.CONNECTED){
                 disconnect();
             }
@@ -171,6 +177,11 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         VideoRenderer remoteRenderer = new VideoRenderer(new VideoCallBacks(mRemoteVideoView, QBGLVideoView.Endpoint.REMOTE));
         qbrtcVideoTrack.addRenderer(remoteRenderer);
         mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
+    }
+
+    @Override
+    void onQBSetup(QBSession session, QBUser user) {
+        //Do Nothing
     }
 
     private enum RemoteState {

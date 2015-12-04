@@ -3,7 +3,6 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
@@ -51,25 +49,6 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
         mPreview = (CameraSourcePreview) view.findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) view.findViewById(R.id.faceOverlay);
         updateView(PocketBotSettings.isShowPreview(getActivity()));
-
-        FaceDetector detector = new FaceDetector.Builder(getActivity().getApplicationContext())
-                .setTrackingEnabled(true)
-                .setMode(FaceDetector.ACCURATE_MODE)
-                .setProminentFaceOnly(true)
-                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
-                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                .build();
-        //detector.setProcessor(new MultiProcessor.Builder<Face>(new GraphicFaceTrackerFactory()).build());
-        detector.setProcessor(
-                new LargestFaceFocusingProcessor(
-                        detector,
-                        new GraphicFaceTracker(mGraphicOverlay)));
-
-        mCameraSource = new CameraSource.Builder(getActivity().getApplicationContext(), detector)
-                .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
-                .setFacing(CameraSource.CAMERA_FACING_FRONT)
-                .setRequestedFps(30.0f)
-                .build();
         return view;
     }
 
@@ -81,12 +60,48 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
     @Override
     public void onStart() {
         super.onStart();
+        startFaceDetection();
+        //Listen for settings changes
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(getActivity(), this);
+    }
+
+    private void startFaceDetection() {
+        final FaceDetector detector;
+        if(PocketBotSettings.getFastTrackingMode(getActivity())) {
+            detector = new FaceDetector.Builder(getActivity().getApplicationContext())
+                    .setTrackingEnabled(true)
+                    .setMode(FaceDetector.FAST_MODE)
+                    .setProminentFaceOnly(true)
+                    .setClassificationType(FaceDetector.NO_CLASSIFICATIONS)
+                    .setLandmarkType(FaceDetector.NO_LANDMARKS)
+                    .build();
+
+        } else {
+            detector = new FaceDetector.Builder(getActivity().getApplicationContext())
+                    .setTrackingEnabled(true)
+                    .setMode(FaceDetector.ACCURATE_MODE)
+                    .setProminentFaceOnly(true)
+                    .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                    .build();
+        }
+        detector.setProcessor(new MultiProcessor.Builder<Face>(new GraphicFaceTrackerFactory()).build());
+//        detector.setProcessor(
+//                new LargestFaceFocusingProcessor(
+//                        detector,
+//                        new GraphicFaceTracker(mGraphicOverlay)));
+
+        mCameraSource = new CameraSource.Builder(getActivity().getApplicationContext(), detector)
+                .setRequestedPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)
+                .setFacing(CameraSource.CAMERA_FACING_FRONT)
+                .setRequestedFps(15.0f)
+                .build();
+
         try {
             mPreview.start(mCameraSource, mGraphicOverlay);
         } catch (IOException e) {
             //Log.e(TAG, e.getMessage());
         }
-        PocketBotSettings.registerOnSharedPreferenceChangeListener(getActivity(), this);
     }
 
     @Override
@@ -105,6 +120,14 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
         if(key.equals(PocketBotSettings.SHOW_PREVIEW)){
             final boolean showPreview = sharedPreferences.getBoolean(key, false);
             updateView(showPreview);
+        } else if(key.equals(PocketBotSettings.FAST_TRACKING)){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mCameraSource.stop();
+                    startFaceDetection();
+                }
+            });
         }
     }
 

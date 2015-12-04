@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.robot.faces;
 
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.EyeView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
@@ -10,6 +11,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by josh on 10/17/2015.
@@ -149,4 +153,16 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
         mRightEye.squintLeft();
     }
 
+    public void sendJson(JSONObject jsonObject) {
+        final SensorData sensorData = mRobotInterface.getSensorData();
+        try {
+            final float x = (float) jsonObject.getDouble(ControlFace.JOY_X);
+            final float y = (float) jsonObject.getDouble(ControlFace.JOY_Y);
+            final float z = (float) jsonObject.getDouble(ControlFace.JOY_Z);
+            sensorData.setJoystick(x, y, z);
+            mRobotInterface.sendSensorData(false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

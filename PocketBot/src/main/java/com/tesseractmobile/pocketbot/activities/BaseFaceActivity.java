@@ -35,8 +35,10 @@ import com.tesseractmobile.pocketbot.activities.fragments.ApiAiKeyDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.ControlFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.EfimTelepresenceFaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
@@ -92,6 +94,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         findViewById(R.id.btnSignIn).setOnClickListener(this);
         findViewById(R.id.btnFace).setOnClickListener(this);
         findViewById(R.id.btnApiAi).setOnClickListener(this);
+        findViewById(R.id.btnRemoteFace).setOnClickListener(this);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
@@ -115,7 +118,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
             public void run() {
                 drawerLayout.closeDrawer(Gravity.LEFT);
             }
-        }, 3000);
+        }, 1000);
 //        final long downTime = SystemClock.uptimeMillis();
 //        final long eventTime = SystemClock.uptimeMillis() + 100;
 //        MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, 0, 100, 0);
@@ -296,7 +299,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = supportFragmentManager.beginTransaction();
         final FaceFragment faceFragment;
-        final Boolean isUseFaceTracking;
+        final boolean isUseFaceTracking;
         switch (faceId){
             case 0:
                 faceFragment = new EfimFaceFragment();
@@ -307,8 +310,18 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
                 isUseFaceTracking = false;
                 break;
             case 2:
-                faceFragment = new TelepresenceFaceFragment();
-                isUseFaceTracking = false;
+                if(PocketBotSettings.allowTelepresence(this)) {
+                    faceFragment = new TelepresenceFaceFragment();
+                    isUseFaceTracking = false;
+                } else {
+                    ft.replace(R.id.faceView, new LockedFragment(), FRAGMENT_FACE);
+                    ft.commitAllowingStateLoss();
+                    return;
+                }
+                break;
+            case 3:
+                faceFragment = new EfimTelepresenceFaceFragment();
+                isUseFaceTracking = false;//true && checkGooglePlayServices();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown face id " + faceId);
@@ -398,6 +411,9 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
                 break;
             case R.id.btnFace:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 0);
+                break;
+            case R.id.btnRemoteFace:
+                PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 3);
                 break;
             case R.id.btnApiAi:
                 FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();

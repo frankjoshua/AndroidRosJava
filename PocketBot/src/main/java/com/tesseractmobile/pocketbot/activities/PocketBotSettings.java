@@ -2,10 +2,12 @@ package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.support.v4.app.FragmentActivity;
 
+import com.tesseractmobile.pocketbot.BuildConfig;
 import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
 
@@ -30,6 +32,8 @@ public class PocketBotSettings {
     public static final String API_AI_DEFAULT_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     private static final String API_AI_TOKEN = "api_ai_token";
     public static final String API_AI_DEFAULT_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
+    private static final String ALLOW_TELEPRESENCE = "allow_tele";
+    public static final String FAST_TRACKING = "fast_tracking";
 
     /**
      * True if preview window should be shown
@@ -181,5 +185,19 @@ public class PocketBotSettings {
 
     public static boolean setApiAiToken(final Context context, final String token){
         return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(API_AI_TOKEN, token).commit();
+    }
+
+    public static boolean allowTelepresence(final Context context) {
+        //Should be false by default in releases
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ALLOW_TELEPRESENCE, BuildConfig.DEBUG);
+    }
+
+    /**
+     * Speeds up face tracking but turns off smile detection
+     * @param context
+     * @return
+     */
+    public static boolean getFastTrackingMode(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(FAST_TRACKING, true);
     }
 }

@@ -121,9 +121,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         });
     }
 
-    protected void onQBSetup(QBSession session, QBUser user) {
-        //Do nothing by default
-    }
+    abstract void onQBSetup(QBSession session, QBUser user);
 
 
     @Override
