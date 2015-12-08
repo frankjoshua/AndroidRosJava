@@ -32,7 +32,7 @@ public class UsbSerialActivity extends AiActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Speed up sensor data
-        setSensorDelay(25);
+        setSensorDelay(50);
     }
 
     @Override

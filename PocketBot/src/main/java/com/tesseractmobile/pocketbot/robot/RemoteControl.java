@@ -114,8 +114,8 @@ public class RemoteControl {
      * @param channel
      * @param json
      */
-    public void send(String channel, JSONObject json) {
-        pubnub.publish(channel, json, false, new Callback() {
+    public void send(String channel, JSONObject json, final boolean required) {
+        pubnub.publish(channel, json, required, new Callback() {
             @Override
             public void successCallback(String channel, Object message, String timetoken) {
 

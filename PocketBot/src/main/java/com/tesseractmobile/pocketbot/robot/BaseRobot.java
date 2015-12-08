@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.tesseractmobile.pocketbot.activities.SpeechState;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
@@ -101,12 +102,16 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     public void sendSensorData(boolean required) {
         final long uptime = SystemClock.uptimeMillis();
         if(required || uptime >= mLastSensorTransmision + mSensorDelay) {
+            Log.d("PocketBot", mSensorDelay + " Data sent to body " + (uptime - mLastSensorTransmision));
             mLastSensorTransmision = uptime;
             if(mBodyInterface.isConnected()){
                 final PocketBotProtocol.PocketBotMessage data = SensorData.toPocketBotMessage(mSensorData);
                 //Send raw data
                 mBodyInterface.sendBytes(data.toByteArray());
+
             }
+        } else {
+            Log.d("PocketBot", mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
         }
     }
 
@@ -138,7 +143,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
 
     @Override
     public void humanSpotted(int id) {
-        mSensorData.setFace_id(id);
+
         final long uptimeMillis = SystemClock.uptimeMillis();
         if(id == SensorData.NO_FACE){
             mHumanCount--;
@@ -147,14 +152,19 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
                 if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
                     onHumanLeft();
                 }
+                //Set face id to NO_FACE only if no humans are present
+                mSensorData.setFace_id(id);
                 sendSensorData(true);
             }
             return;
         }
         mHumanCount++;
+        //Set face id to known human
+        mSensorData.setFace_id(id);
         //Check if no human has been spotted for 10 seconds
         if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
             onHumanSpoted();
+            sendSensorData(true);
         }
         mLastHumanSpoted = uptimeMillis;
     }

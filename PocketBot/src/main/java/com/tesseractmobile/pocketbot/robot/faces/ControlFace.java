@@ -27,7 +27,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY_Y = "JoyY";
     public static final String JOY_Z = "JoyZ";
     /** PubNub message delay in millis */
-    public static final int PUBNUB_MAX_TRANSMIT_SPEED = 100;
+    public static final int PUBNUB_MAX_TRANSMIT_SPEED = 200;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
     //Channel that the remote robot is listening on
     private String mChannel;
@@ -103,7 +103,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
             }
             //Send to the remote robot
             if(mChannel != null){
-                RemoteControl.get().send(mChannel, json);
+                RemoteControl.get().send(mChannel, json, force);
             }
         }
     }

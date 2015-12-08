@@ -40,6 +40,7 @@ public class AiActivity extends BaseFaceActivity implements AI {
         final AIConfiguration aiConfig = new AIConfiguration(token, key, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
         getRobotInterface().setAI(this);
+        setSensorDelay(120);
     }
 
 
