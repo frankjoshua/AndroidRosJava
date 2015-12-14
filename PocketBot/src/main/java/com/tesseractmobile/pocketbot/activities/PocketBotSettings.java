@@ -1,15 +1,12 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.support.v4.app.FragmentActivity;
 
 import com.tesseractmobile.pocketbot.BuildConfig;
-import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
+import com.tesseractmobile.pocketbot.service.BluetoothClassicService;
 
 /**
  * Created by josh on 9/10/2015.
@@ -34,6 +31,7 @@ public class PocketBotSettings {
     public static final String API_AI_DEFAULT_TOKEN = "443dddf4747d4408b0e9451d4d53f201";
     private static final String ALLOW_TELEPRESENCE = "allow_tele";
     public static final String FAST_TRACKING = "fast_tracking";
+    private static final String BLUETOOTH_DEVICE = "bluetooth_device";
 
     /**
      * True if preview window should be shown
@@ -199,5 +197,24 @@ public class PocketBotSettings {
      */
     public static boolean getFastTrackingMode(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(FAST_TRACKING, true);
+    }
+
+    /**
+     * Set the mac address of the connected bluetooth device
+     * @param context
+     * @param name
+     * @return
+     */
+    public static boolean setBluetoothDevice(Context context, String name) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(BLUETOOTH_DEVICE, name).commit();
+    }
+
+    /**
+     * Return the MAC address of the selected bluetooth device
+     * @param context
+     * @return "" if no device selected
+     */
+    public static String getBluetoothDevice(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(BLUETOOTH_DEVICE, "");
     }
 }

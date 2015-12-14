@@ -49,8 +49,15 @@
         <com.tesseractmobile.pocketbot.views.JoystickView
             android:layout_width="150dp"
             android:layout_height="150dp"
+            android:id="@+id/joyStickLeft"
+            android:layout_gravity="bottom|left"
+            android:layout_margin="10dp" />
+        <com.tesseractmobile.pocketbot.views.JoystickView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:id="@+id/joyStick"
-            android:layout_gravity="bottom|right" />
+            android:layout_gravity="bottom|right"
+            android:layout_margin="10dp" />
     </FrameLayout>
 
 

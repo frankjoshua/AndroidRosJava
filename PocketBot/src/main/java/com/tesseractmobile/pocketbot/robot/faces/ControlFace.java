@@ -42,15 +42,17 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
 
     private TextView mFaceData;
     private float x, y, z;
+    private int mDestHeading;
 
     public ControlFace(final View view){
         numberFormat.setMinimumFractionDigits(2);
         mFaceData = (TextView) view.findViewById(R.id.tvFaceData);
         ((JoystickView) view.findViewById(R.id.joyStick)).setJoystickListener(this);
+        ((JoystickView) view.findViewById(R.id.joyStickLeft)).setJoystickListener(this);
     }
 
     private void handleMessage(Message msg) {
-        final String data =  "JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
+        final String data =  "Heading: " + mDestHeading + " JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
         mFaceData.setText(data);
     }
 
@@ -75,15 +77,22 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     @Override
-    public void onPositionChange(float x, float y, float z) {
+    public void onPositionChange(final JoystickView joystickView, float x, float y, float z) {
         final SensorData sensorData = mRobotInterface.getSensorData();
-        sensorData.setJoystick(x, y, z);
+        if(joystickView.getId() == R.id.joyStick) {
+            sensorData.setJoystick(x, y, z);
+            this.x = sensorData.getJoyX();
+            this.y = sensorData.getJoyY();
+            this.z = sensorData.getJoyZ();
+        }
+
+        if(joystickView.getId() == R.id.joyStickLeft) {
+            mDestHeading =  (int) ((x + y) * 10);
+        }
+
         mRobotInterface.sendSensorData(false);
-        this.x = sensorData.getJoyX();
-        this.y = sensorData.getJoyY();
-        this.z = sensorData.getJoyZ();
-        mHandler.sendEmptyMessage(0);
         updateRemote(false);
+        mHandler.sendEmptyMessage(0);
     }
 
     /**
@@ -109,7 +118,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     @Override
-    public void onFocusChange(boolean hasFocus) {
+    public void onFocusChange(final JoystickView joystickView, boolean hasFocus) {
         //Send message when user lets go of controls
         if(hasFocus == false) {
             final SensorData sensorData = mRobotInterface.getSensorData();

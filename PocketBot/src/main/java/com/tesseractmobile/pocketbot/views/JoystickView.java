@@ -99,7 +99,7 @@ public class JoystickView extends View {
         x = Math.max(-1.0f, Math.min(1.0f, x));
         y = Math.max(-1.0f, Math.min(1.0f, y));
 
-        mJoystickListener.onPositionChange(x, y, 0);
+        mJoystickListener.onPositionChange(this, x, y, 0);
     }
 
     public void setJoystickListener(final JoystickListener joystickListener){
@@ -109,7 +109,7 @@ public class JoystickView extends View {
     private void setHasFocus(boolean hasFocus) {
         if(this.mHasFocus != hasFocus){
             this.mHasFocus = hasFocus;
-            mJoystickListener.onFocusChange(hasFocus);
+            mJoystickListener.onFocusChange(this, hasFocus);
         }
     }
 
@@ -119,12 +119,12 @@ public class JoystickView extends View {
          * @param x -1.0 is far left, 1.0 is far right, 0.0 is center
          * @param y -1.0 is down, 1.0 is up, 0.0 is center
          */
-        void onPositionChange(float x, float y, float z);
+        void onPositionChange(final JoystickView joystickView, float x, float y, float z);
 
         /**
          * True when user is touching false when they let go
          * @param hasFocus
          */
-        void onFocusChange(final boolean hasFocus);
+        void onFocusChange(final JoystickView joystickView, final boolean hasFocus);
     }
 }

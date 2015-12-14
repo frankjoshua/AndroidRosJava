@@ -19,5 +19,6 @@
     <usb-device vendor-id="1659" product-id="8963" />
 
     <!-- Triket Pro -->
-    <usb-device vendor-id="1781" product-id="0C9F" />
+    <usb-device vendor-id="1781"/>
+    <usb-device/>
 </resources>

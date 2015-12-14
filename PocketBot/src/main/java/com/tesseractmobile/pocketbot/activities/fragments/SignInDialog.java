@@ -2,14 +2,10 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.quickblox.auth.QBAuth;
@@ -25,7 +21,7 @@ import java.util.List;
 /**
  * Created by josh on 11/1/2015.
  */
-public class SignInFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener {
+public class SignInDialog extends android.support.v4.app.DialogFragment implements View.OnClickListener {
     private EditText mEmail;
     private EditText mPassword;
 
@@ -84,7 +80,7 @@ public class SignInFragment extends android.support.v4.app.DialogFragment implem
         //Mark user as signed in
         PocketBotSettings.setSignedIn(getActivity(), true);
         //Close fragment
-        getActivity().getSupportFragmentManager().beginTransaction().remove(SignInFragment.this).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().remove(SignInDialog.this).commit();
     }
 
     private void signUpUser(final QBUser qbUser) {

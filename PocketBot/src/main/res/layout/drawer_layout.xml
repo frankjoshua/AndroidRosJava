@@ -15,42 +15,78 @@
             android:layout_height="wrap_content"
             android:text="Sign In"
             android:id="@+id/btnSignIn"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center" />
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Face Mode"
-            android:id="@+id/btnFace"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Modes"
+            android:id="@+id/textView6"
             android:layout_gravity="center_horizontal" />
 
-        <Button
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Remote Face Mode"
-            android:id="@+id/btnRemoteFace"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center">
 
-        <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Telepresence Mode"
-        android:id="@+id/btnTelepresence"
-        android:layout_gravity="center_horizontal" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Face"
+                android:id="@+id/btnFace" />
 
-        <Button
-            android:layout_width="wrap_content"
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Remote Face"
+                android:id="@+id/btnRemoteFace" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Control Mode"
-            android:id="@+id/btnControl"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal">
 
-        <Button
-            android:layout_width="wrap_content"
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+            android:text="Telepresence"
+            android:id="@+id/btnTelepresence" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Control"
+                android:id="@+id/btnControl" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="api.ai settings"
-            android:id="@+id/btnApiAi"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="right">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="api.ai settings"
+                android:id="@+id/btnApiAi" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Bluetooth Scan"
+                android:id="@+id/btnBluetooth" />
+        </LinearLayout>
 
         <fragment
             android:layout_width="match_parent"

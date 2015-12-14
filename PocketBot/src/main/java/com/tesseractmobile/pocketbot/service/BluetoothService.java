@@ -438,7 +438,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
         }
     }
 
-    private class BluetoothDeviceData {
+    public class BluetoothDeviceData {
         public BluetoothDevice device;
         public int rssi;
         public byte[] scanRecord;

@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.pubnub.api.Pubnub;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
@@ -57,7 +56,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         if(TextUtils.isEmpty(login) || TextUtils.isEmpty(password)){
             //Launch sign in fragment
             FragmentTransaction fragmentTransaction = ((FragmentActivity) activity).getSupportFragmentManager().beginTransaction();
-            new SignInFragment().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
+            new SignInDialog().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
             return;
         }
 

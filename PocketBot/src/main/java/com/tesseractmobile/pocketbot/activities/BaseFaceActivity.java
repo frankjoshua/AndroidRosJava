@@ -40,7 +40,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.SignInFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.SignInDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.Robot;
@@ -402,7 +402,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
             case R.id.btnSignIn:
                 //Launch sign in fragment
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                new SignInFragment().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
+                new SignInDialog().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
             case R.id.btnTelepresence:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 2);
                 break;

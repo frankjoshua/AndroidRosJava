@@ -73,6 +73,12 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
 
+        </activity>
+        <activity
+            android:name=".activities.BluetoothClassicActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -91,7 +97,8 @@
         <service android:name=".service.UsbConnectionService"></service>
         <service android:name=".service.UsbSerialService"></service>
         <service android:name=".service.VoiceRecognitionService" />
-        <service android:name=".service.BluetoothService" />1
+        <service android:name=".service.BluetoothService" />
+        <service android:name=".service.BluetoothClassicService" />
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
