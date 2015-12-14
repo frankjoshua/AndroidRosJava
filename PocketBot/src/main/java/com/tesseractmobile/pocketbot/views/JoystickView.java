@@ -16,38 +16,42 @@ import android.view.View;
  */
 public class JoystickView extends View {
 
-    private Paint mCirclePaint;
-    private Paint mTouchPaint;
-    private Point mCenterPoint;
-    private Point mTouchPoint;
-    private int mSizeCircle;
-    private int mSizeTouch;
+    //Main circle
+    private TouchCircle mainCircle;
+    //Center Circle
+    private TouchCircle touchCircle;
+    //Toggle Circle
+    private TouchCircle toggleCircle;
 
     /** true if the user is touching */
     private boolean mHasFocus;
+    /** if true joystick will hold position */
+    private boolean mSticky = false;
+
+    private boolean mChangingState = false;
 
     private JoystickListener mJoystickListener;
 
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        mCirclePaint = new Paint();
-        mCirclePaint.setColor(Color.parseColor("#bcb9e5"));
-        mCirclePaint.setAlpha(150);
-        mTouchPaint = new Paint();
-        mTouchPaint.setColor(Color.parseColor("#e59100"));
-        mTouchPaint.setAlpha(200);
-        mCenterPoint = new Point();
-        mTouchPoint = new Point();
+        mainCircle = new TouchCircle(Color.parseColor("#bcb9e5"), 150);
+        touchCircle = new TouchCircle(Color.parseColor("#e59100"), 200);
+        toggleCircle = new TouchCircle(Color.BLUE, 100);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mCenterPoint.set(w / 2, h / 2);
-        mTouchPoint.set(w / 2, h / 2);
-        mSizeCircle = Math.min(w, h) / 2;
-        mSizeTouch = Math.min(w, h) / 10;
+        final int size = Math.min(w, h) / 10;
+        mainCircle.set(w / 2, h / 2);
+        touchCircle.set(w / 2, h / 2);
+
+        toggleCircle.set(size, h - size);
+
+        toggleCircle.setSize(size);
+        mainCircle.setSize(Math.min(w, h) / 2);
+
+        touchCircle.setSize(size);
 
         int[] circleColors = new int[]{
                 Color.parseColor("#bcb9e5"),
@@ -55,7 +59,7 @@ public class JoystickView extends View {
                 Color.parseColor("#b3a2c1")
         };
         final Shader circleShader = new LinearGradient(0, 0, w, h, circleColors, null, Shader.TileMode.CLAMP);
-        mCirclePaint.setShader(circleShader);
+        mainCircle.setShader(circleShader);
 
         int[] touchColors = new int[]{
                 Color.parseColor("#e59100"),
@@ -63,34 +67,42 @@ public class JoystickView extends View {
                 Color.parseColor("#e09900")
         };
         final Shader touchShader = new LinearGradient(0, 0, w, h, touchColors, null, Shader.TileMode.CLAMP);
-        mTouchPaint.setShader(touchShader);
+        touchCircle.setShader(touchShader);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawCircle(mCenterPoint.x, mCenterPoint.y, mSizeCircle, mCirclePaint);
-        canvas.drawCircle(mTouchPoint.x, mTouchPoint.y, mSizeTouch, mTouchPaint);
+        mainCircle.draw(canvas);
+        toggleCircle.draw(canvas);
+        touchCircle.draw(canvas);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE){
-            mTouchPoint.set(Math.round(event.getX()), Math.round(event.getY()));
+        if(event.getAction() == MotionEvent.ACTION_DOWN && toggleCircle.isTouched(Math.round(event.getX()), Math.round(event.getY()))){
+            mSticky = !mSticky;
+            toggleCircle.toggle(mSticky);
+            mChangingState = true;
+        } else if(mChangingState == false && (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE)){
+            touchCircle.set(Math.round(event.getX()), Math.round(event.getY()));
             update();
             setHasFocus(true);
         } else if (event.getAction() == MotionEvent.ACTION_UP){
-            mTouchPoint.set(mCenterPoint.x, mCenterPoint.y);
-            update();
-            setHasFocus(false);
+            if(!mSticky) {
+                touchCircle.set(mainCircle.point.x, mainCircle.point.y);
+                update();
+                setHasFocus(false);
+            }
+            mChangingState = false;
         }
         invalidate();
         return true;
     }
 
     private void update() {
-        float cx = mTouchPoint.x / (float) getWidth();
-        float cy = mTouchPoint.y / (float) getHeight();
+        float cx = touchCircle.point.x / (float) getWidth();
+        float cy = touchCircle.point.y / (float) getHeight();
 
         float x = cx * 2 - 1;
         float y = -(cy * 2 - 1);
@@ -110,6 +122,48 @@ public class JoystickView extends View {
         if(this.mHasFocus != hasFocus){
             this.mHasFocus = hasFocus;
             mJoystickListener.onFocusChange(this, hasFocus);
+        }
+    }
+
+    private static class TouchCircle {
+        public Paint paint = new Paint();
+        public Point point = new Point();
+        public int circleSize;
+
+        public TouchCircle(final int color, final int alpha){
+            paint.setColor(color);
+            paint.setAlpha(alpha);
+        }
+
+        public void set(int x, int y) {
+            point.set(x, y);
+        }
+
+        public void setSize(int size) {
+            circleSize = size;
+        }
+
+        public void setShader(Shader shader) {
+            paint.setShader(shader);
+        }
+
+        public void draw(Canvas canvas) {
+            canvas.drawCircle(point.x, point.y, circleSize, paint);
+        }
+
+        public boolean isTouched(int x, int y) {
+            final double distance = Math.sqrt(Math.pow((x - point.x), 2) + Math.pow((y - point.y), 2));
+            return distance <= circleSize;
+        }
+
+        public void toggle(final boolean sticky){
+            int alpha = paint.getAlpha();
+            if(sticky){
+                paint.setColor(Color.RED);
+            } else {
+                paint.setColor(Color.BLUE);
+            }
+            paint.setAlpha(alpha);
         }
     }
 

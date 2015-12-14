@@ -181,7 +181,7 @@ public class SensorData {
         return mLon;
     }
 
-    private int getDestHeading() {
+    public int getDestHeading() {
         return dh;
     }
 
@@ -209,4 +209,5 @@ public class SensorData {
         message[message.length - 1] = (byte) CommandContract.STOP_BYTE;
         return message;
     }
+
 }

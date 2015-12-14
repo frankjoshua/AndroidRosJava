@@ -87,7 +87,15 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         }
 
         if(joystickView.getId() == R.id.joyStickLeft) {
-            mDestHeading =  (int) ((x + y) * 10);
+            final double degrees;
+            if(x != 0 && y != 0) {
+                final double heading = Math.atan2(x, y) * 57;
+                degrees = heading < 0 ? heading + 360 : heading;
+            } else {
+                degrees = 0;
+            }
+            sensorData.setDestHeading((int) Math.round(degrees));
+            mDestHeading =  sensorData.getDestHeading();
         }
 
         mRobotInterface.sendSensorData(false);
