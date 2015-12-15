@@ -147,7 +147,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
         final long uptimeMillis = SystemClock.uptimeMillis();
         if(id == SensorData.NO_FACE){
             mHumanCount--;
-            if(mHumanCount == 0){
+            //if(mHumanCount == 0){
                 mSensorData.setFace_id(id);
                 if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
                     onHumanLeft();
@@ -155,7 +155,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
                 //Set face id to NO_FACE only if no humans are present
                 mSensorData.setFace_id(id);
                 sendSensorData(true);
-            }
+            //}
             return;
         }
         mHumanCount++;
