@@ -1,12 +1,14 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -95,6 +97,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         findViewById(R.id.btnFace).setOnClickListener(this);
         findViewById(R.id.btnApiAi).setOnClickListener(this);
         findViewById(R.id.btnRemoteFace).setOnClickListener(this);
+        findViewById(R.id.btnFeedback).setOnClickListener(this);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
@@ -419,6 +422,13 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
                 FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
                 ApiAiKeyDialog apiAiKeyDialog = new ApiAiKeyDialog();
                 apiAiKeyDialog.show(fragmentTransaction2, "API_AI_FRAGMENT");
+                break;
+            case R.id.btnFeedback:
+                //Launch user feedback website
+                String url = "https://feedback.userreport.com/eb1b841d-4f55-44a7-9432-36e77efefb77/";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
                 break;
             default:
                 throw new UnsupportedOperationException("Not implemented");
