@@ -50,8 +50,7 @@ public class PocketBotApp extends Application{
         }
 
         //Start up remote control service
-        RemoteControl.init("1");
-
+        RemoteControl.init(this, "1");
 
     }
 

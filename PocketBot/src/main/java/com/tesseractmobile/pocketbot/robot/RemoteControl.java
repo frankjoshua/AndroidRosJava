@@ -1,11 +1,17 @@
 package com.tesseractmobile.pocketbot.robot;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
+import com.tesseractmobile.pocketbot.activities.Chat;
 
 import org.json.JSONObject;
 
@@ -15,8 +21,9 @@ import java.util.Date;
 /**
  * Created by josh on 12/1/2015.
  */
-public class RemoteControl {
+public class RemoteControl implements ValueEventListener {
     private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
+    private Firebase mFirebaseRef;
 
     /** the pubnub channel to listen to */
     private String id;
@@ -25,7 +32,8 @@ public class RemoteControl {
     /** Singleton */
     static private RemoteControl instance;
 
-    private RemoteControl(final String id){
+    private RemoteControl(final Context context, final String id){
+        Firebase.setAndroidContext(context);
         setId(id);
     }
 
@@ -33,9 +41,9 @@ public class RemoteControl {
      * Initialize the RemoteControl
      * @param id
      */
-    static public void init(final String id){
+    static public void init(final Context context, final String id){
         if(instance == null){
-            instance = new RemoteControl(id);
+            instance = new RemoteControl(context, id);
         }
     }
 
@@ -71,9 +79,14 @@ public class RemoteControl {
         if(this.id != null){
             //Stop listening to the old channel
             pubnub.unsubscribe(this.id);
+            //Stop listening for firebase messages
+            mFirebaseRef.removeEventListener(this);
         }
         //Set the ID
         this.id = id;
+        //Listen for messages from firebase
+        mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(id);
+        mFirebaseRef.addValueEventListener(this);
         //Listen for messages from pubnub
         try {
             pubnub.subscribe(id, new Callback() {
@@ -87,9 +100,7 @@ public class RemoteControl {
                     //Update listeners
                     final long timeElapsed = timeElapsed(timeToken);
                     if(timeElapsed < 500) {
-                        for (RemoteListener remoteListener : mRemoteListeners) {
-                            remoteListener.onMessageReceived(message);
-                        }
+                        onObjectReceived(message);
                     } else {
                         Log.e("PUBNUB", "Old Packet " + Long.toString(timeElapsed));
                     }
@@ -98,6 +109,16 @@ public class RemoteControl {
             });
         } catch (PubnubException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Call when remote message is received
+     * @param message
+     */
+    private void onObjectReceived(Object message) {
+        for (RemoteListener remoteListener : mRemoteListeners) {
+            remoteListener.onMessageReceived(message);
         }
     }
 
@@ -115,11 +136,27 @@ public class RemoteControl {
      * @param json
      */
     public void send(String channel, JSONObject json, final boolean required) {
+        //Send to PubNub
         pubnub.publish(channel, json, required, new Callback() {
             @Override
             public void successCallback(String channel, Object message, String timetoken) {
 
             }
         });
+        //Send to firebase
+        mFirebaseRef.push().setValue(json.toString());
+    }
+
+    @Override
+    public void onDataChange(final DataSnapshot dataSnapshot) {
+        //Firebase Data updated
+        for (final DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+            onObjectReceived(childSnapshot.getValue(JSONObject.class));
+        }
+    }
+
+    @Override
+    public void onCancelled(final FirebaseError firebaseError) {
+        //Firebase Cancelled
     }
 }
