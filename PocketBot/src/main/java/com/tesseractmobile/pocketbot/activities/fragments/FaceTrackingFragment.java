@@ -99,7 +99,7 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
 
         try {
             mPreview.start(mCameraSource, mGraphicOverlay);
-        } catch (IOException e) {
+        } catch (Exception e) {
             //Log.e(TAG, e.getMessage());
         }
     }

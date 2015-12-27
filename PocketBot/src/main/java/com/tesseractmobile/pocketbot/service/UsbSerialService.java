@@ -1,6 +1,10 @@
 package com.tesseractmobile.pocketbot.service;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by josh on 11/18/2015.
@@ -27,6 +32,24 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
     private SerialInputOutputManager mSerialIoManager;
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private boolean mErrorState = false;
+    private AtomicBoolean mConnected = new AtomicBoolean(false);
+
+    BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                if (device != null) {
+                    // call your method that cleans up and closes communication with the device
+                    mSerialIoManager.stop();
+                    mConnected.set(false);
+                    error(0, "Usb Connection Lost");
+                    unregisterReceiver(this);
+                }
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -57,7 +80,7 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
     @Override
     public void sendBytes(byte[] bytes) {
         //Check for error
-        if(mErrorState){
+        if(mErrorState || mConnected.get() == false){
             return;
         }
         //Send data to the Serial Manager
@@ -67,26 +90,43 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
 
     @Override
     public void run() {
-        final UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
-        final UsbSerialPort usbSerialPort = drivers.get(0).getPorts().get(0);
-        UsbDeviceConnection connection = mUsbManager.openDevice(usbSerialPort.getDriver().getDevice());
-        try {
-            usbSerialPort.open(connection);
-            usbSerialPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        mSerialIoManager = new SerialInputOutputManager(usbSerialPort, this);
-        mExecutor.submit(mSerialIoManager);
-        bodyReady();
+
         while(true){
+            if(mConnected.get() == false){
+                connectUsb();
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void connectUsb(){
+        final UsbManager mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
+        if(drivers.size() > 0) {
+            final UsbSerialPort usbSerialPort = drivers.get(0).getPorts().get(0);
+            UsbDeviceConnection connection = mUsbManager.openDevice(usbSerialPort.getDriver().getDevice());
+            try {
+                usbSerialPort.open(connection);
+                usbSerialPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            mSerialIoManager = new SerialInputOutputManager(usbSerialPort, this);
+            mExecutor.submit(mSerialIoManager);
+            mConnected.set(true);
+            mErrorState = false;
+            bodyReady();
+
+            //Listen for disconnect
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+            registerReceiver(mUsbReceiver, filter);
+        }
+
     }
 
     @Override

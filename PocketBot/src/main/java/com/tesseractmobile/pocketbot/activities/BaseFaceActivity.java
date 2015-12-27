@@ -23,10 +23,20 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
@@ -52,7 +62,7 @@ import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener {
+public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -61,6 +71,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
     public static final String FRAGMENT_FACE_TRACKING = "FACE_TRACKING";
     public static final String FRAGMENT_FACE = "FACE";
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
+    private static final int RC_SIGN_IN = 7;
 
 
     //private RobotFace mRobotFace;
@@ -82,6 +93,8 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
 
     private RobotInterface mRobotInterFace;
 
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +106,6 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         //Set on click listeners
         findViewById(R.id.btnTelepresence).setOnClickListener(this);
         findViewById(R.id.btnControl).setOnClickListener(this);
-        findViewById(R.id.btnSignIn).setOnClickListener(this);
         findViewById(R.id.btnFace).setOnClickListener(this);
         findViewById(R.id.btnApiAi).setOnClickListener(this);
         findViewById(R.id.btnRemoteFace).setOnClickListener(this);
@@ -112,6 +124,35 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
+
+        //Setup Google Sign in
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        signInButton.setScopes(gso.getScopeArray());
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if(result.isSuccess()){
+                Toast.makeText(this, result.getSignInAccount().getEmail(), Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, result.getStatus().toString(), Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     protected void peekDrawer(final DrawerLayout drawerLayout) {
@@ -402,10 +443,12 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
     public void onClick(View view) {
         final int id = view.getId();
         switch (id){
-            case R.id.btnSignIn:
+            case R.id.sign_in_button:
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN);
                 //Launch sign in fragment
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                new SignInDialog().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
+//                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//                new SignInDialog().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
             case R.id.btnTelepresence:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 2);
                 break;
@@ -437,6 +480,11 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
 
     protected RobotInterface getRobotInterface() {
         return mRobotInterFace;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(this, connectionResult.getErrorMessage(), Toast.LENGTH_LONG).show();
     }
 
 

@@ -37,7 +37,7 @@ public class CameraSourcePreview extends RelativeLayout {
         addView(mSurfaceView);
     }
 
-    public void start(CameraSource cameraSource) throws IOException {
+    public void start(CameraSource cameraSource) throws Exception {
         if (cameraSource == null) {
             stop();
         }
@@ -50,7 +50,7 @@ public class CameraSourcePreview extends RelativeLayout {
         }
     }
 
-    public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
+    public void start(CameraSource cameraSource, GraphicOverlay overlay) throws Exception {
         mOverlay = overlay;
         start(cameraSource);
     }
@@ -68,7 +68,7 @@ public class CameraSourcePreview extends RelativeLayout {
         }
     }
 
-    private void startIfReady() throws IOException {
+    private void startIfReady() throws Exception {
         if (mStartRequested && mSurfaceAvailable) {
             mCameraSource.start(mSurfaceView.getHolder());
             if (mOverlay != null) {
@@ -94,7 +94,7 @@ public class CameraSourcePreview extends RelativeLayout {
             mSurfaceAvailable = true;
             try {
                 startIfReady();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Could not start camera source.", e);
             }
         }
@@ -147,7 +147,7 @@ public class CameraSourcePreview extends RelativeLayout {
 
         try {
             startIfReady();
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, "Could not start camera source.", e);
         }
     }
