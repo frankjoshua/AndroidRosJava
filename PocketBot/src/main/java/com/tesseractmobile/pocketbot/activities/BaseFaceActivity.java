@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -23,15 +24,20 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
@@ -54,15 +60,20 @@ import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.SignInDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
+import com.google.android.gms.plus.Plus;
+
+import java.io.IOException;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener {
+public class BaseFaceActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = BaseFaceActivity.class.getSimpleName();
 
@@ -71,7 +82,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
     public static final String FRAGMENT_FACE_TRACKING = "FACE_TRACKING";
     public static final String FRAGMENT_FACE = "FACE";
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
-    private static final int RC_SIGN_IN = 7;
+    private static final int RC_GOOGLE_LOGIN = 1;
 
 
     //private RobotFace mRobotFace;
@@ -93,7 +104,19 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
 
     private RobotInterface mRobotInterFace;
 
+    /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
+
+    /* A flag indicating that a PendingIntent is in progress and prevents us from starting further intents. */
+    private boolean mGoogleIntentInProgress;
+
+    /* Track whether the sign-in button has been clicked so that we know to resolve all issues preventing sign-in
+     * without waiting. */
+    private boolean mGoogleLoginClicked;
+
+    /* Store the connection result from onConnectionFailed callbacks so that we can resolve them when the user clicks
+     * sign-in. */
+    private ConnectionResult mGoogleConnectionResult;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -123,35 +146,34 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        //Setup Robot Name
+        final TextView tvRobotId = (TextView) findViewById(R.id.tvRobotId);
+        tvRobotId.setText(PocketBotSettings.getRobotId(this));
+
+        //Show drawer to user
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
 
         //Setup Google Sign in
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Plus.API)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
                 .build();
 
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setScopes(gso.getScopeArray());
         findViewById(R.id.sign_in_button).setOnClickListener(this);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void onTokenReceived(final String token){
+        DataStore.get().setAuthToken(token);
+        Toast.makeText(this, token, Toast.LENGTH_LONG).show();
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if(result.isSuccess()){
-                Toast.makeText(this, result.getSignInAccount().getEmail(), Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, result.getStatus().toString(), Toast.LENGTH_LONG).show();
-            }
+        mGoogleIntentInProgress = false;
+
+        if (!mGoogleApiClient.isConnecting()) {
+            mGoogleApiClient.connect();
         }
     }
 
@@ -444,11 +466,18 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         final int id = view.getId();
         switch (id){
             case R.id.sign_in_button:
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-                //Launch sign in fragment
-//                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//                new SignInDialog().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
+                mGoogleLoginClicked = true;
+                if (!mGoogleApiClient.isConnecting()) {
+                    if (mGoogleConnectionResult != null) {
+                        resolveSignInError();
+                    } else if (mGoogleApiClient.isConnected()) {
+                        getGoogleOAuthTokenAndLogin();
+                    } else {
+                    /* connect API now */
+                        Log.d(TAG, "Trying to connect to Google API");
+                        mGoogleApiClient.connect();
+                    }
+                }
             case R.id.btnTelepresence:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 2);
                 break;
@@ -478,13 +507,98 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         }
     }
 
+    /* A helper method to resolve the current ConnectionResult error. */
+    private void resolveSignInError() {
+        if (mGoogleConnectionResult.hasResolution()) {
+            try {
+                mGoogleIntentInProgress = true;
+                mGoogleConnectionResult.startResolutionForResult(this, RC_GOOGLE_LOGIN);
+            } catch (IntentSender.SendIntentException e) {
+                // The intent was canceled before it was sent.  Return to the default
+                // state and attempt to connect to get an updated ConnectionResult.
+                mGoogleIntentInProgress = false;
+                mGoogleApiClient.connect();
+            }
+        }
+    }
+
+    private void getGoogleOAuthTokenAndLogin() {
+        /* Get OAuth token in Background */
+        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+            String errorMessage = null;
+
+            @Override
+            protected String doInBackground(Void... params) {
+                String token = null;
+
+                try {
+                    String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
+                    token = GoogleAuthUtil.getToken(BaseFaceActivity.this, Plus.AccountApi.getAccountName(mGoogleApiClient), scope);
+                } catch (IOException transientEx) {
+                    /* Network or server error */
+                    Log.e(TAG, "Error authenticating with Google: " + transientEx);
+                    errorMessage = "Network error: " + transientEx.getMessage();
+                } catch (UserRecoverableAuthException e) {
+                    Log.w(TAG, "Recoverable Google OAuth error: " + e.toString());
+                    /* We probably need to ask for permissions, so start the intent if there is none pending */
+                    if (!mGoogleIntentInProgress) {
+                        mGoogleIntentInProgress = true;
+                        Intent recover = e.getIntent();
+                        startActivityForResult(recover, RC_GOOGLE_LOGIN);
+                    }
+                } catch (GoogleAuthException authEx) {
+                    /* The call is not ever expected to succeed assuming you have already verified that
+                     * Google Play services is installed. */
+                    Log.e(TAG, "Error authenticating with Google: " + authEx.getMessage(), authEx);
+                    errorMessage = "Error authenticating with Google: " + authEx.getMessage();
+                }
+
+                return token;
+            }
+
+            @Override
+            protected void onPostExecute(String token) {
+                mGoogleLoginClicked = false;
+                if (token != null) {
+                    onTokenReceived(token);
+                } else if (errorMessage != null) {
+                    Toast.makeText(BaseFaceActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+        task.execute();
+    }
+
+
     protected RobotInterface getRobotInterface() {
         return mRobotInterFace;
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(this, connectionResult.getErrorMessage(), Toast.LENGTH_LONG).show();
+    public void onConnectionFailed(ConnectionResult result) {
+        if (!mGoogleIntentInProgress) {
+            /* Store the ConnectionResult so that we can use it later when the user clicks on the Google+ login button */
+            mGoogleConnectionResult = result;
+
+            if (mGoogleLoginClicked) {
+                /* The user has already clicked login so we attempt to resolve all errors until the user is signed in,
+                 * or they cancel. */
+                resolveSignInError();
+            } else {
+                Log.e(TAG, result.toString());
+            }
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        /* Connected with Google API, use this to authenticate with Firebase */
+        getGoogleOAuthTokenAndLogin();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        // ignore
     }
 
 

@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.firebase.client.Firebase;
 import com.quickblox.core.QBSettings;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
@@ -49,8 +51,15 @@ public class PocketBotApp extends Application{
             throw new UnsupportedOperationException("Error binding to service");
         }
 
+        //Start Firebase - before DataStore
+        Firebase.setAndroidContext(this);
+
+        //Init DataStore
+        DataStore.init();
+        DataStore.get().addRobot(PocketBotSettings.getRobotId(this), "NO_NAME");
+
         //Start up remote control service
-        RemoteControl.init(this, "1");
+        RemoteControl.init(PocketBotSettings.getRobotId(this));
 
     }
 

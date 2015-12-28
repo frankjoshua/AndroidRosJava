@@ -3,6 +3,7 @@ package com.tesseractmobile.pocketbot.robot;
 import android.content.Context;
 import android.util.Log;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -24,6 +25,7 @@ import java.util.Date;
 public class RemoteControl implements ValueEventListener {
     private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
     private Firebase mFirebaseRef;
+    private Firebase mFirebaseTransmit;
 
     /** the pubnub channel to listen to */
     private String id;
@@ -32,8 +34,7 @@ public class RemoteControl implements ValueEventListener {
     /** Singleton */
     static private RemoteControl instance;
 
-    private RemoteControl(final Context context, final String id){
-        Firebase.setAndroidContext(context);
+    private RemoteControl(final String id){
         setId(id);
     }
 
@@ -41,9 +42,9 @@ public class RemoteControl implements ValueEventListener {
      * Initialize the RemoteControl
      * @param id
      */
-    static public void init(final Context context, final String id){
+    static public void init(final String id){
         if(instance == null){
-            instance = new RemoteControl(context, id);
+            instance = new RemoteControl(id);
         }
     }
 
@@ -85,8 +86,9 @@ public class RemoteControl implements ValueEventListener {
         //Set the ID
         this.id = id;
         //Listen for messages from firebase
-        mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(id);
-        mFirebaseRef.addValueEventListener(this);
+        mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("robots").child(id);
+        mFirebaseRef.child("control").addValueEventListener(this);
+        mFirebaseTransmit = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("robots");
         //Listen for messages from pubnub
         try {
             pubnub.subscribe(id, new Callback() {
@@ -144,7 +146,7 @@ public class RemoteControl implements ValueEventListener {
             }
         });
         //Send to firebase
-        mFirebaseRef.push().setValue(json.toString());
+        mFirebaseTransmit.child(channel).child("control").setValue(json.toString());
     }
 
     @Override
@@ -159,4 +161,6 @@ public class RemoteControl implements ValueEventListener {
     public void onCancelled(final FirebaseError firebaseError) {
         //Firebase Cancelled
     }
+
+
 }

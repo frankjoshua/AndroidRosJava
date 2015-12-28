@@ -8,6 +8,8 @@ import com.tesseractmobile.pocketbot.BuildConfig;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.service.BluetoothClassicService;
 
+import java.util.UUID;
+
 /**
  * Created by josh on 9/10/2015.
  */
@@ -32,6 +34,7 @@ public class PocketBotSettings {
     private static final String ALLOW_TELEPRESENCE = "allow_tele";
     public static final String FAST_TRACKING = "fast_tracking";
     private static final String BLUETOOTH_DEVICE = "bluetooth_device";
+    private static final String ROBOT_ID = "robot_id";
 
     /**
      * True if preview window should be shown
@@ -167,6 +170,21 @@ public class PocketBotSettings {
 
     public static boolean setLastUserId(Context context, String userId) {
         return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(USER_ID, userId).commit();
+    }
+
+    public static String getRobotId(Context context) {
+        final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(ROBOT_ID, "NOT_SET");
+        if(uuid.equals("NOT_SET")){
+            //Set UUID
+            final String newUUID = UUID.randomUUID().toString();
+            setRobotId(context, newUUID);
+            return newUUID;
+        }
+        return uuid;
+    }
+
+    public static boolean setRobotId(Context context, String userId) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(ROBOT_ID, userId).commit();
     }
 
     public static String getApiAiKey(final Context context){
