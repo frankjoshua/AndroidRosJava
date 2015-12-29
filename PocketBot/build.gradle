@@ -76,8 +76,11 @@ dependencies {
     compile 'ai.api:sdk:1.7.1@aar'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'commons-io:commons-io:2.4'
+    //Firebase
     compile 'com.firebase:firebase-client-android:2.5.0+'
+    //Protobuf
     compile files('libs/protobuf-java-2.6.1.jar')
+    //Crashlytics
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
@@ -89,4 +92,6 @@ dependencies {
     //User authentication
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.google.android.gms:play-services-plus:8.4.0'
+    //RecyclerView
+    compile 'com.android.support:recyclerview-v7:22.2.1'
 }

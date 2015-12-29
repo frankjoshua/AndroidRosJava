@@ -37,7 +37,14 @@
                 android:text="Connect"
                 android:layout_alignParentRight="true"
                 android:id="@+id/btnConnect"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvRobots"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edUserId"
+                />
         </RelativeLayout>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

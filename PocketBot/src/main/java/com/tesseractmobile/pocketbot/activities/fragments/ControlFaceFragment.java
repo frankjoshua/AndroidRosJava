@@ -1,6 +1,8 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,9 +28,12 @@ import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.DataStore;
+import com.tesseractmobile.pocketbot.robot.RobotInfo;
 import com.tesseractmobile.pocketbot.robot.faces.ControlFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
+import com.tesseractmobile.pocketbot.views.FirebaseRecyclerAdapter;
 
 import org.webrtc.VideoRenderer;
 
@@ -40,7 +45,7 @@ import java.util.Map;
 /**
  * Created by josh on 10/25/2015.
  */
-public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener {
+public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener, DataStore.OnAuthCompleteListener {
 
     private RobotFace mRobotFace;
     private EditText mRemoteUserId;
@@ -48,6 +53,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     private Button mConnectButton;
     private RemoteState mRemoteState = RemoteState.NOT_CONNECTED;
     private QBRTCSession mSession;
+    private RecyclerView mRobotRecyclerView;
 
 
     @Override
@@ -76,6 +82,11 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 return false;
             }
         });
+        mRobotRecyclerView = (RecyclerView) view.findViewById(R.id.rvRobots);
+        mRobotRecyclerView.setHasFixedSize(true);
+        mRobotRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        //Setup list view after logging in
+        DataStore.get().registerOnAuthCompleteListener(this);
         return view;
     }
 
@@ -184,7 +195,32 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         //Do Nothing
     }
 
+    @Override
+    public void onAuthComplete() {
+        mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo, RobotInfoViewHolder>(RobotInfo.class, R.layout.robot_list_item, RobotInfoViewHolder.class, DataStore.get().getRobotListRef()) {
+            @Override
+            protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo model, final int position) {
+                viewHolder.robotName.setText(model.Name);
+                viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mRemoteUserId.setText(model.Id);
+                    }
+                });
+            }
+        });
+    }
+
     private enum RemoteState {
         NOT_CONNECTED, CONNECTED, CONNECTING
+    }
+
+    private static class RobotInfoViewHolder extends RecyclerView.ViewHolder{
+        TextView robotName;
+
+        public RobotInfoViewHolder(final View itemView){
+            super(itemView);
+            robotName = (TextView) itemView.findViewById(R.id.tvRobotName);
+        }
     }
 }

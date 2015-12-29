@@ -34,7 +34,8 @@ public class PocketBotSettings {
     private static final String ALLOW_TELEPRESENCE = "allow_tele";
     public static final String FAST_TRACKING = "fast_tracking";
     private static final String BLUETOOTH_DEVICE = "bluetooth_device";
-    private static final String ROBOT_ID = "robot_id";
+    public static final String ROBOT_ID = "robot_id";
+    public static final String ROBOT_NAME = "robot_name";
 
     /**
      * True if preview window should be shown
@@ -181,6 +182,15 @@ public class PocketBotSettings {
             return newUUID;
         }
         return uuid;
+    }
+
+    public static boolean setRobotName(Context context, String name) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(ROBOT_NAME, name).commit();
+    }
+
+    public static String getRobotName(Context context) {
+        final String name = PreferenceManager.getDefaultSharedPreferences(context).getString(ROBOT_NAME, "Robot-1");
+        return name;
     }
 
     public static boolean setRobotId(Context context, String userId) {

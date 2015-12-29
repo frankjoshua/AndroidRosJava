@@ -55,8 +55,7 @@ public class PocketBotApp extends Application{
         Firebase.setAndroidContext(this);
 
         //Init DataStore
-        DataStore.init();
-        DataStore.get().addRobot(PocketBotSettings.getRobotId(this), "NO_NAME");
+        DataStore.init(this);
 
         //Start up remote control service
         RemoteControl.init(PocketBotSettings.getRobotId(this));

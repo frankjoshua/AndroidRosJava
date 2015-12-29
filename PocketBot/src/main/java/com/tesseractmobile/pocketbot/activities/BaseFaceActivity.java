@@ -146,9 +146,13 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        //Setup Robot Name
+        //Setup Robot Id
         final TextView tvRobotId = (TextView) findViewById(R.id.tvRobotId);
         tvRobotId.setText(PocketBotSettings.getRobotId(this));
+
+        //Setup Robot Name
+        final TextView tvRobotName = (TextView) findViewById(R.id.tvRobotName);
+        tvRobotName.setText(PocketBotSettings.getRobotName(this));
 
         //Show drawer to user
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
@@ -478,6 +482,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
                         mGoogleApiClient.connect();
                     }
                 }
+                break;
             case R.id.btnTelepresence:
                 PocketBotSettings.setSelectedFace(BaseFaceActivity.this, 2);
                 break;
