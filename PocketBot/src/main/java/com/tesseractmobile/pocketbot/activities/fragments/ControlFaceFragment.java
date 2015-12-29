@@ -13,9 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pubnub.api.Callback;
-import com.pubnub.api.PubnubError;
-import com.pubnub.api.PubnubException;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.core.QBEntityCallbackImpl;
@@ -34,6 +31,7 @@ import com.tesseractmobile.pocketbot.robot.faces.ControlFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.views.FirebaseRecyclerAdapter;
+import com.tesseractmobile.pocketbot.views.RobotInfoViewHolder;
 
 import org.webrtc.VideoRenderer;
 
@@ -45,15 +43,13 @@ import java.util.Map;
 /**
  * Created by josh on 10/25/2015.
  */
-public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener, DataStore.OnAuthCompleteListener {
+public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener, RobotSelectionDialog.OnRobotSelectedListener {
 
     private RobotFace mRobotFace;
-    private EditText mRemoteUserId;
     private QBGLVideoView mRemoteVideoView;
     private Button mConnectButton;
     private RemoteState mRemoteState = RemoteState.NOT_CONNECTED;
     private QBRTCSession mSession;
-    private RecyclerView mRobotRecyclerView;
 
 
     @Override
@@ -68,25 +64,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         mConnectButton = (Button) view.findViewById(R.id.btnConnect);
         mConnectButton.setOnClickListener(this);
         mRemoteVideoView = (QBGLVideoView) view.findViewById(R.id.remoteVideoView);
-        mRemoteUserId = (EditText) view.findViewById(R.id.edUserId);
         mRobotFace = new ControlFace(view);
-        //Set last user id
-        mRemoteUserId.setText(PocketBotSettings.getLastUserId(getActivity()));
-        //Listen for done button
-        mRemoteUserId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    connectToRemoteRobot();
-                }
-                return false;
-            }
-        });
-        mRobotRecyclerView = (RecyclerView) view.findViewById(R.id.rvRobots);
-        mRobotRecyclerView.setHasFixedSize(true);
-        mRobotRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        //Setup list view after logging in
-        DataStore.get().registerOnAuthCompleteListener(this);
         return view;
     }
 
@@ -99,12 +77,10 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     public void onClick(View view) {
         if(view.getId() == R.id.btnConnect){
             if(mRemoteState == RemoteState.NOT_CONNECTED){
-                //Connect if we have an ID
-                if(mRemoteUserId.getText().equals("") == false){
-                    connectToRemoteRobot();
-                } else {
-                    Toast.makeText(getActivity(), "Remote ID missing", Toast.LENGTH_LONG).show();
-                }
+                //Show selection dialog
+                RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
+                robotSelectionDialog.show(getActivity().getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
+                robotSelectionDialog.setOnRobotSelectedListener(this);
             } else if (mRemoteState == RemoteState.CONNECTED){
                 disconnect();
             }
@@ -121,6 +97,8 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
     private void connectToRemoteRobot() {
         setRemoteState(RemoteState.CONNECTING);
+        //Get id of robot to connect to
+        final String remoteRobotId = PocketBotSettings.getRobotId(getContext());
         //Connect to QuickBlox
         QBUser user = new QBUser(PocketBotSettings.getUserName(getActivity()), PocketBotSettings.getPassword(getActivity()));
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
@@ -128,7 +106,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
             public void onSuccess(QBSession result, Bundle params) {
                 //Initiate opponents list
                 List<Integer> opponents = new ArrayList<Integer>();
-                opponents.add(Integer.parseInt(mRemoteUserId.getText().toString())); //12345 - QBUser ID
+                opponents.add(12345); //12345 - QBUser ID
 
                 //Set user information
                 // User can set any string key and value in user info
@@ -144,10 +122,10 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 mSession.startCall(userInfo);
 
                 //Connect to PubNub
-                ((ControlFace) mRobotFace).setChannel(mRemoteUserId.getText().toString());
+                ((ControlFace) mRobotFace).setChannel(remoteRobotId);
 
                 //Save UserId
-                PocketBotSettings.setLastUserId(getActivity(), mRemoteUserId.getText().toString());
+                PocketBotSettings.setLastUserId(getActivity(), remoteRobotId);
 
                 //Update state
                 setRemoteState(RemoteState.CONNECTED);
@@ -167,17 +145,14 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
             case CONNECTING:
                 mConnectButton.setEnabled(false);
                 mConnectButton.setText("Connecting");
-                mRemoteUserId.setVisibility(View.INVISIBLE);
                 break;
             case CONNECTED:
                 mConnectButton.setEnabled(true);
                 mConnectButton.setText("Disconnect");
-                mRemoteUserId.setVisibility(View.INVISIBLE);
                 break;
             case NOT_CONNECTED:
                 mConnectButton.setEnabled(true);
                 mConnectButton.setText("Connect");
-                mRemoteUserId.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -196,31 +171,12 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     }
 
     @Override
-    public void onAuthComplete() {
-        mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo, RobotInfoViewHolder>(RobotInfo.class, R.layout.robot_list_item, RobotInfoViewHolder.class, DataStore.get().getRobotListRef()) {
-            @Override
-            protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo model, final int position) {
-                viewHolder.robotName.setText(model.Name);
-                viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mRemoteUserId.setText(model.Id);
-                    }
-                });
-            }
-        });
+    public void onRobotSelected(RobotInfo robotinfo) {
+        connectToRemoteRobot();
     }
 
     private enum RemoteState {
         NOT_CONNECTED, CONNECTED, CONNECTING
     }
 
-    private static class RobotInfoViewHolder extends RecyclerView.ViewHolder{
-        TextView robotName;
-
-        public RobotInfoViewHolder(final View itemView){
-            super(itemView);
-            robotName = (TextView) itemView.findViewById(R.id.tvRobotName);
-        }
-    }
 }

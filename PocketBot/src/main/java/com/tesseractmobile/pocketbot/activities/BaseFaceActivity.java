@@ -57,6 +57,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.EfimTelepresenceFaceFr
 import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.SignInDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
@@ -133,6 +134,7 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         findViewById(R.id.btnApiAi).setOnClickListener(this);
         findViewById(R.id.btnRemoteFace).setOnClickListener(this);
         findViewById(R.id.btnFeedback).setOnClickListener(this);
+        findViewById(R.id.tvRobotName).setOnClickListener(this);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
@@ -145,14 +147,8 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
 
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        updateUI();
 
-        //Setup Robot Id
-        final TextView tvRobotId = (TextView) findViewById(R.id.tvRobotId);
-        tvRobotId.setText(PocketBotSettings.getRobotId(this));
-
-        //Setup Robot Name
-        final TextView tvRobotName = (TextView) findViewById(R.id.tvRobotName);
-        tvRobotName.setText(PocketBotSettings.getRobotName(this));
 
         //Show drawer to user
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
@@ -168,6 +164,16 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         findViewById(R.id.sign_in_button).setOnClickListener(this);
+    }
+
+    private void updateUI() {
+        //Setup Robot Id
+        final TextView tvRobotId = (TextView) findViewById(R.id.tvRobotId);
+        tvRobotId.setText(PocketBotSettings.getRobotId(this));
+
+        //Setup Robot Name
+        final TextView tvRobotName = (TextView) findViewById(R.id.tvRobotName);
+        tvRobotName.setText(PocketBotSettings.getRobotName(this));
     }
 
     private void onTokenReceived(final String token){
@@ -454,6 +460,13 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
         if(PocketBotSettings.SELECTED_FACE.equals(key)){
             final int faceId = sharedPreferences.getInt(key, PocketBotSettings.DEFAULT_FACE_ID);
             switchFace(faceId);
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateUI();
+                }
+            });
         }
     }
 
@@ -469,6 +482,10 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
     public void onClick(View view) {
         final int id = view.getId();
         switch (id){
+            case R.id.tvRobotName:
+                RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
+                robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
+                break;
             case R.id.sign_in_button:
                 mGoogleLoginClicked = true;
                 if (!mGoogleApiClient.isConnecting()) {
