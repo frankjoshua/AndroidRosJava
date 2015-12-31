@@ -47,11 +47,10 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo, RobotInfoViewHolder>(RobotInfo.class, R.layout.robot_list_item, RobotInfoViewHolder.class, DataStore.get().getRobotListRef()) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo model, final int position) {
-                viewHolder.robotName.setText(model.Name);
+                viewHolder.robotName.setText(model.settings.prefs.robotName);
                 viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        PocketBotSettings.setRobotId(getContext(), model.Id);
                         dismiss();
                         if (mOnRobotSelectedListener != null) {
                             mOnRobotSelectedListener.onRobotSelected(model);

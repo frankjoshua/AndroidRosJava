@@ -3,6 +3,7 @@ package com.tesseractmobile.pocketbot.activities;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.support.v4.app.FragmentActivity;
 
 import com.tesseractmobile.pocketbot.BuildConfig;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
@@ -26,16 +27,17 @@ public class PocketBotSettings {
     public static final String USER_NAME = "user_name";
     public static final String PASSWORD = "password";
     public static final String SIGNED_IN = "signed_in";
-    private static final String USER_ID = "user_id";
-    private static final String API_AI_KEY = "api_ai_key";
+    public static final String USER_ID = "user_id";
+    public static final String API_AI_KEY = "api_ai_key";
     public static final String API_AI_DEFAULT_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";//"1eca9ad4-74e8-4d3a-afea-7131df82d19b";
-    private static final String API_AI_TOKEN = "api_ai_token";
+    public static final String API_AI_TOKEN = "api_ai_token";
     public static final String API_AI_DEFAULT_TOKEN = "69bbe66f78e647a491d703b275309481";//"443dddf4747d4408b0e9451d4d53f201";
-    private static final String ALLOW_TELEPRESENCE = "allow_tele";
+    public static final String ALLOW_TELEPRESENCE = "allow_tele";
     public static final String FAST_TRACKING = "fast_tracking";
-    private static final String BLUETOOTH_DEVICE = "bluetooth_device";
+    public static final String BLUETOOTH_DEVICE = "bluetooth_device";
     public static final String ROBOT_ID = "robot_id";
     public static final String ROBOT_NAME = "robot_name";
+    public static final String QB_ID = "quickblox_id";
 
     /**
      * True if preview window should be shown
@@ -125,8 +127,20 @@ public class PocketBotSettings {
         return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PASSWORD, password).commit();
     }
 
+    /**
+     * Returns save password or creates a new one if needed
+     * @param context
+     * @return
+     */
     public static String getPassword(final Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(PASSWORD, "");
+        final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(PASSWORD, "NOT_SET");
+        if(uuid.equals("NOT_SET")){
+            //Set UUID
+            final String newUUID = UUID.randomUUID().toString();
+            setPassword(context, newUUID);
+            return newUUID;
+        }
+        return uuid;
     }
 
     public static boolean setSignedIn(final Context context, boolean b) {
@@ -244,5 +258,17 @@ public class PocketBotSettings {
      */
     public static String getBluetoothDevice(final Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(BLUETOOTH_DEVICE, "");
+    }
+
+    public static boolean setUseFastFaceTracking(Context context, boolean fastFaceTracking) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(FAST_TRACKING, fastFaceTracking).commit();
+    }
+
+    public static boolean setQuickBloxId(final Context context, int qbUserId) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(QB_ID, qbUserId).commit();
+    }
+
+    public static int getQuickBloxId(final Context context){
+        return PreferenceManager.getDefaultSharedPreferences(context).getInt(QB_ID, -1);
     }
 }

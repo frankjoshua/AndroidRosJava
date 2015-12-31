@@ -65,6 +65,7 @@ import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
+import com.tesseractmobile.pocketbot.robot.RobotInfo;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
@@ -485,6 +486,12 @@ public class BaseFaceActivity extends FragmentActivity implements  SensorEventLi
             case R.id.tvRobotName:
                 RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
                 robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
+                robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
+                    @Override
+                    public void onRobotSelected(RobotInfo model) {
+                        PocketBotSettings.setRobotId(BaseFaceActivity.this, model.settings.prefs.robotId);
+                    }
+                });
                 break;
             case R.id.sign_in_button:
                 mGoogleLoginClicked = true;

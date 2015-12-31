@@ -13,6 +13,7 @@ import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
@@ -62,13 +63,15 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
 
     @Override
     protected void onQBSetup(final QBSession session, final QBUser user) {
-        mChannel = String.valueOf(session.getUserId());
+        final Integer userId = session.getUserId();
+        mChannel = String.valueOf(userId);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mUserId.setText(Integer.toString(session.getUserId()));
+                mUserId.setText(Integer.toString(userId));
             }
         });
+        PocketBotSettings.setQuickBloxId(getActivity(), userId);
     }
 
     @Override

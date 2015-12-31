@@ -14,6 +14,7 @@ import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCException;
@@ -50,7 +51,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     protected void signIn(final Activity activity) {
-        final String login = PocketBotSettings.getUserName(activity);
+        final String login = PocketBotSettings.getRobotId(activity);
         final String password = PocketBotSettings.getPassword(activity);
 
         if(TextUtils.isEmpty(login) || TextUtils.isEmpty(password)){
@@ -70,7 +71,36 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             @Override
             public void onError(List<String> errors) {
                 //error
+                if (errors.get(0).equals("Unauthorized")) {
+                    signUpUser(user);
+                } else {
+                    error(errors.toString());
+                }
+            }
+        });
+    }
+
+    private void signUpUser(final QBUser user) {
+        QBAuth.createSession(new QBEntityCallbackImpl<QBSession>(){
+
+            @Override
+            public void onError(List<String> errors) {
                 error(errors.toString());
+            }
+
+            @Override
+            public void onSuccess(final QBSession session, Bundle params) {
+                QBUsers.signUp(user, new QBEntityCallbackImpl<QBUser>() {
+                    @Override
+                    public void onSuccess(QBUser result, Bundle params) {
+                        setUpQB(session, user, getActivity());
+                    }
+
+                    @Override
+                    public void onError(List<String> errors) {
+                        error(errors.toString());;
+                    }
+                });
             }
         });
     }

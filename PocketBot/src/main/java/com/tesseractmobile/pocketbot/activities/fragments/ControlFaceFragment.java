@@ -95,18 +95,18 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         ((ControlFace) mRobotFace).setChannel(null);
     }
 
-    private void connectToRemoteRobot() {
+    private void connectToRemoteRobot(final int remoteNumber) {
         setRemoteState(RemoteState.CONNECTING);
         //Get id of robot to connect to
         final String remoteRobotId = PocketBotSettings.getRobotId(getContext());
         //Connect to QuickBlox
-        QBUser user = new QBUser(PocketBotSettings.getUserName(getActivity()), PocketBotSettings.getPassword(getActivity()));
+        QBUser user = new QBUser(PocketBotSettings.getRobotId(getActivity()), PocketBotSettings.getPassword(getActivity()));
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession result, Bundle params) {
                 //Initiate opponents list
                 List<Integer> opponents = new ArrayList<Integer>();
-                opponents.add(12345); //12345 - QBUser ID
+                opponents.add(remoteNumber); //12345 - QBUser ID
 
                 //Set user information
                 // User can set any string key and value in user info
@@ -172,7 +172,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
     @Override
     public void onRobotSelected(RobotInfo robotinfo) {
-        connectToRemoteRobot();
+        connectToRemoteRobot(robotinfo.settings.prefs.qbId);
     }
 
     private enum RemoteState {
