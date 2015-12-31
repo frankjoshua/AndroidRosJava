@@ -24,15 +24,21 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
 
     private RecyclerView mRobotRecyclerView;
     private OnRobotSelectedListener mOnRobotSelectedListener;
+    private View mSignInView;
+    private View.OnClickListener mSignInOnClickListener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.robot_selector, null);
 
+        mSignInView = view.findViewById(R.id.signInLayout);
+        setSignInOnClickListener(mSignInOnClickListener);
+
         mRobotRecyclerView = (RecyclerView) view.findViewById(R.id.rvRobots);
         mRobotRecyclerView.setHasFixedSize(true);
         mRobotRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         //Setup list view after logging in
         DataStore.get().registerOnAuthCompleteListener(this);
 
@@ -44,6 +50,9 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
 
     @Override
     public void onAuthComplete() {
+        //Hide sign in
+        mSignInView.setVisibility(View.GONE);
+        //Set adapter
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo, RobotInfoViewHolder>(RobotInfo.class, R.layout.robot_list_item, RobotInfoViewHolder.class, DataStore.get().getRobotListRef()) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo model, final int position) {
@@ -59,6 +68,20 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
                 });
             }
         });
+    }
+
+    /**
+     * Set the click listener to respond to sign in
+     * R.layout.signInLayout
+     * @param onClickListener
+     */
+    public void setSignInOnClickListener(final View.OnClickListener onClickListener){
+        mSignInOnClickListener = onClickListener;
+        if(mSignInView != null){
+            //Set the main view and the button to the sam listener
+            mSignInView.setOnClickListener(onClickListener);
+            mSignInView.findViewById(R.id.sign_in_button).setOnClickListener(onClickListener);
+        }
     }
 
     /**

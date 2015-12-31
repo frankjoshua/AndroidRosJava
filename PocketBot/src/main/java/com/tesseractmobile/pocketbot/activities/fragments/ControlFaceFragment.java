@@ -79,6 +79,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
             if(mRemoteState == RemoteState.NOT_CONNECTED){
                 //Show selection dialog
                 RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
+                robotSelectionDialog.setSignInOnClickListener((View.OnClickListener) getActivity());
                 robotSelectionDialog.show(getActivity().getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
                 robotSelectionDialog.setOnRobotSelectedListener(this);
             } else if (mRemoteState == RemoteState.CONNECTED){
