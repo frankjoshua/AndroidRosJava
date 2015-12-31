@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.firebase.client.AuthData;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -22,8 +23,8 @@ import java.util.Date;
 /**
  * Created by josh on 12/1/2015.
  */
-public class RemoteControl implements ValueEventListener {
-    private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
+public class RemoteControl implements ChildEventListener {
+    //private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
     private Firebase mFirebaseRef;
     private Firebase mFirebaseTransmit;
 
@@ -79,7 +80,7 @@ public class RemoteControl implements ValueEventListener {
     public void setId(String id) {
         if(this.id != null){
             //Stop listening to the old channel
-            pubnub.unsubscribe(this.id);
+           // pubnub.unsubscribe(this.id);
             //Stop listening for firebase messages
             mFirebaseRef.removeEventListener(this);
         }
@@ -87,31 +88,31 @@ public class RemoteControl implements ValueEventListener {
         this.id = id;
         //Listen for messages from firebase
         mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("robots").child(id);
-        mFirebaseRef.child("control").addValueEventListener(this);
+        mFirebaseRef.child("control").addChildEventListener(this);
         mFirebaseTransmit = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("robots");
         //Listen for messages from pubnub
-        try {
-            pubnub.subscribe(id, new Callback() {
-                @Override
-                public void errorCallback(String channel, PubnubError error) {
-                    Log.e("PUBNUB", error.getErrorString());
-                }
-
-                @Override
-                public void successCallback(String channel, final Object message, String timeToken) {
-                    //Update listeners
-                    final long timeElapsed = timeElapsed(timeToken);
-                    if(timeElapsed < 500) {
-                        onObjectReceived(message);
-                    } else {
-                        Log.e("PUBNUB", "Old Packet " + Long.toString(timeElapsed));
-                    }
-                    //Log.d("PUBNUB", Long.toString(timeElapsed(timeToken)));
-                }
-            });
-        } catch (PubnubException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            pubnub.subscribe(id, new Callback() {
+//                @Override
+//                public void errorCallback(String channel, PubnubError error) {
+//                    Log.e("PUBNUB", error.getErrorString());
+//                }
+//
+//                @Override
+//                public void successCallback(String channel, final Object message, String timeToken) {
+//                    //Update listeners
+//                    final long timeElapsed = timeElapsed(timeToken);
+//                    if(timeElapsed < 500) {
+//                        onObjectReceived(message);
+//                    } else {
+//                        Log.e("PUBNUB", "Old Packet " + Long.toString(timeElapsed));
+//                    }
+//                    //Log.d("PUBNUB", Long.toString(timeElapsed(timeToken)));
+//                }
+//            });
+//        } catch (PubnubException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -139,22 +140,35 @@ public class RemoteControl implements ValueEventListener {
      */
     public void send(String channel, JSONObject json, final boolean required) {
         //Send to PubNub
-        pubnub.publish(channel, json, required, new Callback() {
-            @Override
-            public void successCallback(String channel, Object message, String timetoken) {
-
-            }
-        });
+//        pubnub.publish(channel, json, required, new Callback() {
+//            @Override
+//            public void successCallback(String channel, Object message, String timetoken) {
+//
+//            }
+//        });
         //Send to firebase
-        mFirebaseTransmit.child(channel).child("control").setValue(json.toString());
+        mFirebaseTransmit.child(channel).child("control").child("data").setValue(json.toString());
+    }
+
+
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
     }
 
     @Override
-    public void onDataChange(final DataSnapshot dataSnapshot) {
-        //Firebase Data updated
-        for (final DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-            onObjectReceived(childSnapshot.getValue(JSONObject.class));
-        }
+    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        onObjectReceived(dataSnapshot.getValue(JSONObject.class));
+    }
+
+    @Override
+    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+    }
+
+    @Override
+    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
     }
 
     @Override

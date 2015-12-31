@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by josh on 12/27/2015.
  */
-public class DataStore implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class DataStore{
     public static final String ROBOTS = "robots";
     static private DataStore instance;
 
@@ -38,7 +38,6 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     static public void init(final Context context){
         if(instance == null){
             instance = new DataStore();
-            PocketBotSettings.registerOnSharedPreferenceChangeListener(context, instance);
             instance.mFirebasePreferenceSync = new FirebasePreferenceSync(context, instance.getRobots());
         }
     }
@@ -82,30 +81,9 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         });
     }
 
-    public void addRobot(final String uuid, final String name){
-        //Setup Robot
-        Firebase robots = mFirebaseUsers.getParent().child(ROBOTS).child(uuid);
-        robots.child("Name").setValue(name);
-        robots.child("Owner").setValue("NOT_IMPLEMENTED");
-        //Add to Users list of robots
-        if(mAuthData != null){
-            mFirebaseUsers.child(mAuthData.getUid()).child(ROBOTS).child(uuid).child("Name").setValue(name);
-            mFirebaseUsers.child(mAuthData.getUid()).child(ROBOTS).child(uuid).child("Id").setValue(uuid);
-        }
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
-        String robotUUID = sharedPreferences.getString(PocketBotSettings.ROBOT_ID, "");
-        if(key.equals(PocketBotSettings.ROBOT_NAME)){
-            addRobot(robotUUID, sharedPreferences.getString(key, ""));
-        }
-    }
-
     private Firebase getRobots() {
         return mFirebaseUsers.getParent().child("robots");
     }
-
 
     /**
      * Returns a reference to the users robots
@@ -155,10 +133,15 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             //Update local RobotSettings object
             if(key.equals(PocketBotSettings.ROBOT_ID)){
+                //Remove old event listener
                 mFirebase.child(mRobotId).child("settings").removeEventListener((ChildEventListener) this);
+                //Get new Id
                 mRobotId = sharedPreferences.getString(key, mRobotId);
+                //Create new event listener
                 mFirebase.child(mRobotId).child("settings").addChildEventListener(this);
+                //Update Id
                 mRobotSettings.robotId = mRobotId;
+                return;
             } else if(key.equals(PocketBotSettings.SELECTED_FACE)){
                 mRobotSettings.selectedFace = sharedPreferences.getInt(key, 0);
             } else if (key.equals(PocketBotSettings.FAST_TRACKING)) {
@@ -179,10 +162,10 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
                 //Setting not tracked
                 return;
             }
+
             //Update setting to Firebase
-            //mFirebase.child(sharedPreferences.getString(PocketBotSettings.ROBOT_ID, "Error")).child("settings").child("prefs").setValue(GSON.toJson(mRobotSettings));
             String id = sharedPreferences.getString(PocketBotSettings.ROBOT_ID, "Error");
-            if(id.equals("Error") == false){
+            if(!mRobotSettings.syncInProgress && id.equals("Error") == false){
                 mFirebase.child(id).child("settings").child("prefs").setValue(mRobotSettings);
             }
         }
@@ -225,6 +208,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
             public String password;
             public int qbId;
             public String robotId;
+            public boolean syncInProgress;
 
             public RobotSettings(){
                 //For Jackson
@@ -248,6 +232,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
              * @param robotSettings
              */
             public void sync(final Context context, final RobotSettings robotSettings){
+                syncInProgress = true;
                 if(robotSettings.selectedFace != selectedFace){
                     selectedFace = robotSettings.selectedFace;
                     PocketBotSettings.setSelectedFace(context, selectedFace);
@@ -284,6 +269,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
                     robotId = robotSettings.robotId;
                     PocketBotSettings.setRobotId(context, robotId);
                 }
+                syncInProgress = false;
             }
 
         }

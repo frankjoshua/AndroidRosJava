@@ -61,10 +61,7 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
         });
 
         //Subscribe to PubNub
-        if(mChannel != null){
-            RemoteControl.get().setId(mChannel);
-            RemoteControl.get().registerRemoteListener(this);
-        }
+        RemoteControl.get().registerRemoteListener(this);
     }
 
     @Override

@@ -35,7 +35,7 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     private RobotFace mRobotFace;
     private QBGLVideoView mRemoteVideoView;
     private TextView mUserId;
-    private String mChannel;
+    //private String mChannel;
 
     @Override
     public RobotFace getRobotFace(RobotInterface robotInterface) {
@@ -64,7 +64,6 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     @Override
     protected void onQBSetup(final QBSession session, final QBUser user) {
         final Integer userId = session.getUserId();
-        mChannel = String.valueOf(userId);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -91,11 +90,8 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
             }
         });
 
-        //Subscribe to PubNub
-        if(mChannel != null){
-            RemoteControl.get().setId(mChannel);
-            RemoteControl.get().registerRemoteListener(this);
-        }
+        //Listen for remote messages
+        RemoteControl.get().registerRemoteListener(this);
 
     }
 

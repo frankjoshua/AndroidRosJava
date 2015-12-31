@@ -24,7 +24,6 @@ public class EfimFaceFragment extends FaceFragment implements RemoteListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RemoteControl.get().setId("012345");
         RemoteControl.get().registerRemoteListener(this);
     }
 
