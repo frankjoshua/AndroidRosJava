@@ -139,7 +139,7 @@ public class RemoteControl implements ChildEventListener {
 //            }
 //        });
         //Send to firebase
-        mFirebaseTransmit.child(channel).child("control").child(DATA).setValue(json.toString());
+        mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json.toString());
     }
 
 
