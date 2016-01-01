@@ -20,7 +20,7 @@ import com.tesseractmobile.pocketbot.views.RobotInfoViewHolder;
 /**
  * Created by josh on 12/29/2015.
  */
-public class RobotSelectionDialog extends DialogFragment implements DataStore.OnAuthCompleteListener {
+public class RobotSelectionDialog extends DialogFragment implements DataStore.OnAuthCompleteListener, View.OnClickListener {
 
     private RecyclerView mRobotRecyclerView;
     private OnRobotSelectedListener mOnRobotSelectedListener;
@@ -33,7 +33,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         final View view = inflater.inflate(R.layout.robot_selector, null);
 
         mSignInView = view.findViewById(R.id.signInLayout);
-        setSignInOnClickListener(mSignInOnClickListener);
+        mSignInView.findViewById(R.id.sign_in_button).setOnClickListener(this);
 
         mRobotRecyclerView = (RecyclerView) view.findViewById(R.id.rvRobots);
         mRobotRecyclerView.setHasFixedSize(true);
@@ -77,11 +77,6 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
      */
     public void setSignInOnClickListener(final View.OnClickListener onClickListener){
         mSignInOnClickListener = onClickListener;
-        if(mSignInView != null){
-            //Set the main view and the button to the sam listener
-            mSignInView.setOnClickListener(onClickListener);
-            mSignInView.findViewById(R.id.sign_in_button).setOnClickListener(onClickListener);
-        }
     }
 
     /**
@@ -90,6 +85,16 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
      */
     public void setOnRobotSelectedListener(final OnRobotSelectedListener onRobotSelectedListener){
         mOnRobotSelectedListener = onRobotSelectedListener;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(mSignInOnClickListener != null){
+            ///Hide the button
+            mSignInView.findViewById(R.id.sign_in_button).setVisibility(View.GONE);
+            //Pass on the click
+            mSignInOnClickListener.onClick(view);
+        }
     }
 
     public interface OnRobotSelectedListener {

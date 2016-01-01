@@ -19,11 +19,13 @@ import java.util.ArrayList;
  */
 public class DataStore{
     public static final String ROBOTS = "robots";
+    public static final String USERS = "users";
     static private DataStore instance;
 
     private PocketBotUser mUser;
 
-    private Firebase mFirebaseUsers;
+    /** Stores user and robot data */
+    private Firebase mFirebaseData;
 
     private AuthData mAuthData;
 
@@ -31,14 +33,13 @@ public class DataStore{
 
     private FirebasePreferenceSync mFirebasePreferenceSync;
 
-    private DataStore(){
-        mFirebaseUsers = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("users");
+    private DataStore(final Context context){
+        mFirebasePreferenceSync = new FirebasePreferenceSync(context);
     }
 
     static public void init(final Context context){
         if(instance == null){
-            instance = new DataStore();
-            instance.mFirebasePreferenceSync = new FirebasePreferenceSync(context, instance.getRobots());
+            instance = new DataStore(context);
         }
     }
 
@@ -47,27 +48,16 @@ public class DataStore{
     }
 
     public void setAuthToken(final String token) {
-        mFirebaseUsers.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
+        final Firebase firebaseUsers = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(USERS);
+        firebaseUsers.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
                 mAuthData = authData;
                 //Setup User
-                final Firebase child = mFirebaseUsers.child(authData.getUid());
-                child.child("AuthData").setValue(authData);
-                child.child("Name").setValue(authData.getProviderData().get("displayName"));
-                child.child("Email").setValue(authData.getProviderData().get("email"));
-                child.child("ImageUrl").setValue(authData.getProviderData().get("profileImageURL"));
-//                mFirebaseUsers.child(authData.getUid()).addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(FirebaseError firebaseError) {
-//
-//                    }
-//                });
+                mFirebaseData = firebaseUsers.child(authData.getUid());
+                mFirebaseData.child("AuthData").setValue(authData);
+                //Start syncing preferences
+                mFirebasePreferenceSync.start(getRobots());
                 //Let everyone know we are logged in
                 for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
                     onAuthCompleteListener.onAuthComplete();
@@ -82,7 +72,7 @@ public class DataStore{
     }
 
     private Firebase getRobots() {
-        return mFirebaseUsers.getParent().child("robots");
+        return mFirebaseData.child(ROBOTS);
     }
 
     /**
@@ -91,7 +81,6 @@ public class DataStore{
      */
     public Firebase getRobotListRef() {
         if(mAuthData != null){
-            //return mFirebaseUsers.child(mAuthData.getUid()).child(ROBOTS);
             return getRobots();
         }
         throw new UnsupportedOperationException();
@@ -117,16 +106,23 @@ public class DataStore{
         private RobotSettings mRobotSettings;
         private Context mContext;
 
-        public FirebasePreferenceSync(final Context context, final Firebase firebase) {
-            this.mFirebase = firebase;
+        public FirebasePreferenceSync(final Context context) {
             this.mContext = context;
+        }
+
+        /**
+         * Start syncing data
+         * @param firebase
+         */
+        public void start(final Firebase firebase){
+            this.mFirebase = firebase;
             //Listen for data changes on selected robot
-            mRobotId = PocketBotSettings.getRobotId(context);
+            mRobotId = PocketBotSettings.getRobotId(mContext);
             firebase.child(mRobotId).child("settings").addChildEventListener(this);
             //Set inital preferences
-            mRobotSettings = new RobotSettings(context);
+            mRobotSettings = new RobotSettings(mContext);
             //Register for preference changes
-            PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
+            PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, this);
         }
 
         @Override

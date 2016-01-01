@@ -1,19 +1,9 @@
 package com.tesseractmobile.pocketbot.robot;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.pubnub.api.Callback;
-import com.pubnub.api.Pubnub;
-import com.pubnub.api.PubnubError;
-import com.pubnub.api.PubnubException;
-import com.tesseractmobile.pocketbot.activities.Chat;
 
 import org.json.JSONObject;
 
@@ -24,8 +14,10 @@ import java.util.Date;
  * Created by josh on 12/1/2015.
  */
 public class RemoteControl implements ChildEventListener {
+    public static final String CONTROL = "control";
+    public static final String DATA = "data";
     //private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
-    private Firebase mFirebaseRef;
+    private Firebase mFirebaseListen;
     private Firebase mFirebaseTransmit;
 
     /** the pubnub channel to listen to */
@@ -82,14 +74,14 @@ public class RemoteControl implements ChildEventListener {
             //Stop listening to the old channel
            // pubnub.unsubscribe(this.id);
             //Stop listening for firebase messages
-            mFirebaseRef.removeEventListener(this);
+            mFirebaseListen.removeEventListener(this);
         }
         //Set the ID
         this.id = id;
         //Listen for messages from firebase
-        mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("robots").child(id);
-        mFirebaseRef.child("control").addChildEventListener(this);
-        mFirebaseTransmit = new Firebase("https://boiling-torch-4457.firebaseio.com/").child("robots");
+        mFirebaseListen = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CONTROL).child(id);
+        mFirebaseListen.child(CONTROL).addChildEventListener(this);
+        mFirebaseTransmit = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CONTROL);
         //Listen for messages from pubnub
 //        try {
 //            pubnub.subscribe(id, new Callback() {
@@ -147,7 +139,7 @@ public class RemoteControl implements ChildEventListener {
 //            }
 //        });
         //Send to firebase
-        mFirebaseTransmit.child(channel).child("control").child("data").setValue(json.toString());
+        mFirebaseTransmit.child(channel).child("control").child(DATA).setValue(json.toString());
     }
 
 

@@ -110,6 +110,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
     /* Store the connection result from onConnectionFailed callbacks so that we can resolve them when the user clicks
      * sign-in. */
     private ConnectionResult mGoogleConnectionResult;
+    private SignInButton mSignInButton;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -153,8 +154,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
                 .build();
 
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignInButton.setSize(SignInButton.SIZE_STANDARD);
         findViewById(R.id.sign_in_button).setOnClickListener(this);
     }
 
@@ -169,13 +170,15 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
     }
 
     private void onTokenReceived(final String token){
-        DataStore.get().setAuthToken(token);
-        Toast.makeText(this, token, Toast.LENGTH_LONG).show();
+
 
         mGoogleIntentInProgress = false;
 
         if (!mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
+            DataStore.get().setAuthToken(token);
+            Toast.makeText(this, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
+            mSignInButton.setEnabled(true);
         }
     }
 
@@ -485,8 +488,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
                     }
                 });
                 break;
-            case R.id.signInLayout:
             case R.id.sign_in_button:
+                mSignInButton.setEnabled(false);
                 mGoogleLoginClicked = true;
                 if (!mGoogleApiClient.isConnecting()) {
                     if (mGoogleConnectionResult != null) {
