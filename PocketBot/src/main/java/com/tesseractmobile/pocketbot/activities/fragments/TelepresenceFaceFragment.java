@@ -1,6 +1,7 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     private RobotFace mRobotFace;
     private QBGLVideoView mRemoteVideoView;
     private TextView mUserId;
-    //private String mChannel;
+    private Handler mHandler = new Handler();
 
     @Override
     public RobotFace getRobotFace(RobotInterface robotInterface) {
@@ -106,15 +107,32 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     }
 
     @Override
-    public void onRemoteVideoTrackReceive(QBRTCSession qbrtcSession, QBRTCVideoTrack qbrtcVideoTrack, Integer integer) {
+    public void onRemoteVideoTrackReceive(final QBRTCSession qbrtcSession, final QBRTCVideoTrack qbrtcVideoTrack, final Integer integer) {
         //Setup Remote video
         VideoRenderer remoteRenderer = new VideoRenderer(new VideoCallBacks(mRemoteVideoView, QBGLVideoView.Endpoint.REMOTE));
         qbrtcVideoTrack.addRenderer(remoteRenderer);
-        mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mRemoteVideoView.setVisibility(View.VISIBLE);
+                mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
+            }
+        });
     }
 
     @Override
     public void onMessageReceived(Object message) {
         ((TelePresenceFace) mRobotFace).sendJson((JSONObject) message);
     }
+
+    @Override
+    public void onSessionClosed(QBRTCSession qbrtcSession) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mRemoteVideoView.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
 }

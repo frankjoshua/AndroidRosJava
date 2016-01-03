@@ -1,6 +1,8 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import java.util.Map;
  */
 public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements RemoteListener{
 
+    private static final String TAG = EfimTelepresenceFaceFragment.class.getSimpleName();
     private EfimFace mRobotFace;
 
     @Override
@@ -44,20 +47,27 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
 
     @Override
     public void onReceiveNewSession(final QBRTCSession qbrtcSession) {
+        Log.d(TAG, "WevRTC session received");
         // Set userInfo
         // User can set any string key and value in user info
         // Then retrieve this data from sessions which is returned in callbacks
         // and parse them as he wish
-        final Map<String,String> userInfo = new HashMap<String,String>();
-        userInfo.put("Key", "Value");
+
 
         // Accept incoming call
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                qbrtcSession.acceptCall(userInfo);
-            }
-        });
+        final FragmentActivity activity = getActivity();
+        if(activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final Map<String,String> userInfo = new HashMap<String,String>();
+                    userInfo.put("Key", "Value");
+                    qbrtcSession.acceptCall(userInfo);
+                }
+            });
+        } else {
+            Log.e(TAG, "Activity is null!");
+        }
 
     }
 

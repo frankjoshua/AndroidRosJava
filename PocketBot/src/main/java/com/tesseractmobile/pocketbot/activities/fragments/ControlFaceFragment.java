@@ -1,6 +1,7 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -52,6 +53,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     private RemoteState mRemoteState = RemoteState.NOT_CONNECTED;
     private QBRTCSession mSession;
 
+    private Handler mHandler = new Handler();
 
     @Override
     public RobotFace getRobotFace(RobotInterface robotInterface) {
@@ -163,16 +165,33 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     }
 
     @Override
-    public void onRemoteVideoTrackReceive(QBRTCSession qbrtcSession, QBRTCVideoTrack qbrtcVideoTrack, Integer integer) {
+    public void onRemoteVideoTrackReceive(final QBRTCSession qbrtcSession, final QBRTCVideoTrack qbrtcVideoTrack, final Integer integer) {
         //Setup Remote video
         VideoRenderer remoteRenderer = new VideoRenderer(new VideoCallBacks(mRemoteVideoView, QBGLVideoView.Endpoint.REMOTE));
         qbrtcVideoTrack.addRenderer(remoteRenderer);
-        mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mRemoteVideoView.setVisibility(View.VISIBLE);
+                mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
+            }
+        });
+
     }
 
     @Override
     void onQBSetup(QBSession session, QBUser user) {
         //Do Nothing
+    }
+
+    @Override
+    public void onSessionClosed(QBRTCSession qbrtcSession) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mRemoteVideoView.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     @Override
