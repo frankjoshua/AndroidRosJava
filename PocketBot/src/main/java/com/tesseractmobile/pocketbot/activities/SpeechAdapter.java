@@ -29,9 +29,11 @@ public class SpeechAdapter extends BaseAdapter {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mSpeechList.add(mNewSpeech);
             notifyDataSetChanged();
         }
     };
+    private Speech mNewSpeech;
 
     public SpeechAdapter(final Context context){
         mContext = context;
@@ -79,7 +81,9 @@ public class SpeechAdapter extends BaseAdapter {
     }
 
     public void addText(String text, final boolean isPocketBot) {
-        mSpeechList.add(new Speech(text, isPocketBot));
+        //Save the speech
+        mNewSpeech = new Speech(text, isPocketBot);
+        //Update the list
         mHandler.sendEmptyMessage(0);
     }
 

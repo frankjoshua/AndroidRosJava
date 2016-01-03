@@ -32,7 +32,7 @@ public class UsbSerialFragmentActivity extends AiFragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Speed up sensor data
-        setSensorDelay(50);
+        setSensorDelay(20);
     }
 
     @Override

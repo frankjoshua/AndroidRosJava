@@ -1,6 +1,7 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -97,9 +98,14 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     }
 
     private void connectToRemoteRobot(final int remoteNumber, final String remoteRobotId) {
+        final FragmentActivity activity = getActivity();
+        if(activity == null){
+            //Called after activity closed just return
+            return;
+        }
         setRemoteState(RemoteState.CONNECTING);
         //Connect to QuickBlox
-        QBUser user = new QBUser(PocketBotSettings.getRobotId(getActivity()), PocketBotSettings.getPassword(getActivity()));
+        QBUser user = new QBUser(PocketBotSettings.getRobotId(activity), PocketBotSettings.getPassword(activity));
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession result, Bundle params) {
@@ -124,7 +130,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 ((ControlFace) mRobotFace).setChannel(remoteRobotId);
 
                 //Save UserId
-                PocketBotSettings.setLastUserId(getActivity(), remoteRobotId);
+                PocketBotSettings.setLastUserId(activity, remoteRobotId);
 
                 //Update state
                 setRemoteState(RemoteState.CONNECTED);

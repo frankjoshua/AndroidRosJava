@@ -18,6 +18,7 @@ import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -131,6 +132,13 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
 
     @Override
     public void onNewData(byte[] data) {
+        //throw new UnsupportedOperationException();
+        try {
+            String str = new String(data, "UTF-8");
+            Robot.get().say(str);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
     }
 

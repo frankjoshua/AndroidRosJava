@@ -65,6 +65,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle bundle) {
+                PocketBotSettings.setQuickBloxId(getActivity(), session.getUserId());
                 setUpQB(session, user, activity);
             }
 

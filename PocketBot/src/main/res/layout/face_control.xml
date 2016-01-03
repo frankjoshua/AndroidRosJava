@@ -37,8 +37,18 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="No Data"
             android:background="#44000000"
+            android:id="@+id/tvInput"
+            android:layout_gravity="top|center_horizontal"
+            android:gravity="center"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="No Data"
+            android:background="#44000000"
             android:id="@+id/tvFaceData"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="bottom|center_horizontal"
+            android:gravity="center"/>
         <com.tesseractmobile.pocketbot.views.JoystickView
             android:layout_width="150dp"
             android:layout_height="150dp"

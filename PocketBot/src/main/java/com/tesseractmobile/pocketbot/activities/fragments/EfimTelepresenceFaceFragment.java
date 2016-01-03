@@ -28,7 +28,6 @@ import java.util.Map;
 public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements RemoteListener{
 
     private EfimFace mRobotFace;
-    private String mChannel;
 
     @Override
     public RobotFace getRobotFace(final RobotInterface robotInterface) {
@@ -60,9 +59,22 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
             }
         });
 
-        //Subscribe to PubNub
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Listen to remote messages
         RemoteControl.get().registerRemoteListener(this);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Stop listening to remote messages
+        RemoteControl.get().unregisterRemoteListener(this);
+    }
+
 
     @Override
     public void onRemoteVideoTrackReceive(QBRTCSession qbrtcSession, QBRTCVideoTrack qbrtcVideoTrack, Integer integer) {
@@ -71,7 +83,6 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
 
     @Override
     void onQBSetup(QBSession session, QBUser user) {
-        mChannel = String.valueOf(session.getUserId());
     }
 
     @Override

@@ -62,6 +62,20 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        //Listen for remote messages
+        RemoteControl.get().registerRemoteListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //Stop listening for remote messages
+        RemoteControl.get().unregisterRemoteListener(this);
+    }
+
+    @Override
     protected void onQBSetup(final QBSession session, final QBUser user) {
         final Integer userId = session.getUserId();
         getActivity().runOnUiThread(new Runnable() {
@@ -70,7 +84,6 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
                 mUserId.setText(Integer.toString(userId));
             }
         });
-        PocketBotSettings.setQuickBloxId(getActivity(), userId);
     }
 
     @Override
@@ -89,9 +102,6 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
                 qbrtcSession.acceptCall(userInfo);
             }
         });
-
-        //Listen for remote messages
-        RemoteControl.get().registerRemoteListener(this);
 
     }
 

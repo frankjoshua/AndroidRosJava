@@ -28,10 +28,12 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY_Z = "JoyZ";
     /** PubNub message delay in millis */
     public static final int PUBNUB_MAX_TRANSMIT_SPEED = 200;
+    private final TextView mInputTextView;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
     //Channel that the remote robot is listening on
     private String mChannel;
     private long mLastUpdate = SystemClock.uptimeMillis();
+    private String inputText;
 
     final Handler mHandler = new Handler(){
         @Override
@@ -43,17 +45,25 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private TextView mFaceData;
     private float x, y, z;
     private int mDestHeading;
+    private MouthView.SpeechCompleteListener mSpeechCompleteListener;
 
     public ControlFace(final View view){
         numberFormat.setMinimumFractionDigits(2);
         mFaceData = (TextView) view.findViewById(R.id.tvFaceData);
         ((JoystickView) view.findViewById(R.id.joyStick)).setJoystickListener(this);
         ((JoystickView) view.findViewById(R.id.joyStickLeft)).setJoystickListener(this);
+        mInputTextView = (TextView) view.findViewById(R.id.tvInput);
     }
 
     private void handleMessage(Message msg) {
         final String data =  "Heading: " + mDestHeading + " JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
         mFaceData.setText(data);
+        if(inputText != null){
+            mInputTextView.setText(inputText);
+            if(mSpeechCompleteListener != null){
+                mSpeechCompleteListener.onSpeechComplete();
+            }
+        }
     }
 
     @Override
@@ -67,13 +77,14 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     @Override
-    public void say(String text) {
-
+    public void say(final String text) {
+        inputText = text;
+        mHandler.sendEmptyMessage(0);
     }
 
     @Override
     public void setOnSpeechCompleteListener(MouthView.SpeechCompleteListener speechCompleteListener) {
-
+        mSpeechCompleteListener = speechCompleteListener;
     }
 
     @Override
