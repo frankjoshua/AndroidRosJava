@@ -8,8 +8,6 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
 import java.util.ArrayList;
@@ -20,12 +18,14 @@ import java.util.ArrayList;
 public class DataStore{
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
+    public static final String FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/";
+    public static final String AUTH_DATA = "auth_data";
     static private DataStore instance;
 
     private PocketBotUser mUser;
 
     /** Stores user and robot data */
-    private Firebase mFirebaseData;
+    private Firebase mFirebase;
 
     private AuthData mAuthData;
 
@@ -47,17 +47,24 @@ public class DataStore{
         return instance;
     }
 
-    public void setAuthToken(final String token) {
-        final Firebase firebaseUsers = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(USERS);
-        firebaseUsers.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
+    /**
+     * Signs in to Firebase using Google Auth
+     * Also adds robot to list of allowed robots
+     * @param robotId
+     * @param token
+     */
+    public void setAuthToken(final String robotId, final String token) {
+        mFirebase = new Firebase(FIREBASE_URL);
+        mFirebase.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
                 mAuthData = authData;
                 //Setup User
-                mFirebaseData = firebaseUsers.child(authData.getUid());
-                mFirebaseData.child("AuthData").setValue(authData);
+                mFirebase.child(USERS).child(authData.getUid()).child(AUTH_DATA).setValue(authData);
                 //Start syncing preferences
                 mFirebasePreferenceSync.start(getRobots());
+                //Save current robot to list of allowed robots
+                mFirebase.child(USERS).child(authData.getUid()).child(ROBOTS).child(robotId).setValue(true);
                 //Let everyone know we are logged in
                 for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
                     onAuthCompleteListener.onAuthComplete();
@@ -72,7 +79,7 @@ public class DataStore{
     }
 
     private Firebase getRobots() {
-        return mFirebaseData.child(ROBOTS);
+        return mFirebase.child(ROBOTS);
     }
 
     /**
@@ -82,6 +89,13 @@ public class DataStore{
     public Firebase getRobotListRef() {
         if(mAuthData != null){
             return getRobots();
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    public Firebase getUserListRef() {
+        if(mAuthData != null){
+            return mFirebase.child(USERS).child(mAuthData.getUid());
         }
         throw new UnsupportedOperationException();
     }

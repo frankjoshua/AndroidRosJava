@@ -3,6 +3,7 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
@@ -53,10 +59,12 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         //Hide sign in
         mSignInView.setVisibility(View.GONE);
         //Set adapter
-        mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo, RobotInfoViewHolder>(RobotInfo.class, R.layout.robot_list_item, RobotInfoViewHolder.class, DataStore.get().getRobotListRef()) {
+        final Firebase userListRef = DataStore.get().getUserListRef().child(DataStore.ROBOTS);
+        final Firebase robotListRef = DataStore.get().getRobotListRef();
+        mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef) {
             @Override
-            protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo model, final int position) {
-                viewHolder.robotName.setText(model.settings.prefs.robotName);
+            protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {
+                viewHolder.robotName.setText(model.prefs.robotName);
                 viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -102,6 +110,6 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
          * Called when robot is selected from the dialog
          * @param robotinfo
          */
-        void onRobotSelected(final RobotInfo robotinfo);
+        void onRobotSelected(final RobotInfo.Settings robotinfo);
     }
 }

@@ -30,8 +30,10 @@ package com.tesseractmobile.pocketbot.views;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 
 import java.util.ArrayList;
 
@@ -51,7 +53,35 @@ class FirebaseArray implements ChildEventListener {
     public FirebaseArray(Query ref) {
         mQuery = ref;
         mSnapshots = new ArrayList<DataSnapshot>();
-        mQuery.addChildEventListener(this);
+        final Firebase robots = DataStore.get().getRobotListRef();
+        //mQuery.addChildEventListener(this);
+        mQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                //Add child event listener for each robot user has in their list
+                robots.child(dataSnapshot.getKey()).addChildEventListener(FirebaseArray.this);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
     }
 
     public void cleanup() {

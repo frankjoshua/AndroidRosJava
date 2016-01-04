@@ -176,7 +176,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
 
         if (!mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
-            DataStore.get().setAuthToken(token);
+            DataStore.get().setAuthToken(PocketBotSettings.getRobotId(this), token);
             Toast.makeText(this, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
             mSignInButton.setEnabled(true);
         }
@@ -483,8 +483,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
                 robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
                 robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
                     @Override
-                    public void onRobotSelected(RobotInfo model) {
-                        PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.settings.prefs.robotId);
+                    public void onRobotSelected(RobotInfo.Settings model) {
+                        PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robotId);
                     }
                 });
                 break;

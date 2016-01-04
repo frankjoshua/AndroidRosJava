@@ -195,8 +195,8 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     }
 
     @Override
-    public void onRobotSelected(RobotInfo robotinfo) {
-        connectToRemoteRobot(robotinfo.settings.prefs.qbId, robotinfo.settings.prefs.robotId);
+    public void onRobotSelected(RobotInfo.Settings robotinfo) {
+        connectToRemoteRobot(robotinfo.prefs.qbId, robotinfo.prefs.robotId);
     }
 
     private enum RemoteState {
