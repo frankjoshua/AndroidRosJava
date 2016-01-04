@@ -54,7 +54,7 @@ public class TelePresenceFace extends BaseFace {
             final float x = (float) jsonObject.getDouble(ControlFace.JOY_X);
             final float y = (float) jsonObject.getDouble(ControlFace.JOY_Y);
             final float z = (float) jsonObject.getDouble(ControlFace.JOY_Z);
-            sensorData.setJoystick(x, y, z);
+            sensorData.setJoystick1(x, y, z);
             mRobotInterface.sendSensorData(false);
             //Show joystick data in text view
             final String data =  "JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);

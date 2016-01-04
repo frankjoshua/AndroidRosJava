@@ -159,7 +159,10 @@ public class EfimFace extends BaseFace implements RobotFace, OnClickListener{
             final float x = (float) jsonObject.getDouble(ControlFace.JOY_X);
             final float y = (float) jsonObject.getDouble(ControlFace.JOY_Y);
             final float z = (float) jsonObject.getDouble(ControlFace.JOY_Z);
-            sensorData.setJoystick(x, y, z);
+            final boolean a = (boolean) jsonObject.getBoolean(ControlFace.JOY_A);
+            final boolean b = (boolean) jsonObject.getBoolean(ControlFace.JOY_B);
+            final int heading = (int) jsonObject.getInt(ControlFace.HEADING);
+            sensorData.setJoystick1(x, y, z, a, b, heading);
             mRobotInterface.sendSensorData(false);
         } catch (JSONException e) {
             e.printStackTrace();

@@ -87,9 +87,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public void look(float x, float y, float z) {
         mRobotFace.look(x, y, z);
-        mSensorData.setFace_x(x);
-        mSensorData.setFace_y(y);
-        mSensorData.setFace_z(z);
+        mSensorData.setFace(x, y, z);
         sendSensorData(false);
     }
 
@@ -148,19 +146,19 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
         if(id == SensorData.NO_FACE){
             mHumanCount--;
             //if(mHumanCount == 0){
-                mSensorData.setFace_id(id);
+                mSensorData.setFace(id);
                 if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
                     onHumanLeft();
                 }
                 //Set face id to NO_FACE only if no humans are present
-                mSensorData.setFace_id(id);
+                mSensorData.setFace(id);
                 sendSensorData(true);
             //}
             return;
         }
         mHumanCount++;
         //Set face id to known human
-        mSensorData.setFace_id(id);
+        mSensorData.setFace(id);
         //Check if no human has been spotted for 10 seconds
         if (uptimeMillis - mLastHumanSpoted > TIME_BETWEEN_HUMAN_SPOTTING) {
             onHumanSpoted();

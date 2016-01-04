@@ -82,29 +82,6 @@ public class RemoteControl implements ChildEventListener {
         mFirebaseListen = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CONTROL).child(id);
         mFirebaseListen.child(CONTROL).addChildEventListener(this);
         mFirebaseTransmit = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CONTROL);
-        //Listen for messages from pubnub
-//        try {
-//            pubnub.subscribe(id, new Callback() {
-//                @Override
-//                public void errorCallback(String channel, PubnubError error) {
-//                    Log.e("PUBNUB", error.getErrorString());
-//                }
-//
-//                @Override
-//                public void successCallback(String channel, final Object message, String timeToken) {
-//                    //Update listeners
-//                    final long timeElapsed = timeElapsed(timeToken);
-//                    if(timeElapsed < 500) {
-//                        onObjectReceived(message);
-//                    } else {
-//                        Log.e("PUBNUB", "Old Packet " + Long.toString(timeElapsed));
-//                    }
-//                    //Log.d("PUBNUB", Long.toString(timeElapsed(timeToken)));
-//                }
-//            });
-//        } catch (PubnubException e) {
-//            e.printStackTrace();
-//        }
     }
 
     /**
@@ -117,27 +94,12 @@ public class RemoteControl implements ChildEventListener {
         }
     }
 
-    private long timeElapsed(final String timeToken) {
-        final Date now = new Date();
-        final Date then = new Date(Long.valueOf(timeToken) / 10000);
-        //Log.d("PUBNUB", "Now " + Long.toString(now.getTime()));
-        //Log.d("PUBNUB", "Then " + Long.toString(then.getTime()));
-        return now.getTime() - then.getTime();
-    }
-
     /**
      * Pass data to remote robot
      * @param channel
      * @param json
      */
     public void send(String channel, JSONObject json, final boolean required) {
-        //Send to PubNub
-//        pubnub.publish(channel, json, required, new Callback() {
-//            @Override
-//            public void successCallback(String channel, Object message, String timetoken) {
-//
-//            }
-//        });
         //Send to firebase
         mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json.toString());
     }

@@ -26,8 +26,13 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY_X = "JoyX";
     public static final String JOY_Y = "JoyY";
     public static final String JOY_Z = "JoyZ";
+    public static final String JOY_A = "JoyA";
+    public static final String JOY_B = "JoyB";
+    public static final String HEADING = "Heading";
+
     /** PubNub message delay in millis */
     public static final int PUBNUB_MAX_TRANSMIT_SPEED = 200;
+
     private final TextView mInputTextView;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
     //Channel that the remote robot is listening on
@@ -43,8 +48,8 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     };
 
     private TextView mFaceData;
-    private float x, y, z;
-    private int mDestHeading;
+    private SensorData.Joystick mJoy1 = new SensorData.Joystick();
+    private SensorData.Joystick mJoy2 = new SensorData.Joystick();
     private MouthView.SpeechCompleteListener mSpeechCompleteListener;
 
     public ControlFace(final View view){
@@ -56,7 +61,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     private void handleMessage(Message msg) {
-        final String data =  "Heading: " + mDestHeading + " JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
+        final String data =  "Heading: " + mJoy2.heading + " JoyX: " + numberFormat.format(mJoy1.X) + " JoyY: " + numberFormat.format(mJoy1.Y);// + " JoyZ: " + numberFormat.format(z);
         mFaceData.setText(data);
         if(inputText != null){
             mInputTextView.setText(inputText);
@@ -88,25 +93,28 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     @Override
-    public void onPositionChange(final JoystickView joystickView, float x, float y, float z) {
+    public void onPositionChange(final JoystickView joystickView, float x, float y, float z, final boolean a, final boolean b) {
         final SensorData sensorData = mRobotInterface.getSensorData();
         if(joystickView.getId() == R.id.joyStick) {
-            sensorData.setJoystick(x, y, z);
-            this.x = sensorData.getJoyX();
-            this.y = sensorData.getJoyY();
-            this.z = sensorData.getJoyZ();
+            final int heading = headingFromPosition(x, y);
+            sensorData.setJoystick1(x, y, z, a, b, heading);
+            mJoy1.X = x;
+            mJoy1.Y = y;
+            mJoy1.Z = z;
+            mJoy1.A = a;
+            mJoy1.B = b;
+            mJoy1.heading = heading;
         }
 
         if(joystickView.getId() == R.id.joyStickLeft) {
-            final double degrees;
-            if(x != 0 && y != 0) {
-                final double heading = Math.atan2(x, y) * 57;
-                degrees = heading < 0 ? heading + 360 : heading;
-            } else {
-                degrees = 0;
-            }
-            sensorData.setDestHeading((int) Math.round(degrees));
-            mDestHeading =  sensorData.getDestHeading();
+            final int heading = headingFromPosition(x, y);
+            sensorData.setJoystick1(x, y, z, a, b, heading);
+            mJoy2.X = x;
+            mJoy2.Y = y;
+            mJoy2.Z = z;
+            mJoy2.A = a;
+            mJoy2.B = b;
+            mJoy2.heading = heading;
         }
 
         mRobotInterface.sendSensorData(false);
@@ -114,8 +122,19 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         mHandler.sendEmptyMessage(0);
     }
 
+    private int headingFromPosition(float x, float y) {
+        final double degrees;
+        if(x != 0 && y != 0) {
+            final double heading = Math.atan2(x, y) * 57;
+            degrees = heading < 0 ? heading + 360 : heading;
+        } else {
+            degrees = 0;
+        }
+        return (int) Math.round(degrees);
+    }
+
     /**
-     * Send control data to PubNub
+     * Send control data to remote robot
      * @param force true if data must be sent
      */
     private void updateRemote(boolean force) {
@@ -123,9 +142,12 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
             mLastUpdate = SystemClock.uptimeMillis();
             final JSONObject json = new JSONObject();
             try {
-                json.put(JOY_X, x);
-                json.put(JOY_Y, y);
-                json.put(JOY_Z, z);
+                json.put(JOY_X, mJoy1.X);
+                json.put(JOY_Y, mJoy1.Y);
+                json.put(JOY_Z, mJoy1.Z);
+                json.put(JOY_A, mJoy1.A);
+                json.put(JOY_B, mJoy1.B);
+                json.put(HEADING, mJoy1.heading);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -139,13 +161,23 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     @Override
     public void onFocusChange(final JoystickView joystickView, boolean hasFocus) {
         //Send message when user lets go of controls
-        if(hasFocus == false) {
+        if(joystickView.getId() == R.id.joyStick && hasFocus == false) {
             final SensorData sensorData = mRobotInterface.getSensorData();
-            sensorData.setJoystick(0, 0, 0);
+            sensorData.setJoystick1(0, 0, 0);
             mRobotInterface.sendSensorData(true);
-            this.x = sensorData.getJoyX();
-            this.y = sensorData.getJoyY();
-            this.z = sensorData.getJoyZ();
+            mJoy1.X = 0;
+            mJoy1.Y = 0;
+            mJoy1.Z = 0;
+            mHandler.sendEmptyMessage(0);
+            updateRemote(true);
+        }
+        if(joystickView.getId() == R.id.joyStickLeft && hasFocus == false) {
+            final SensorData sensorData = mRobotInterface.getSensorData();
+            sensorData.setJoystick1(0, 0, 0);
+            mRobotInterface.sendSensorData(true);
+            mJoy2.X = 0;
+            mJoy2.Y = 0;
+            mJoy2.Z = 0;
             mHandler.sendEmptyMessage(0);
             updateRemote(true);
         }

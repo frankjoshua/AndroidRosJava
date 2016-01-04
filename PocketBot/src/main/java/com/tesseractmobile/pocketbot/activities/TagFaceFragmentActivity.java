@@ -135,17 +135,19 @@ public class TagFaceFragmentActivity extends BluetoothFragmentActivity implement
                         obtain.arg2 = Integer.parseInt(transimitedId);
                         hander.sendMessage(obtain);
                         //Update heading estimate
-                        mHeadingEstimate.newData(getRobotInterface().getSensorData().getHeading(), distanceChange);
+                        mHeadingEstimate.newData(getRobotInterface().getSensorData().getSensor().heading, distanceChange);
                         if(mTagGame.getState() == TagGame.IT) {
                             //Chase
-                            getRobotInterface().getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
+                            //getRobotInterface().getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
+                            throw new UnsupportedOperationException("Not implemented!");
                         } else {
                             //Run Away
                             int direction = mHeadingEstimate.getHeadingEstimate() - 180;
                             if(direction < 0){
                                 direction += 360;
                             }
-                            getRobotInterface().getSensorData().setDestHeading(direction);
+                            //getRobotInterface().getSensorData().setDestHeading(direction);
+                            throw new UnsupportedOperationException("Not implemented!");
                         }
                     }
                 }

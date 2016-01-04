@@ -334,7 +334,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
                 SensorManager.getOrientation(ROTATION, ORIENTATION);
                 //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
                 final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
-                if (Math.abs(heading - sensorData.getHeading()) > 1) {
+                if (Math.abs(heading - sensorData.getSensor().heading) > 1) {
                     sensorData.setHeading(heading);
                     mRobotInterFace.sendSensorData(false);
                     //Log.d(TAG, " New Heading " + heading);

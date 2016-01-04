@@ -37,28 +37,15 @@ public final class PocketBotProtocol {
     PocketBotProtocol.ControlOrBuilder getControlOrBuilder();
 
     /**
-     * <code>required .Gps gps = 3;</code>
-     */
-    boolean hasGps();
-    /**
-     * <code>required .Gps gps = 3;</code>
-     */
-    PocketBotProtocol.Gps getGps();
-    /**
-     * <code>required .Gps gps = 3;</code>
-     */
-    PocketBotProtocol.GpsOrBuilder getGpsOrBuilder();
-
-    /**
-     * <code>required .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 3;</code>
      */
     boolean hasSensor();
     /**
-     * <code>required .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 3;</code>
      */
     PocketBotProtocol.Sensor getSensor();
     /**
-     * <code>required .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 3;</code>
      */
     PocketBotProtocol.SensorOrBuilder getSensorOrBuilder();
   }
@@ -141,21 +128,8 @@ public final class PocketBotProtocol {
               break;
             }
             case 26: {
-              PocketBotProtocol.Gps.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                subBuilder = gps_.toBuilder();
-              }
-              gps_ = input.readMessage(PocketBotProtocol.Gps.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(gps_);
-                gps_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000004;
-              break;
-            }
-            case 34: {
               PocketBotProtocol.Sensor.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000008) == 0x00000008)) {
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
                 subBuilder = sensor_.toBuilder();
               }
               sensor_ = input.readMessage(PocketBotProtocol.Sensor.PARSER, extensionRegistry);
@@ -163,7 +137,7 @@ public final class PocketBotProtocol {
                 subBuilder.mergeFrom(sensor_);
                 sensor_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000004;
               break;
             }
           }
@@ -248,43 +222,22 @@ public final class PocketBotProtocol {
       return control_;
     }
 
-    public static final int GPS_FIELD_NUMBER = 3;
-    private PocketBotProtocol.Gps gps_;
+    public static final int SENSOR_FIELD_NUMBER = 3;
+    private PocketBotProtocol.Sensor sensor_;
     /**
-     * <code>required .Gps gps = 3;</code>
+     * <code>required .Sensor sensor = 3;</code>
      */
-    public boolean hasGps() {
+    public boolean hasSensor() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required .Gps gps = 3;</code>
-     */
-    public PocketBotProtocol.Gps getGps() {
-      return gps_;
-    }
-    /**
-     * <code>required .Gps gps = 3;</code>
-     */
-    public PocketBotProtocol.GpsOrBuilder getGpsOrBuilder() {
-      return gps_;
-    }
-
-    public static final int SENSOR_FIELD_NUMBER = 4;
-    private PocketBotProtocol.Sensor sensor_;
-    /**
-     * <code>required .Sensor sensor = 4;</code>
-     */
-    public boolean hasSensor() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    /**
-     * <code>required .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 3;</code>
      */
     public PocketBotProtocol.Sensor getSensor() {
       return sensor_;
     }
     /**
-     * <code>required .Sensor sensor = 4;</code>
+     * <code>required .Sensor sensor = 3;</code>
      */
     public PocketBotProtocol.SensorOrBuilder getSensorOrBuilder() {
       return sensor_;
@@ -293,7 +246,6 @@ public final class PocketBotProtocol {
     private void initFields() {
       face_ = PocketBotProtocol.Face.getDefaultInstance();
       control_ = PocketBotProtocol.Control.getDefaultInstance();
-      gps_ = PocketBotProtocol.Gps.getDefaultInstance();
       sensor_ = PocketBotProtocol.Sensor.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
@@ -310,10 +262,6 @@ public final class PocketBotProtocol {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasGps()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       if (!hasSensor()) {
         memoizedIsInitialized = 0;
         return false;
@@ -323,10 +271,6 @@ public final class PocketBotProtocol {
         return false;
       }
       if (!getControl().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getGps().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -348,10 +292,7 @@ public final class PocketBotProtocol {
         output.writeMessage(2, control_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, gps_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(4, sensor_);
+        output.writeMessage(3, sensor_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -372,11 +313,7 @@ public final class PocketBotProtocol {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, gps_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, sensor_);
+          .computeMessageSize(3, sensor_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -489,7 +426,6 @@ public final class PocketBotProtocol {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getFaceFieldBuilder();
           getControlFieldBuilder();
-          getGpsFieldBuilder();
           getSensorFieldBuilder();
         }
       }
@@ -511,18 +447,12 @@ public final class PocketBotProtocol {
           controlBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
-        if (gpsBuilder_ == null) {
-          gps_ = PocketBotProtocol.Gps.getDefaultInstance();
-        } else {
-          gpsBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000004);
         if (sensorBuilder_ == null) {
           sensor_ = PocketBotProtocol.Sensor.getDefaultInstance();
         } else {
           sensorBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
 
@@ -570,14 +500,6 @@ public final class PocketBotProtocol {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        if (gpsBuilder_ == null) {
-          result.gps_ = gps_;
-        } else {
-          result.gps_ = gpsBuilder_.build();
-        }
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
         if (sensorBuilder_ == null) {
           result.sensor_ = sensor_;
         } else {
@@ -605,9 +527,6 @@ public final class PocketBotProtocol {
         if (other.hasControl()) {
           mergeControl(other.getControl());
         }
-        if (other.hasGps()) {
-          mergeGps(other.getGps());
-        }
         if (other.hasSensor()) {
           mergeSensor(other.getSensor());
         }
@@ -624,10 +543,6 @@ public final class PocketBotProtocol {
           
           return false;
         }
-        if (!hasGps()) {
-          
-          return false;
-        }
         if (!hasSensor()) {
           
           return false;
@@ -637,10 +552,6 @@ public final class PocketBotProtocol {
           return false;
         }
         if (!getControl().isInitialized()) {
-          
-          return false;
-        }
-        if (!getGps().isInitialized()) {
           
           return false;
         }
@@ -902,133 +813,17 @@ public final class PocketBotProtocol {
         return controlBuilder_;
       }
 
-      private PocketBotProtocol.Gps gps_ = PocketBotProtocol.Gps.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          PocketBotProtocol.Gps, PocketBotProtocol.Gps.Builder, PocketBotProtocol.GpsOrBuilder> gpsBuilder_;
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public boolean hasGps() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public PocketBotProtocol.Gps getGps() {
-        if (gpsBuilder_ == null) {
-          return gps_;
-        } else {
-          return gpsBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public Builder setGps(PocketBotProtocol.Gps value) {
-        if (gpsBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          gps_ = value;
-          onChanged();
-        } else {
-          gpsBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000004;
-        return this;
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public Builder setGps(
-          PocketBotProtocol.Gps.Builder builderForValue) {
-        if (gpsBuilder_ == null) {
-          gps_ = builderForValue.build();
-          onChanged();
-        } else {
-          gpsBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000004;
-        return this;
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public Builder mergeGps(PocketBotProtocol.Gps value) {
-        if (gpsBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              gps_ != PocketBotProtocol.Gps.getDefaultInstance()) {
-            gps_ =
-              PocketBotProtocol.Gps.newBuilder(gps_).mergeFrom(value).buildPartial();
-          } else {
-            gps_ = value;
-          }
-          onChanged();
-        } else {
-          gpsBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000004;
-        return this;
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public Builder clearGps() {
-        if (gpsBuilder_ == null) {
-          gps_ = PocketBotProtocol.Gps.getDefaultInstance();
-          onChanged();
-        } else {
-          gpsBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public PocketBotProtocol.Gps.Builder getGpsBuilder() {
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return getGpsFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      public PocketBotProtocol.GpsOrBuilder getGpsOrBuilder() {
-        if (gpsBuilder_ != null) {
-          return gpsBuilder_.getMessageOrBuilder();
-        } else {
-          return gps_;
-        }
-      }
-      /**
-       * <code>required .Gps gps = 3;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          PocketBotProtocol.Gps, PocketBotProtocol.Gps.Builder, PocketBotProtocol.GpsOrBuilder> 
-          getGpsFieldBuilder() {
-        if (gpsBuilder_ == null) {
-          gpsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              PocketBotProtocol.Gps, PocketBotProtocol.Gps.Builder, PocketBotProtocol.GpsOrBuilder>(
-                  getGps(),
-                  getParentForChildren(),
-                  isClean());
-          gps_ = null;
-        }
-        return gpsBuilder_;
-      }
-
       private PocketBotProtocol.Sensor sensor_ = PocketBotProtocol.Sensor.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           PocketBotProtocol.Sensor, PocketBotProtocol.Sensor.Builder, PocketBotProtocol.SensorOrBuilder> sensorBuilder_;
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public boolean hasSensor() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public PocketBotProtocol.Sensor getSensor() {
         if (sensorBuilder_ == null) {
@@ -1038,7 +833,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public Builder setSensor(PocketBotProtocol.Sensor value) {
         if (sensorBuilder_ == null) {
@@ -1050,11 +845,11 @@ public final class PocketBotProtocol {
         } else {
           sensorBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public Builder setSensor(
           PocketBotProtocol.Sensor.Builder builderForValue) {
@@ -1064,15 +859,15 @@ public final class PocketBotProtocol {
         } else {
           sensorBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public Builder mergeSensor(PocketBotProtocol.Sensor value) {
         if (sensorBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+          if (((bitField0_ & 0x00000004) == 0x00000004) &&
               sensor_ != PocketBotProtocol.Sensor.getDefaultInstance()) {
             sensor_ =
               PocketBotProtocol.Sensor.newBuilder(sensor_).mergeFrom(value).buildPartial();
@@ -1083,11 +878,11 @@ public final class PocketBotProtocol {
         } else {
           sensorBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         return this;
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public Builder clearSensor() {
         if (sensorBuilder_ == null) {
@@ -1096,19 +891,19 @@ public final class PocketBotProtocol {
         } else {
           sensorBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public PocketBotProtocol.Sensor.Builder getSensorBuilder() {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         onChanged();
         return getSensorFieldBuilder().getBuilder();
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       public PocketBotProtocol.SensorOrBuilder getSensorOrBuilder() {
         if (sensorBuilder_ != null) {
@@ -1118,7 +913,7 @@ public final class PocketBotProtocol {
         }
       }
       /**
-       * <code>required .Sensor sensor = 4;</code>
+       * <code>required .Sensor sensor = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           PocketBotProtocol.Sensor, PocketBotProtocol.Sensor.Builder, PocketBotProtocol.SensorOrBuilder> 
@@ -1150,40 +945,72 @@ public final class PocketBotProtocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required sint32 faceId = 1;</code>
+     * <code>required sint32 id = 1;</code>
+     *
+     * <pre>
+     *-1 == no face, faceId increases when new face is detected
+     * </pre>
      */
-    boolean hasFaceId();
+    boolean hasId();
     /**
-     * <code>required sint32 faceId = 1;</code>
+     * <code>required sint32 id = 1;</code>
+     *
+     * <pre>
+     *-1 == no face, faceId increases when new face is detected
+     * </pre>
      */
-    int getFaceId();
+    int getId();
 
     /**
-     * <code>required float faceX = 2;</code>
+     * <code>required float X = 2;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+     * </pre>
      */
-    boolean hasFaceX();
+    boolean hasX();
     /**
-     * <code>required float faceX = 2;</code>
+     * <code>required float X = 2;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+     * </pre>
      */
-    float getFaceX();
+    float getX();
 
     /**
-     * <code>required float faceY = 3;</code>
+     * <code>required float Y = 3;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == below robot, -1.0 == above robot
+     * </pre>
      */
-    boolean hasFaceY();
+    boolean hasY();
     /**
-     * <code>required float faceY = 3;</code>
+     * <code>required float Y = 3;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == below robot, -1.0 == above robot
+     * </pre>
      */
-    float getFaceY();
+    float getY();
 
     /**
-     * <code>required float faceZ = 4;</code>
+     * <code>required float Z = 4;</code>
+     *
+     * <pre>
+     *1.0 == close, 0.0 == far, 0.5 == medium
+     * </pre>
      */
-    boolean hasFaceZ();
+    boolean hasZ();
     /**
-     * <code>required float faceZ = 4;</code>
+     * <code>required float Z = 4;</code>
+     *
+     * <pre>
+     *1.0 == close, 0.0 == far, 0.5 == medium
+     * </pre>
      */
-    float getFaceZ();
+    float getZ();
   }
   /**
    * Protobuf type {@code Face}
@@ -1239,22 +1066,22 @@ public final class PocketBotProtocol {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              faceId_ = input.readSInt32();
+              id_ = input.readSInt32();
               break;
             }
             case 21: {
               bitField0_ |= 0x00000002;
-              faceX_ = input.readFloat();
+              x_ = input.readFloat();
               break;
             }
             case 29: {
               bitField0_ |= 0x00000004;
-              faceY_ = input.readFloat();
+              y_ = input.readFloat();
               break;
             }
             case 37: {
               bitField0_ |= 0x00000008;
-              faceZ_ = input.readFloat();
+              z_ = input.readFloat();
               break;
             }
           }
@@ -1297,71 +1124,103 @@ public final class PocketBotProtocol {
     }
 
     private int bitField0_;
-    public static final int FACEID_FIELD_NUMBER = 1;
-    private int faceId_;
+    public static final int ID_FIELD_NUMBER = 1;
+    private int id_;
     /**
-     * <code>required sint32 faceId = 1;</code>
+     * <code>required sint32 id = 1;</code>
+     *
+     * <pre>
+     *-1 == no face, faceId increases when new face is detected
+     * </pre>
      */
-    public boolean hasFaceId() {
+    public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required sint32 faceId = 1;</code>
+     * <code>required sint32 id = 1;</code>
+     *
+     * <pre>
+     *-1 == no face, faceId increases when new face is detected
+     * </pre>
      */
-    public int getFaceId() {
-      return faceId_;
+    public int getId() {
+      return id_;
     }
 
-    public static final int FACEX_FIELD_NUMBER = 2;
-    private float faceX_;
+    public static final int X_FIELD_NUMBER = 2;
+    private float x_;
     /**
-     * <code>required float faceX = 2;</code>
+     * <code>required float X = 2;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+     * </pre>
      */
-    public boolean hasFaceX() {
+    public boolean hasX() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required float faceX = 2;</code>
+     * <code>required float X = 2;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+     * </pre>
      */
-    public float getFaceX() {
-      return faceX_;
+    public float getX() {
+      return x_;
     }
 
-    public static final int FACEY_FIELD_NUMBER = 3;
-    private float faceY_;
+    public static final int Y_FIELD_NUMBER = 3;
+    private float y_;
     /**
-     * <code>required float faceY = 3;</code>
+     * <code>required float Y = 3;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == below robot, -1.0 == above robot
+     * </pre>
      */
-    public boolean hasFaceY() {
+    public boolean hasY() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required float faceY = 3;</code>
+     * <code>required float Y = 3;</code>
+     *
+     * <pre>
+     *0.0 == center, 1.0 == below robot, -1.0 == above robot
+     * </pre>
      */
-    public float getFaceY() {
-      return faceY_;
+    public float getY() {
+      return y_;
     }
 
-    public static final int FACEZ_FIELD_NUMBER = 4;
-    private float faceZ_;
+    public static final int Z_FIELD_NUMBER = 4;
+    private float z_;
     /**
-     * <code>required float faceZ = 4;</code>
+     * <code>required float Z = 4;</code>
+     *
+     * <pre>
+     *1.0 == close, 0.0 == far, 0.5 == medium
+     * </pre>
      */
-    public boolean hasFaceZ() {
+    public boolean hasZ() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>required float faceZ = 4;</code>
+     * <code>required float Z = 4;</code>
+     *
+     * <pre>
+     *1.0 == close, 0.0 == far, 0.5 == medium
+     * </pre>
      */
-    public float getFaceZ() {
-      return faceZ_;
+    public float getZ() {
+      return z_;
     }
 
     private void initFields() {
-      faceId_ = 0;
-      faceX_ = 0F;
-      faceY_ = 0F;
-      faceZ_ = 0F;
+      id_ = 0;
+      x_ = 0F;
+      y_ = 0F;
+      z_ = 0F;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1369,19 +1228,19 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasFaceId()) {
+      if (!hasId()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasFaceX()) {
+      if (!hasX()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasFaceY()) {
+      if (!hasY()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasFaceZ()) {
+      if (!hasZ()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1393,16 +1252,16 @@ public final class PocketBotProtocol {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt32(1, faceId_);
+        output.writeSInt32(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, faceX_);
+        output.writeFloat(2, x_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeFloat(3, faceY_);
+        output.writeFloat(3, y_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeFloat(4, faceZ_);
+        output.writeFloat(4, z_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1415,19 +1274,19 @@ public final class PocketBotProtocol {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(1, faceId_);
+          .computeSInt32Size(1, id_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, faceX_);
+          .computeFloatSize(2, x_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, faceY_);
+          .computeFloatSize(3, y_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(4, faceZ_);
+          .computeFloatSize(4, z_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1546,13 +1405,13 @@ public final class PocketBotProtocol {
 
       public Builder clear() {
         super.clear();
-        faceId_ = 0;
+        id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        faceX_ = 0F;
+        x_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
-        faceY_ = 0F;
+        y_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000004);
-        faceZ_ = 0F;
+        z_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
@@ -1585,19 +1444,19 @@ public final class PocketBotProtocol {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.faceId_ = faceId_;
+        result.id_ = id_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.faceX_ = faceX_;
+        result.x_ = x_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.faceY_ = faceY_;
+        result.y_ = y_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.faceZ_ = faceZ_;
+        result.z_ = z_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1614,36 +1473,36 @@ public final class PocketBotProtocol {
 
       public Builder mergeFrom(PocketBotProtocol.Face other) {
         if (other == PocketBotProtocol.Face.getDefaultInstance()) return this;
-        if (other.hasFaceId()) {
-          setFaceId(other.getFaceId());
+        if (other.hasId()) {
+          setId(other.getId());
         }
-        if (other.hasFaceX()) {
-          setFaceX(other.getFaceX());
+        if (other.hasX()) {
+          setX(other.getX());
         }
-        if (other.hasFaceY()) {
-          setFaceY(other.getFaceY());
+        if (other.hasY()) {
+          setY(other.getY());
         }
-        if (other.hasFaceZ()) {
-          setFaceZ(other.getFaceZ());
+        if (other.hasZ()) {
+          setZ(other.getZ());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
-        if (!hasFaceId()) {
+        if (!hasId()) {
           
           return false;
         }
-        if (!hasFaceX()) {
+        if (!hasX()) {
           
           return false;
         }
-        if (!hasFaceY()) {
+        if (!hasY()) {
           
           return false;
         }
-        if (!hasFaceZ()) {
+        if (!hasZ()) {
           
           return false;
         }
@@ -1669,130 +1528,194 @@ public final class PocketBotProtocol {
       }
       private int bitField0_;
 
-      private int faceId_ ;
+      private int id_ ;
       /**
-       * <code>required sint32 faceId = 1;</code>
+       * <code>required sint32 id = 1;</code>
+       *
+       * <pre>
+       *-1 == no face, faceId increases when new face is detected
+       * </pre>
        */
-      public boolean hasFaceId() {
+      public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required sint32 faceId = 1;</code>
+       * <code>required sint32 id = 1;</code>
+       *
+       * <pre>
+       *-1 == no face, faceId increases when new face is detected
+       * </pre>
        */
-      public int getFaceId() {
-        return faceId_;
+      public int getId() {
+        return id_;
       }
       /**
-       * <code>required sint32 faceId = 1;</code>
+       * <code>required sint32 id = 1;</code>
+       *
+       * <pre>
+       *-1 == no face, faceId increases when new face is detected
+       * </pre>
        */
-      public Builder setFaceId(int value) {
+      public Builder setId(int value) {
         bitField0_ |= 0x00000001;
-        faceId_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required sint32 faceId = 1;</code>
+       * <code>required sint32 id = 1;</code>
+       *
+       * <pre>
+       *-1 == no face, faceId increases when new face is detected
+       * </pre>
        */
-      public Builder clearFaceId() {
+      public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        faceId_ = 0;
+        id_ = 0;
         onChanged();
         return this;
       }
 
-      private float faceX_ ;
+      private float x_ ;
       /**
-       * <code>required float faceX = 2;</code>
+       * <code>required float X = 2;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+       * </pre>
        */
-      public boolean hasFaceX() {
+      public boolean hasX() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required float faceX = 2;</code>
+       * <code>required float X = 2;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+       * </pre>
        */
-      public float getFaceX() {
-        return faceX_;
+      public float getX() {
+        return x_;
       }
       /**
-       * <code>required float faceX = 2;</code>
+       * <code>required float X = 2;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+       * </pre>
        */
-      public Builder setFaceX(float value) {
+      public Builder setX(float value) {
         bitField0_ |= 0x00000002;
-        faceX_ = value;
+        x_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required float faceX = 2;</code>
+       * <code>required float X = 2;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+       * </pre>
        */
-      public Builder clearFaceX() {
+      public Builder clearX() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        faceX_ = 0F;
+        x_ = 0F;
         onChanged();
         return this;
       }
 
-      private float faceY_ ;
+      private float y_ ;
       /**
-       * <code>required float faceY = 3;</code>
+       * <code>required float Y = 3;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == below robot, -1.0 == above robot
+       * </pre>
        */
-      public boolean hasFaceY() {
+      public boolean hasY() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required float faceY = 3;</code>
+       * <code>required float Y = 3;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == below robot, -1.0 == above robot
+       * </pre>
        */
-      public float getFaceY() {
-        return faceY_;
+      public float getY() {
+        return y_;
       }
       /**
-       * <code>required float faceY = 3;</code>
+       * <code>required float Y = 3;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == below robot, -1.0 == above robot
+       * </pre>
        */
-      public Builder setFaceY(float value) {
+      public Builder setY(float value) {
         bitField0_ |= 0x00000004;
-        faceY_ = value;
+        y_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required float faceY = 3;</code>
+       * <code>required float Y = 3;</code>
+       *
+       * <pre>
+       *0.0 == center, 1.0 == below robot, -1.0 == above robot
+       * </pre>
        */
-      public Builder clearFaceY() {
+      public Builder clearY() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        faceY_ = 0F;
+        y_ = 0F;
         onChanged();
         return this;
       }
 
-      private float faceZ_ ;
+      private float z_ ;
       /**
-       * <code>required float faceZ = 4;</code>
+       * <code>required float Z = 4;</code>
+       *
+       * <pre>
+       *1.0 == close, 0.0 == far, 0.5 == medium
+       * </pre>
        */
-      public boolean hasFaceZ() {
+      public boolean hasZ() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>required float faceZ = 4;</code>
+       * <code>required float Z = 4;</code>
+       *
+       * <pre>
+       *1.0 == close, 0.0 == far, 0.5 == medium
+       * </pre>
        */
-      public float getFaceZ() {
-        return faceZ_;
+      public float getZ() {
+        return z_;
       }
       /**
-       * <code>required float faceZ = 4;</code>
+       * <code>required float Z = 4;</code>
+       *
+       * <pre>
+       *1.0 == close, 0.0 == far, 0.5 == medium
+       * </pre>
        */
-      public Builder setFaceZ(float value) {
+      public Builder setZ(float value) {
         bitField0_ |= 0x00000008;
-        faceZ_ = value;
+        z_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required float faceZ = 4;</code>
+       * <code>required float Z = 4;</code>
+       *
+       * <pre>
+       *1.0 == close, 0.0 == far, 0.5 == medium
+       * </pre>
        */
-      public Builder clearFaceZ() {
+      public Builder clearZ() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        faceZ_ = 0F;
+        z_ = 0F;
         onChanged();
         return this;
       }
@@ -1808,63 +1731,879 @@ public final class PocketBotProtocol {
     // @@protoc_insertion_point(class_scope:Face)
   }
 
+  public interface SensorOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Sensor)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required bool proximity = 1;</code>
+     *
+     * <pre>
+     *if something within 8cm == true
+     * </pre>
+     */
+    boolean hasProximity();
+    /**
+     * <code>required bool proximity = 1;</code>
+     *
+     * <pre>
+     *if something within 8cm == true
+     * </pre>
+     */
+    boolean getProximity();
+
+    /**
+     * <code>required int32 heading = 2;</code>
+     *
+     * <pre>
+     *Compass heading in degrees 0-359
+     * </pre>
+     */
+    boolean hasHeading();
+    /**
+     * <code>required int32 heading = 2;</code>
+     *
+     * <pre>
+     *Compass heading in degrees 0-359
+     * </pre>
+     */
+    int getHeading();
+
+    /**
+     * <code>required .Gps gps = 3;</code>
+     *
+     * <pre>
+     *Current GPS position
+     * </pre>
+     */
+    boolean hasGps();
+    /**
+     * <code>required .Gps gps = 3;</code>
+     *
+     * <pre>
+     *Current GPS position
+     * </pre>
+     */
+    PocketBotProtocol.Gps getGps();
+    /**
+     * <code>required .Gps gps = 3;</code>
+     *
+     * <pre>
+     *Current GPS position
+     * </pre>
+     */
+    PocketBotProtocol.GpsOrBuilder getGpsOrBuilder();
+  }
+  /**
+   * Protobuf type {@code Sensor}
+   */
+  public static final class Sensor extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Sensor)
+      SensorOrBuilder {
+    // Use Sensor.newBuilder() to construct.
+    private Sensor(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private Sensor(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Sensor defaultInstance;
+    public static Sensor getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public Sensor getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Sensor(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              proximity_ = input.readBool();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              heading_ = input.readInt32();
+              break;
+            }
+            case 26: {
+              PocketBotProtocol.Gps.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = gps_.toBuilder();
+              }
+              gps_ = input.readMessage(PocketBotProtocol.Gps.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(gps_);
+                gps_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return PocketBotProtocol.internal_static_Sensor_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return PocketBotProtocol.internal_static_Sensor_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              PocketBotProtocol.Sensor.class, PocketBotProtocol.Sensor.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<Sensor> PARSER =
+        new com.google.protobuf.AbstractParser<Sensor>() {
+      public Sensor parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Sensor(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Sensor> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int PROXIMITY_FIELD_NUMBER = 1;
+    private boolean proximity_;
+    /**
+     * <code>required bool proximity = 1;</code>
+     *
+     * <pre>
+     *if something within 8cm == true
+     * </pre>
+     */
+    public boolean hasProximity() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required bool proximity = 1;</code>
+     *
+     * <pre>
+     *if something within 8cm == true
+     * </pre>
+     */
+    public boolean getProximity() {
+      return proximity_;
+    }
+
+    public static final int HEADING_FIELD_NUMBER = 2;
+    private int heading_;
+    /**
+     * <code>required int32 heading = 2;</code>
+     *
+     * <pre>
+     *Compass heading in degrees 0-359
+     * </pre>
+     */
+    public boolean hasHeading() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required int32 heading = 2;</code>
+     *
+     * <pre>
+     *Compass heading in degrees 0-359
+     * </pre>
+     */
+    public int getHeading() {
+      return heading_;
+    }
+
+    public static final int GPS_FIELD_NUMBER = 3;
+    private PocketBotProtocol.Gps gps_;
+    /**
+     * <code>required .Gps gps = 3;</code>
+     *
+     * <pre>
+     *Current GPS position
+     * </pre>
+     */
+    public boolean hasGps() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>required .Gps gps = 3;</code>
+     *
+     * <pre>
+     *Current GPS position
+     * </pre>
+     */
+    public PocketBotProtocol.Gps getGps() {
+      return gps_;
+    }
+    /**
+     * <code>required .Gps gps = 3;</code>
+     *
+     * <pre>
+     *Current GPS position
+     * </pre>
+     */
+    public PocketBotProtocol.GpsOrBuilder getGpsOrBuilder() {
+      return gps_;
+    }
+
+    private void initFields() {
+      proximity_ = false;
+      heading_ = 0;
+      gps_ = PocketBotProtocol.Gps.getDefaultInstance();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasProximity()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasHeading()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasGps()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getGps().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBool(1, proximity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(2, heading_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeMessage(3, gps_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, proximity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, heading_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, gps_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static PocketBotProtocol.Sensor parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static PocketBotProtocol.Sensor parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static PocketBotProtocol.Sensor parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static PocketBotProtocol.Sensor parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(PocketBotProtocol.Sensor prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code Sensor}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Sensor)
+        PocketBotProtocol.SensorOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return PocketBotProtocol.internal_static_Sensor_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return PocketBotProtocol.internal_static_Sensor_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                PocketBotProtocol.Sensor.class, PocketBotProtocol.Sensor.Builder.class);
+      }
+
+      // Construct using PocketBotProtocol.Sensor.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getGpsFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        proximity_ = false;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        heading_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        if (gpsBuilder_ == null) {
+          gps_ = PocketBotProtocol.Gps.getDefaultInstance();
+        } else {
+          gpsBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return PocketBotProtocol.internal_static_Sensor_descriptor;
+      }
+
+      public PocketBotProtocol.Sensor getDefaultInstanceForType() {
+        return PocketBotProtocol.Sensor.getDefaultInstance();
+      }
+
+      public PocketBotProtocol.Sensor build() {
+        PocketBotProtocol.Sensor result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public PocketBotProtocol.Sensor buildPartial() {
+        PocketBotProtocol.Sensor result = new PocketBotProtocol.Sensor(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.proximity_ = proximity_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.heading_ = heading_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        if (gpsBuilder_ == null) {
+          result.gps_ = gps_;
+        } else {
+          result.gps_ = gpsBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof PocketBotProtocol.Sensor) {
+          return mergeFrom((PocketBotProtocol.Sensor)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(PocketBotProtocol.Sensor other) {
+        if (other == PocketBotProtocol.Sensor.getDefaultInstance()) return this;
+        if (other.hasProximity()) {
+          setProximity(other.getProximity());
+        }
+        if (other.hasHeading()) {
+          setHeading(other.getHeading());
+        }
+        if (other.hasGps()) {
+          mergeGps(other.getGps());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasProximity()) {
+          
+          return false;
+        }
+        if (!hasHeading()) {
+          
+          return false;
+        }
+        if (!hasGps()) {
+          
+          return false;
+        }
+        if (!getGps().isInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        PocketBotProtocol.Sensor parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (PocketBotProtocol.Sensor) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private boolean proximity_ ;
+      /**
+       * <code>required bool proximity = 1;</code>
+       *
+       * <pre>
+       *if something within 8cm == true
+       * </pre>
+       */
+      public boolean hasProximity() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required bool proximity = 1;</code>
+       *
+       * <pre>
+       *if something within 8cm == true
+       * </pre>
+       */
+      public boolean getProximity() {
+        return proximity_;
+      }
+      /**
+       * <code>required bool proximity = 1;</code>
+       *
+       * <pre>
+       *if something within 8cm == true
+       * </pre>
+       */
+      public Builder setProximity(boolean value) {
+        bitField0_ |= 0x00000001;
+        proximity_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required bool proximity = 1;</code>
+       *
+       * <pre>
+       *if something within 8cm == true
+       * </pre>
+       */
+      public Builder clearProximity() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        proximity_ = false;
+        onChanged();
+        return this;
+      }
+
+      private int heading_ ;
+      /**
+       * <code>required int32 heading = 2;</code>
+       *
+       * <pre>
+       *Compass heading in degrees 0-359
+       * </pre>
+       */
+      public boolean hasHeading() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required int32 heading = 2;</code>
+       *
+       * <pre>
+       *Compass heading in degrees 0-359
+       * </pre>
+       */
+      public int getHeading() {
+        return heading_;
+      }
+      /**
+       * <code>required int32 heading = 2;</code>
+       *
+       * <pre>
+       *Compass heading in degrees 0-359
+       * </pre>
+       */
+      public Builder setHeading(int value) {
+        bitField0_ |= 0x00000002;
+        heading_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int32 heading = 2;</code>
+       *
+       * <pre>
+       *Compass heading in degrees 0-359
+       * </pre>
+       */
+      public Builder clearHeading() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        heading_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private PocketBotProtocol.Gps gps_ = PocketBotProtocol.Gps.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          PocketBotProtocol.Gps, PocketBotProtocol.Gps.Builder, PocketBotProtocol.GpsOrBuilder> gpsBuilder_;
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public boolean hasGps() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public PocketBotProtocol.Gps getGps() {
+        if (gpsBuilder_ == null) {
+          return gps_;
+        } else {
+          return gpsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public Builder setGps(PocketBotProtocol.Gps value) {
+        if (gpsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          gps_ = value;
+          onChanged();
+        } else {
+          gpsBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public Builder setGps(
+          PocketBotProtocol.Gps.Builder builderForValue) {
+        if (gpsBuilder_ == null) {
+          gps_ = builderForValue.build();
+          onChanged();
+        } else {
+          gpsBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public Builder mergeGps(PocketBotProtocol.Gps value) {
+        if (gpsBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) == 0x00000004) &&
+              gps_ != PocketBotProtocol.Gps.getDefaultInstance()) {
+            gps_ =
+              PocketBotProtocol.Gps.newBuilder(gps_).mergeFrom(value).buildPartial();
+          } else {
+            gps_ = value;
+          }
+          onChanged();
+        } else {
+          gpsBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000004;
+        return this;
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public Builder clearGps() {
+        if (gpsBuilder_ == null) {
+          gps_ = PocketBotProtocol.Gps.getDefaultInstance();
+          onChanged();
+        } else {
+          gpsBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public PocketBotProtocol.Gps.Builder getGpsBuilder() {
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return getGpsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      public PocketBotProtocol.GpsOrBuilder getGpsOrBuilder() {
+        if (gpsBuilder_ != null) {
+          return gpsBuilder_.getMessageOrBuilder();
+        } else {
+          return gps_;
+        }
+      }
+      /**
+       * <code>required .Gps gps = 3;</code>
+       *
+       * <pre>
+       *Current GPS position
+       * </pre>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          PocketBotProtocol.Gps, PocketBotProtocol.Gps.Builder, PocketBotProtocol.GpsOrBuilder> 
+          getGpsFieldBuilder() {
+        if (gpsBuilder_ == null) {
+          gpsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              PocketBotProtocol.Gps, PocketBotProtocol.Gps.Builder, PocketBotProtocol.GpsOrBuilder>(
+                  getGps(),
+                  getParentForChildren(),
+                  isClean());
+          gps_ = null;
+        }
+        return gpsBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:Sensor)
+    }
+
+    static {
+      defaultInstance = new Sensor(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:Sensor)
+  }
+
   public interface ControlOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Control)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required float joyX = 1;</code>
+     * <code>required .Joystick joy1 = 1;</code>
+     *
+     * <pre>
+     *Right Joystick Control
+     * </pre>
      */
-    boolean hasJoyX();
+    boolean hasJoy1();
     /**
-     * <code>required float joyX = 1;</code>
+     * <code>required .Joystick joy1 = 1;</code>
+     *
+     * <pre>
+     *Right Joystick Control
+     * </pre>
      */
-    float getJoyX();
+    PocketBotProtocol.Joystick getJoy1();
+    /**
+     * <code>required .Joystick joy1 = 1;</code>
+     *
+     * <pre>
+     *Right Joystick Control
+     * </pre>
+     */
+    PocketBotProtocol.JoystickOrBuilder getJoy1OrBuilder();
 
     /**
-     * <code>required float joyY = 2;</code>
+     * <code>required .Joystick joy2 = 2;</code>
+     *
+     * <pre>
+     *Left Joystick Control
+     * </pre>
      */
-    boolean hasJoyY();
+    boolean hasJoy2();
     /**
-     * <code>required float joyY = 2;</code>
+     * <code>required .Joystick joy2 = 2;</code>
+     *
+     * <pre>
+     *Left Joystick Control
+     * </pre>
      */
-    float getJoyY();
-
+    PocketBotProtocol.Joystick getJoy2();
     /**
-     * <code>required float joyZ = 3;</code>
+     * <code>required .Joystick joy2 = 2;</code>
+     *
+     * <pre>
+     *Left Joystick Control
+     * </pre>
      */
-    boolean hasJoyZ();
-    /**
-     * <code>required float joyZ = 3;</code>
-     */
-    float getJoyZ();
-
-    /**
-     * <code>required bool buttonA = 4;</code>
-     */
-    boolean hasButtonA();
-    /**
-     * <code>required bool buttonA = 4;</code>
-     */
-    boolean getButtonA();
-
-    /**
-     * <code>required bool buttonB = 5;</code>
-     */
-    boolean hasButtonB();
-    /**
-     * <code>required bool buttonB = 5;</code>
-     */
-    boolean getButtonB();
-
-    /**
-     * <code>required int32 destHeading = 6;</code>
-     */
-    boolean hasDestHeading();
-    /**
-     * <code>required int32 destHeading = 6;</code>
-     */
-    int getDestHeading();
+    PocketBotProtocol.JoystickOrBuilder getJoy2OrBuilder();
   }
   /**
    * Protobuf type {@code Control}
@@ -1918,34 +2657,30 @@ public final class PocketBotProtocol {
               }
               break;
             }
-            case 13: {
+            case 10: {
+              PocketBotProtocol.Joystick.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                subBuilder = joy1_.toBuilder();
+              }
+              joy1_ = input.readMessage(PocketBotProtocol.Joystick.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(joy1_);
+                joy1_ = subBuilder.buildPartial();
+              }
               bitField0_ |= 0x00000001;
-              joyX_ = input.readFloat();
               break;
             }
-            case 21: {
+            case 18: {
+              PocketBotProtocol.Joystick.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                subBuilder = joy2_.toBuilder();
+              }
+              joy2_ = input.readMessage(PocketBotProtocol.Joystick.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(joy2_);
+                joy2_ = subBuilder.buildPartial();
+              }
               bitField0_ |= 0x00000002;
-              joyY_ = input.readFloat();
-              break;
-            }
-            case 29: {
-              bitField0_ |= 0x00000004;
-              joyZ_ = input.readFloat();
-              break;
-            }
-            case 32: {
-              bitField0_ |= 0x00000008;
-              buttonA_ = input.readBool();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000010;
-              buttonB_ = input.readBool();
-              break;
-            }
-            case 48: {
-              bitField0_ |= 0x00000020;
-              destHeading_ = input.readInt32();
               break;
             }
           }
@@ -1988,103 +2723,75 @@ public final class PocketBotProtocol {
     }
 
     private int bitField0_;
-    public static final int JOYX_FIELD_NUMBER = 1;
-    private float joyX_;
+    public static final int JOY1_FIELD_NUMBER = 1;
+    private PocketBotProtocol.Joystick joy1_;
     /**
-     * <code>required float joyX = 1;</code>
+     * <code>required .Joystick joy1 = 1;</code>
+     *
+     * <pre>
+     *Right Joystick Control
+     * </pre>
      */
-    public boolean hasJoyX() {
+    public boolean hasJoy1() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required float joyX = 1;</code>
+     * <code>required .Joystick joy1 = 1;</code>
+     *
+     * <pre>
+     *Right Joystick Control
+     * </pre>
      */
-    public float getJoyX() {
-      return joyX_;
+    public PocketBotProtocol.Joystick getJoy1() {
+      return joy1_;
+    }
+    /**
+     * <code>required .Joystick joy1 = 1;</code>
+     *
+     * <pre>
+     *Right Joystick Control
+     * </pre>
+     */
+    public PocketBotProtocol.JoystickOrBuilder getJoy1OrBuilder() {
+      return joy1_;
     }
 
-    public static final int JOYY_FIELD_NUMBER = 2;
-    private float joyY_;
+    public static final int JOY2_FIELD_NUMBER = 2;
+    private PocketBotProtocol.Joystick joy2_;
     /**
-     * <code>required float joyY = 2;</code>
+     * <code>required .Joystick joy2 = 2;</code>
+     *
+     * <pre>
+     *Left Joystick Control
+     * </pre>
      */
-    public boolean hasJoyY() {
+    public boolean hasJoy2() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required float joyY = 2;</code>
+     * <code>required .Joystick joy2 = 2;</code>
+     *
+     * <pre>
+     *Left Joystick Control
+     * </pre>
      */
-    public float getJoyY() {
-      return joyY_;
-    }
-
-    public static final int JOYZ_FIELD_NUMBER = 3;
-    private float joyZ_;
-    /**
-     * <code>required float joyZ = 3;</code>
-     */
-    public boolean hasJoyZ() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+    public PocketBotProtocol.Joystick getJoy2() {
+      return joy2_;
     }
     /**
-     * <code>required float joyZ = 3;</code>
+     * <code>required .Joystick joy2 = 2;</code>
+     *
+     * <pre>
+     *Left Joystick Control
+     * </pre>
      */
-    public float getJoyZ() {
-      return joyZ_;
-    }
-
-    public static final int BUTTONA_FIELD_NUMBER = 4;
-    private boolean buttonA_;
-    /**
-     * <code>required bool buttonA = 4;</code>
-     */
-    public boolean hasButtonA() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
-    }
-    /**
-     * <code>required bool buttonA = 4;</code>
-     */
-    public boolean getButtonA() {
-      return buttonA_;
-    }
-
-    public static final int BUTTONB_FIELD_NUMBER = 5;
-    private boolean buttonB_;
-    /**
-     * <code>required bool buttonB = 5;</code>
-     */
-    public boolean hasButtonB() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
-    }
-    /**
-     * <code>required bool buttonB = 5;</code>
-     */
-    public boolean getButtonB() {
-      return buttonB_;
-    }
-
-    public static final int DESTHEADING_FIELD_NUMBER = 6;
-    private int destHeading_;
-    /**
-     * <code>required int32 destHeading = 6;</code>
-     */
-    public boolean hasDestHeading() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
-    }
-    /**
-     * <code>required int32 destHeading = 6;</code>
-     */
-    public int getDestHeading() {
-      return destHeading_;
+    public PocketBotProtocol.JoystickOrBuilder getJoy2OrBuilder() {
+      return joy2_;
     }
 
     private void initFields() {
-      joyX_ = 0F;
-      joyY_ = 0F;
-      joyZ_ = 0F;
-      buttonA_ = false;
-      buttonB_ = false;
-      destHeading_ = 0;
+      joy1_ = PocketBotProtocol.Joystick.getDefaultInstance();
+      joy2_ = PocketBotProtocol.Joystick.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2092,27 +2799,19 @@ public final class PocketBotProtocol {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasJoyX()) {
+      if (!hasJoy1()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasJoyY()) {
+      if (!hasJoy2()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasJoyZ()) {
+      if (!getJoy1().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasButtonA()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasButtonB()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDestHeading()) {
+      if (!getJoy2().isInitialized()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -2124,22 +2823,10 @@ public final class PocketBotProtocol {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeFloat(1, joyX_);
+        output.writeMessage(1, joy1_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeFloat(2, joyY_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeFloat(3, joyZ_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBool(4, buttonA_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeBool(5, buttonB_);
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(6, destHeading_);
+        output.writeMessage(2, joy2_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -2152,27 +2839,11 @@ public final class PocketBotProtocol {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(1, joyX_);
+          .computeMessageSize(1, joy1_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, joyY_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, joyZ_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, buttonA_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(5, buttonB_);
-      }
-      if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, destHeading_);
+          .computeMessageSize(2, joy2_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2283,6 +2954,8 @@ public final class PocketBotProtocol {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getJoy1FieldBuilder();
+          getJoy2FieldBuilder();
         }
       }
       private static Builder create() {
@@ -2291,18 +2964,18 @@ public final class PocketBotProtocol {
 
       public Builder clear() {
         super.clear();
-        joyX_ = 0F;
+        if (joy1Builder_ == null) {
+          joy1_ = PocketBotProtocol.Joystick.getDefaultInstance();
+        } else {
+          joy1Builder_.clear();
+        }
         bitField0_ = (bitField0_ & ~0x00000001);
-        joyY_ = 0F;
+        if (joy2Builder_ == null) {
+          joy2_ = PocketBotProtocol.Joystick.getDefaultInstance();
+        } else {
+          joy2Builder_.clear();
+        }
         bitField0_ = (bitField0_ & ~0x00000002);
-        joyZ_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        buttonA_ = false;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        buttonB_ = false;
-        bitField0_ = (bitField0_ & ~0x00000010);
-        destHeading_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -2334,27 +3007,19 @@ public final class PocketBotProtocol {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.joyX_ = joyX_;
+        if (joy1Builder_ == null) {
+          result.joy1_ = joy1_;
+        } else {
+          result.joy1_ = joy1Builder_.build();
+        }
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.joyY_ = joyY_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
+        if (joy2Builder_ == null) {
+          result.joy2_ = joy2_;
+        } else {
+          result.joy2_ = joy2Builder_.build();
         }
-        result.joyZ_ = joyZ_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
-        result.buttonA_ = buttonA_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-          to_bitField0_ |= 0x00000010;
-        }
-        result.buttonB_ = buttonB_;
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000020;
-        }
-        result.destHeading_ = destHeading_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2371,50 +3036,30 @@ public final class PocketBotProtocol {
 
       public Builder mergeFrom(PocketBotProtocol.Control other) {
         if (other == PocketBotProtocol.Control.getDefaultInstance()) return this;
-        if (other.hasJoyX()) {
-          setJoyX(other.getJoyX());
+        if (other.hasJoy1()) {
+          mergeJoy1(other.getJoy1());
         }
-        if (other.hasJoyY()) {
-          setJoyY(other.getJoyY());
-        }
-        if (other.hasJoyZ()) {
-          setJoyZ(other.getJoyZ());
-        }
-        if (other.hasButtonA()) {
-          setButtonA(other.getButtonA());
-        }
-        if (other.hasButtonB()) {
-          setButtonB(other.getButtonB());
-        }
-        if (other.hasDestHeading()) {
-          setDestHeading(other.getDestHeading());
+        if (other.hasJoy2()) {
+          mergeJoy2(other.getJoy2());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
-        if (!hasJoyX()) {
+        if (!hasJoy1()) {
           
           return false;
         }
-        if (!hasJoyY()) {
+        if (!hasJoy2()) {
           
           return false;
         }
-        if (!hasJoyZ()) {
+        if (!getJoy1().isInitialized()) {
           
           return false;
         }
-        if (!hasButtonA()) {
-          
-          return false;
-        }
-        if (!hasButtonB()) {
-          
-          return false;
-        }
-        if (!hasDestHeading()) {
+        if (!getJoy2().isInitialized()) {
           
           return false;
         }
@@ -2440,196 +3085,308 @@ public final class PocketBotProtocol {
       }
       private int bitField0_;
 
-      private float joyX_ ;
+      private PocketBotProtocol.Joystick joy1_ = PocketBotProtocol.Joystick.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          PocketBotProtocol.Joystick, PocketBotProtocol.Joystick.Builder, PocketBotProtocol.JoystickOrBuilder> joy1Builder_;
       /**
-       * <code>required float joyX = 1;</code>
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
        */
-      public boolean hasJoyX() {
+      public boolean hasJoy1() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required float joyX = 1;</code>
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
        */
-      public float getJoyX() {
-        return joyX_;
+      public PocketBotProtocol.Joystick getJoy1() {
+        if (joy1Builder_ == null) {
+          return joy1_;
+        } else {
+          return joy1Builder_.getMessage();
+        }
       }
       /**
-       * <code>required float joyX = 1;</code>
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
        */
-      public Builder setJoyX(float value) {
+      public Builder setJoy1(PocketBotProtocol.Joystick value) {
+        if (joy1Builder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          joy1_ = value;
+          onChanged();
+        } else {
+          joy1Builder_.setMessage(value);
+        }
         bitField0_ |= 0x00000001;
-        joyX_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>required float joyX = 1;</code>
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
        */
-      public Builder clearJoyX() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        joyX_ = 0F;
-        onChanged();
+      public Builder setJoy1(
+          PocketBotProtocol.Joystick.Builder builderForValue) {
+        if (joy1Builder_ == null) {
+          joy1_ = builderForValue.build();
+          onChanged();
+        } else {
+          joy1Builder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000001;
         return this;
+      }
+      /**
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
+       */
+      public Builder mergeJoy1(PocketBotProtocol.Joystick value) {
+        if (joy1Builder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+              joy1_ != PocketBotProtocol.Joystick.getDefaultInstance()) {
+            joy1_ =
+              PocketBotProtocol.Joystick.newBuilder(joy1_).mergeFrom(value).buildPartial();
+          } else {
+            joy1_ = value;
+          }
+          onChanged();
+        } else {
+          joy1Builder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000001;
+        return this;
+      }
+      /**
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
+       */
+      public Builder clearJoy1() {
+        if (joy1Builder_ == null) {
+          joy1_ = PocketBotProtocol.Joystick.getDefaultInstance();
+          onChanged();
+        } else {
+          joy1Builder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+      /**
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
+       */
+      public PocketBotProtocol.Joystick.Builder getJoy1Builder() {
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return getJoy1FieldBuilder().getBuilder();
+      }
+      /**
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
+       */
+      public PocketBotProtocol.JoystickOrBuilder getJoy1OrBuilder() {
+        if (joy1Builder_ != null) {
+          return joy1Builder_.getMessageOrBuilder();
+        } else {
+          return joy1_;
+        }
+      }
+      /**
+       * <code>required .Joystick joy1 = 1;</code>
+       *
+       * <pre>
+       *Right Joystick Control
+       * </pre>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          PocketBotProtocol.Joystick, PocketBotProtocol.Joystick.Builder, PocketBotProtocol.JoystickOrBuilder> 
+          getJoy1FieldBuilder() {
+        if (joy1Builder_ == null) {
+          joy1Builder_ = new com.google.protobuf.SingleFieldBuilder<
+              PocketBotProtocol.Joystick, PocketBotProtocol.Joystick.Builder, PocketBotProtocol.JoystickOrBuilder>(
+                  getJoy1(),
+                  getParentForChildren(),
+                  isClean());
+          joy1_ = null;
+        }
+        return joy1Builder_;
       }
 
-      private float joyY_ ;
+      private PocketBotProtocol.Joystick joy2_ = PocketBotProtocol.Joystick.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          PocketBotProtocol.Joystick, PocketBotProtocol.Joystick.Builder, PocketBotProtocol.JoystickOrBuilder> joy2Builder_;
       /**
-       * <code>required float joyY = 2;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public boolean hasJoyY() {
+      public boolean hasJoy2() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required float joyY = 2;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public float getJoyY() {
-        return joyY_;
+      public PocketBotProtocol.Joystick getJoy2() {
+        if (joy2Builder_ == null) {
+          return joy2_;
+        } else {
+          return joy2Builder_.getMessage();
+        }
       }
       /**
-       * <code>required float joyY = 2;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public Builder setJoyY(float value) {
+      public Builder setJoy2(PocketBotProtocol.Joystick value) {
+        if (joy2Builder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          joy2_ = value;
+          onChanged();
+        } else {
+          joy2Builder_.setMessage(value);
+        }
         bitField0_ |= 0x00000002;
-        joyY_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>required float joyY = 2;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public Builder clearJoyY() {
+      public Builder setJoy2(
+          PocketBotProtocol.Joystick.Builder builderForValue) {
+        if (joy2Builder_ == null) {
+          joy2_ = builderForValue.build();
+          onChanged();
+        } else {
+          joy2Builder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
+       */
+      public Builder mergeJoy2(PocketBotProtocol.Joystick value) {
+        if (joy2Builder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              joy2_ != PocketBotProtocol.Joystick.getDefaultInstance()) {
+            joy2_ =
+              PocketBotProtocol.Joystick.newBuilder(joy2_).mergeFrom(value).buildPartial();
+          } else {
+            joy2_ = value;
+          }
+          onChanged();
+        } else {
+          joy2Builder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
+       */
+      public Builder clearJoy2() {
+        if (joy2Builder_ == null) {
+          joy2_ = PocketBotProtocol.Joystick.getDefaultInstance();
+          onChanged();
+        } else {
+          joy2Builder_.clear();
+        }
         bitField0_ = (bitField0_ & ~0x00000002);
-        joyY_ = 0F;
-        onChanged();
-        return this;
-      }
-
-      private float joyZ_ ;
-      /**
-       * <code>required float joyZ = 3;</code>
-       */
-      public boolean hasJoyZ() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      /**
-       * <code>required float joyZ = 3;</code>
-       */
-      public float getJoyZ() {
-        return joyZ_;
-      }
-      /**
-       * <code>required float joyZ = 3;</code>
-       */
-      public Builder setJoyZ(float value) {
-        bitField0_ |= 0x00000004;
-        joyZ_ = value;
-        onChanged();
         return this;
       }
       /**
-       * <code>required float joyZ = 3;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public Builder clearJoyZ() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        joyZ_ = 0F;
+      public PocketBotProtocol.Joystick.Builder getJoy2Builder() {
+        bitField0_ |= 0x00000002;
         onChanged();
-        return this;
-      }
-
-      private boolean buttonA_ ;
-      /**
-       * <code>required bool buttonA = 4;</code>
-       */
-      public boolean hasButtonA() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return getJoy2FieldBuilder().getBuilder();
       }
       /**
-       * <code>required bool buttonA = 4;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public boolean getButtonA() {
-        return buttonA_;
+      public PocketBotProtocol.JoystickOrBuilder getJoy2OrBuilder() {
+        if (joy2Builder_ != null) {
+          return joy2Builder_.getMessageOrBuilder();
+        } else {
+          return joy2_;
+        }
       }
       /**
-       * <code>required bool buttonA = 4;</code>
+       * <code>required .Joystick joy2 = 2;</code>
+       *
+       * <pre>
+       *Left Joystick Control
+       * </pre>
        */
-      public Builder setButtonA(boolean value) {
-        bitField0_ |= 0x00000008;
-        buttonA_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required bool buttonA = 4;</code>
-       */
-      public Builder clearButtonA() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        buttonA_ = false;
-        onChanged();
-        return this;
-      }
-
-      private boolean buttonB_ ;
-      /**
-       * <code>required bool buttonB = 5;</code>
-       */
-      public boolean hasButtonB() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
-      }
-      /**
-       * <code>required bool buttonB = 5;</code>
-       */
-      public boolean getButtonB() {
-        return buttonB_;
-      }
-      /**
-       * <code>required bool buttonB = 5;</code>
-       */
-      public Builder setButtonB(boolean value) {
-        bitField0_ |= 0x00000010;
-        buttonB_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required bool buttonB = 5;</code>
-       */
-      public Builder clearButtonB() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        buttonB_ = false;
-        onChanged();
-        return this;
-      }
-
-      private int destHeading_ ;
-      /**
-       * <code>required int32 destHeading = 6;</code>
-       */
-      public boolean hasDestHeading() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
-      }
-      /**
-       * <code>required int32 destHeading = 6;</code>
-       */
-      public int getDestHeading() {
-        return destHeading_;
-      }
-      /**
-       * <code>required int32 destHeading = 6;</code>
-       */
-      public Builder setDestHeading(int value) {
-        bitField0_ |= 0x00000020;
-        destHeading_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 destHeading = 6;</code>
-       */
-      public Builder clearDestHeading() {
-        bitField0_ = (bitField0_ & ~0x00000020);
-        destHeading_ = 0;
-        onChanged();
-        return this;
+      private com.google.protobuf.SingleFieldBuilder<
+          PocketBotProtocol.Joystick, PocketBotProtocol.Joystick.Builder, PocketBotProtocol.JoystickOrBuilder> 
+          getJoy2FieldBuilder() {
+        if (joy2Builder_ == null) {
+          joy2Builder_ = new com.google.protobuf.SingleFieldBuilder<
+              PocketBotProtocol.Joystick, PocketBotProtocol.Joystick.Builder, PocketBotProtocol.JoystickOrBuilder>(
+                  getJoy2(),
+                  getParentForChildren(),
+                  isClean());
+          joy2_ = null;
+        }
+        return joy2Builder_;
       }
 
       // @@protoc_insertion_point(builder_scope:Control)
@@ -2641,6 +3398,1033 @@ public final class PocketBotProtocol {
     }
 
     // @@protoc_insertion_point(class_scope:Control)
+  }
+
+  public interface JoystickOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Joystick)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>required float X = 1;</code>
+     *
+     * <pre>
+     *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+     * </pre>
+     */
+    boolean hasX();
+    /**
+     * <code>required float X = 1;</code>
+     *
+     * <pre>
+     *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+     * </pre>
+     */
+    float getX();
+
+    /**
+     * <code>required float Y = 2;</code>
+     *
+     * <pre>
+     *-1.0 == Down, 1.0 == Up, 0.0 == Center
+     * </pre>
+     */
+    boolean hasY();
+    /**
+     * <code>required float Y = 2;</code>
+     *
+     * <pre>
+     *-1.0 == Down, 1.0 == Up, 0.0 == Center
+     * </pre>
+     */
+    float getY();
+
+    /**
+     * <code>required float Z = 3;</code>
+     *
+     * <pre>
+     *Pressure of user touch 0 == Not touching, 1 == Full pressure
+     * </pre>
+     */
+    boolean hasZ();
+    /**
+     * <code>required float Z = 3;</code>
+     *
+     * <pre>
+     *Pressure of user touch 0 == Not touching, 1 == Full pressure
+     * </pre>
+     */
+    float getZ();
+
+    /**
+     * <code>required bool A = 4;</code>
+     *
+     * <pre>
+     *Button A
+     * </pre>
+     */
+    boolean hasA();
+    /**
+     * <code>required bool A = 4;</code>
+     *
+     * <pre>
+     *Button A
+     * </pre>
+     */
+    boolean getA();
+
+    /**
+     * <code>required bool B = 5;</code>
+     *
+     * <pre>
+     *Button B
+     * </pre>
+     */
+    boolean hasB();
+    /**
+     * <code>required bool B = 5;</code>
+     *
+     * <pre>
+     *Button B
+     * </pre>
+     */
+    boolean getB();
+
+    /**
+     * <code>required int32 heading = 6;</code>
+     *
+     * <pre>
+     *Direction in degrees 0 - 359, 0 == up
+     * </pre>
+     */
+    boolean hasHeading();
+    /**
+     * <code>required int32 heading = 6;</code>
+     *
+     * <pre>
+     *Direction in degrees 0 - 359, 0 == up
+     * </pre>
+     */
+    int getHeading();
+  }
+  /**
+   * Protobuf type {@code Joystick}
+   */
+  public static final class Joystick extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:Joystick)
+      JoystickOrBuilder {
+    // Use Joystick.newBuilder() to construct.
+    private Joystick(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private Joystick(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Joystick defaultInstance;
+    public static Joystick getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public Joystick getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Joystick(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              x_ = input.readFloat();
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              y_ = input.readFloat();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              z_ = input.readFloat();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              a_ = input.readBool();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              b_ = input.readBool();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              heading_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return PocketBotProtocol.internal_static_Joystick_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return PocketBotProtocol.internal_static_Joystick_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              PocketBotProtocol.Joystick.class, PocketBotProtocol.Joystick.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<Joystick> PARSER =
+        new com.google.protobuf.AbstractParser<Joystick>() {
+      public Joystick parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Joystick(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Joystick> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    public static final int X_FIELD_NUMBER = 1;
+    private float x_;
+    /**
+     * <code>required float X = 1;</code>
+     *
+     * <pre>
+     *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+     * </pre>
+     */
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required float X = 1;</code>
+     *
+     * <pre>
+     *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+     * </pre>
+     */
+    public float getX() {
+      return x_;
+    }
+
+    public static final int Y_FIELD_NUMBER = 2;
+    private float y_;
+    /**
+     * <code>required float Y = 2;</code>
+     *
+     * <pre>
+     *-1.0 == Down, 1.0 == Up, 0.0 == Center
+     * </pre>
+     */
+    public boolean hasY() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required float Y = 2;</code>
+     *
+     * <pre>
+     *-1.0 == Down, 1.0 == Up, 0.0 == Center
+     * </pre>
+     */
+    public float getY() {
+      return y_;
+    }
+
+    public static final int Z_FIELD_NUMBER = 3;
+    private float z_;
+    /**
+     * <code>required float Z = 3;</code>
+     *
+     * <pre>
+     *Pressure of user touch 0 == Not touching, 1 == Full pressure
+     * </pre>
+     */
+    public boolean hasZ() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>required float Z = 3;</code>
+     *
+     * <pre>
+     *Pressure of user touch 0 == Not touching, 1 == Full pressure
+     * </pre>
+     */
+    public float getZ() {
+      return z_;
+    }
+
+    public static final int A_FIELD_NUMBER = 4;
+    private boolean a_;
+    /**
+     * <code>required bool A = 4;</code>
+     *
+     * <pre>
+     *Button A
+     * </pre>
+     */
+    public boolean hasA() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>required bool A = 4;</code>
+     *
+     * <pre>
+     *Button A
+     * </pre>
+     */
+    public boolean getA() {
+      return a_;
+    }
+
+    public static final int B_FIELD_NUMBER = 5;
+    private boolean b_;
+    /**
+     * <code>required bool B = 5;</code>
+     *
+     * <pre>
+     *Button B
+     * </pre>
+     */
+    public boolean hasB() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>required bool B = 5;</code>
+     *
+     * <pre>
+     *Button B
+     * </pre>
+     */
+    public boolean getB() {
+      return b_;
+    }
+
+    public static final int HEADING_FIELD_NUMBER = 6;
+    private int heading_;
+    /**
+     * <code>required int32 heading = 6;</code>
+     *
+     * <pre>
+     *Direction in degrees 0 - 359, 0 == up
+     * </pre>
+     */
+    public boolean hasHeading() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>required int32 heading = 6;</code>
+     *
+     * <pre>
+     *Direction in degrees 0 - 359, 0 == up
+     * </pre>
+     */
+    public int getHeading() {
+      return heading_;
+    }
+
+    private void initFields() {
+      x_ = 0F;
+      y_ = 0F;
+      z_ = 0F;
+      a_ = false;
+      b_ = false;
+      heading_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      if (!hasX()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasY()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasZ()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasA()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasB()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasHeading()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeFloat(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeFloat(2, y_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeFloat(3, z_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(4, a_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(5, b_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt32(6, heading_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(1, x_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, y_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, z_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, a_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, b_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(6, heading_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static PocketBotProtocol.Joystick parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static PocketBotProtocol.Joystick parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static PocketBotProtocol.Joystick parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static PocketBotProtocol.Joystick parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(PocketBotProtocol.Joystick prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code Joystick}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Joystick)
+        PocketBotProtocol.JoystickOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return PocketBotProtocol.internal_static_Joystick_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return PocketBotProtocol.internal_static_Joystick_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                PocketBotProtocol.Joystick.class, PocketBotProtocol.Joystick.Builder.class);
+      }
+
+      // Construct using PocketBotProtocol.Joystick.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        x_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        y_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        z_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        a_ = false;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        b_ = false;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        heading_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return PocketBotProtocol.internal_static_Joystick_descriptor;
+      }
+
+      public PocketBotProtocol.Joystick getDefaultInstanceForType() {
+        return PocketBotProtocol.Joystick.getDefaultInstance();
+      }
+
+      public PocketBotProtocol.Joystick build() {
+        PocketBotProtocol.Joystick result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public PocketBotProtocol.Joystick buildPartial() {
+        PocketBotProtocol.Joystick result = new PocketBotProtocol.Joystick(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.z_ = z_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.a_ = a_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.b_ = b_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.heading_ = heading_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof PocketBotProtocol.Joystick) {
+          return mergeFrom((PocketBotProtocol.Joystick)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(PocketBotProtocol.Joystick other) {
+        if (other == PocketBotProtocol.Joystick.getDefaultInstance()) return this;
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        if (other.hasZ()) {
+          setZ(other.getZ());
+        }
+        if (other.hasA()) {
+          setA(other.getA());
+        }
+        if (other.hasB()) {
+          setB(other.getB());
+        }
+        if (other.hasHeading()) {
+          setHeading(other.getHeading());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasX()) {
+          
+          return false;
+        }
+        if (!hasY()) {
+          
+          return false;
+        }
+        if (!hasZ()) {
+          
+          return false;
+        }
+        if (!hasA()) {
+          
+          return false;
+        }
+        if (!hasB()) {
+          
+          return false;
+        }
+        if (!hasHeading()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        PocketBotProtocol.Joystick parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (PocketBotProtocol.Joystick) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private float x_ ;
+      /**
+       * <code>required float X = 1;</code>
+       *
+       * <pre>
+       *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+       * </pre>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required float X = 1;</code>
+       *
+       * <pre>
+       *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+       * </pre>
+       */
+      public float getX() {
+        return x_;
+      }
+      /**
+       * <code>required float X = 1;</code>
+       *
+       * <pre>
+       *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+       * </pre>
+       */
+      public Builder setX(float value) {
+        bitField0_ |= 0x00000001;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required float X = 1;</code>
+       *
+       * <pre>
+       *-1.0 == Left, 1.0 == Right, 0.0 == Center 
+       * </pre>
+       */
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        x_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float y_ ;
+      /**
+       * <code>required float Y = 2;</code>
+       *
+       * <pre>
+       *-1.0 == Down, 1.0 == Up, 0.0 == Center
+       * </pre>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required float Y = 2;</code>
+       *
+       * <pre>
+       *-1.0 == Down, 1.0 == Up, 0.0 == Center
+       * </pre>
+       */
+      public float getY() {
+        return y_;
+      }
+      /**
+       * <code>required float Y = 2;</code>
+       *
+       * <pre>
+       *-1.0 == Down, 1.0 == Up, 0.0 == Center
+       * </pre>
+       */
+      public Builder setY(float value) {
+        bitField0_ |= 0x00000002;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required float Y = 2;</code>
+       *
+       * <pre>
+       *-1.0 == Down, 1.0 == Up, 0.0 == Center
+       * </pre>
+       */
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        y_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float z_ ;
+      /**
+       * <code>required float Z = 3;</code>
+       *
+       * <pre>
+       *Pressure of user touch 0 == Not touching, 1 == Full pressure
+       * </pre>
+       */
+      public boolean hasZ() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>required float Z = 3;</code>
+       *
+       * <pre>
+       *Pressure of user touch 0 == Not touching, 1 == Full pressure
+       * </pre>
+       */
+      public float getZ() {
+        return z_;
+      }
+      /**
+       * <code>required float Z = 3;</code>
+       *
+       * <pre>
+       *Pressure of user touch 0 == Not touching, 1 == Full pressure
+       * </pre>
+       */
+      public Builder setZ(float value) {
+        bitField0_ |= 0x00000004;
+        z_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required float Z = 3;</code>
+       *
+       * <pre>
+       *Pressure of user touch 0 == Not touching, 1 == Full pressure
+       * </pre>
+       */
+      public Builder clearZ() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        z_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private boolean a_ ;
+      /**
+       * <code>required bool A = 4;</code>
+       *
+       * <pre>
+       *Button A
+       * </pre>
+       */
+      public boolean hasA() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>required bool A = 4;</code>
+       *
+       * <pre>
+       *Button A
+       * </pre>
+       */
+      public boolean getA() {
+        return a_;
+      }
+      /**
+       * <code>required bool A = 4;</code>
+       *
+       * <pre>
+       *Button A
+       * </pre>
+       */
+      public Builder setA(boolean value) {
+        bitField0_ |= 0x00000008;
+        a_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required bool A = 4;</code>
+       *
+       * <pre>
+       *Button A
+       * </pre>
+       */
+      public Builder clearA() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        a_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean b_ ;
+      /**
+       * <code>required bool B = 5;</code>
+       *
+       * <pre>
+       *Button B
+       * </pre>
+       */
+      public boolean hasB() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>required bool B = 5;</code>
+       *
+       * <pre>
+       *Button B
+       * </pre>
+       */
+      public boolean getB() {
+        return b_;
+      }
+      /**
+       * <code>required bool B = 5;</code>
+       *
+       * <pre>
+       *Button B
+       * </pre>
+       */
+      public Builder setB(boolean value) {
+        bitField0_ |= 0x00000010;
+        b_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required bool B = 5;</code>
+       *
+       * <pre>
+       *Button B
+       * </pre>
+       */
+      public Builder clearB() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        b_ = false;
+        onChanged();
+        return this;
+      }
+
+      private int heading_ ;
+      /**
+       * <code>required int32 heading = 6;</code>
+       *
+       * <pre>
+       *Direction in degrees 0 - 359, 0 == up
+       * </pre>
+       */
+      public boolean hasHeading() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>required int32 heading = 6;</code>
+       *
+       * <pre>
+       *Direction in degrees 0 - 359, 0 == up
+       * </pre>
+       */
+      public int getHeading() {
+        return heading_;
+      }
+      /**
+       * <code>required int32 heading = 6;</code>
+       *
+       * <pre>
+       *Direction in degrees 0 - 359, 0 == up
+       * </pre>
+       */
+      public Builder setHeading(int value) {
+        bitField0_ |= 0x00000020;
+        heading_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int32 heading = 6;</code>
+       *
+       * <pre>
+       *Direction in degrees 0 - 359, 0 == up
+       * </pre>
+       */
+      public Builder clearHeading() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        heading_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:Joystick)
+    }
+
+    static {
+      defaultInstance = new Joystick(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:Joystick)
   }
 
   public interface GpsOrBuilder extends
@@ -3134,497 +4918,6 @@ public final class PocketBotProtocol {
     // @@protoc_insertion_point(class_scope:Gps)
   }
 
-  public interface SensorOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:Sensor)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>required bool proximity = 1;</code>
-     */
-    boolean hasProximity();
-    /**
-     * <code>required bool proximity = 1;</code>
-     */
-    boolean getProximity();
-
-    /**
-     * <code>required int32 heading = 2;</code>
-     */
-    boolean hasHeading();
-    /**
-     * <code>required int32 heading = 2;</code>
-     */
-    int getHeading();
-  }
-  /**
-   * Protobuf type {@code Sensor}
-   */
-  public static final class Sensor extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:Sensor)
-      SensorOrBuilder {
-    // Use Sensor.newBuilder() to construct.
-    private Sensor(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private Sensor(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Sensor defaultInstance;
-    public static Sensor getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public Sensor getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Sensor(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              proximity_ = input.readBool();
-              break;
-            }
-            case 16: {
-              bitField0_ |= 0x00000002;
-              heading_ = input.readInt32();
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return PocketBotProtocol.internal_static_Sensor_descriptor;
-    }
-
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return PocketBotProtocol.internal_static_Sensor_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              PocketBotProtocol.Sensor.class, PocketBotProtocol.Sensor.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<Sensor> PARSER =
-        new com.google.protobuf.AbstractParser<Sensor>() {
-      public Sensor parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Sensor(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Sensor> getParserForType() {
-      return PARSER;
-    }
-
-    private int bitField0_;
-    public static final int PROXIMITY_FIELD_NUMBER = 1;
-    private boolean proximity_;
-    /**
-     * <code>required bool proximity = 1;</code>
-     */
-    public boolean hasProximity() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>required bool proximity = 1;</code>
-     */
-    public boolean getProximity() {
-      return proximity_;
-    }
-
-    public static final int HEADING_FIELD_NUMBER = 2;
-    private int heading_;
-    /**
-     * <code>required int32 heading = 2;</code>
-     */
-    public boolean hasHeading() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required int32 heading = 2;</code>
-     */
-    public int getHeading() {
-      return heading_;
-    }
-
-    private void initFields() {
-      proximity_ = false;
-      heading_ = 0;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      if (!hasProximity()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasHeading()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBool(1, proximity_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, heading_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(1, proximity_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, heading_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static PocketBotProtocol.Sensor parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static PocketBotProtocol.Sensor parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static PocketBotProtocol.Sensor parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static PocketBotProtocol.Sensor parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(PocketBotProtocol.Sensor prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code Sensor}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:Sensor)
-        PocketBotProtocol.SensorOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return PocketBotProtocol.internal_static_Sensor_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return PocketBotProtocol.internal_static_Sensor_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                PocketBotProtocol.Sensor.class, PocketBotProtocol.Sensor.Builder.class);
-      }
-
-      // Construct using PocketBotProtocol.Sensor.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-
-      public Builder clear() {
-        super.clear();
-        proximity_ = false;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        heading_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return PocketBotProtocol.internal_static_Sensor_descriptor;
-      }
-
-      public PocketBotProtocol.Sensor getDefaultInstanceForType() {
-        return PocketBotProtocol.Sensor.getDefaultInstance();
-      }
-
-      public PocketBotProtocol.Sensor build() {
-        PocketBotProtocol.Sensor result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      public PocketBotProtocol.Sensor buildPartial() {
-        PocketBotProtocol.Sensor result = new PocketBotProtocol.Sensor(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.proximity_ = proximity_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.heading_ = heading_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof PocketBotProtocol.Sensor) {
-          return mergeFrom((PocketBotProtocol.Sensor)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(PocketBotProtocol.Sensor other) {
-        if (other == PocketBotProtocol.Sensor.getDefaultInstance()) return this;
-        if (other.hasProximity()) {
-          setProximity(other.getProximity());
-        }
-        if (other.hasHeading()) {
-          setHeading(other.getHeading());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        if (!hasProximity()) {
-          
-          return false;
-        }
-        if (!hasHeading()) {
-          
-          return false;
-        }
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        PocketBotProtocol.Sensor parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (PocketBotProtocol.Sensor) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      private boolean proximity_ ;
-      /**
-       * <code>required bool proximity = 1;</code>
-       */
-      public boolean hasProximity() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>required bool proximity = 1;</code>
-       */
-      public boolean getProximity() {
-        return proximity_;
-      }
-      /**
-       * <code>required bool proximity = 1;</code>
-       */
-      public Builder setProximity(boolean value) {
-        bitField0_ |= 0x00000001;
-        proximity_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required bool proximity = 1;</code>
-       */
-      public Builder clearProximity() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        proximity_ = false;
-        onChanged();
-        return this;
-      }
-
-      private int heading_ ;
-      /**
-       * <code>required int32 heading = 2;</code>
-       */
-      public boolean hasHeading() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required int32 heading = 2;</code>
-       */
-      public int getHeading() {
-        return heading_;
-      }
-      /**
-       * <code>required int32 heading = 2;</code>
-       */
-      public Builder setHeading(int value) {
-        bitField0_ |= 0x00000002;
-        heading_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required int32 heading = 2;</code>
-       */
-      public Builder clearHeading() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        heading_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:Sensor)
-    }
-
-    static {
-      defaultInstance = new Sensor(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:Sensor)
-  }
-
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_PocketBotMessage_descriptor;
   private static
@@ -3636,20 +4929,25 @@ public final class PocketBotProtocol {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Face_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Sensor_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Sensor_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Control_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Control_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Joystick_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Joystick_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Gps_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_Gps_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Sensor_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_Sensor_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -3659,16 +4957,17 @@ public final class PocketBotProtocol {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\027PocketBotProtocol.proto\"n\n\020PocketBotMe" +
+      "\n\027PocketBotProtocol.proto\"[\n\020PocketBotMe" +
       "ssage\022\023\n\004face\030\001 \002(\0132\005.Face\022\031\n\007control\030\002 " +
-      "\002(\0132\010.Control\022\021\n\003gps\030\003 \002(\0132\004.Gps\022\027\n\006sens" +
-      "or\030\004 \002(\0132\007.Sensor\"C\n\004Face\022\016\n\006faceId\030\001 \002(" +
-      "\021\022\r\n\005faceX\030\002 \002(\002\022\r\n\005faceY\030\003 \002(\002\022\r\n\005faceZ" +
-      "\030\004 \002(\002\"j\n\007Control\022\014\n\004joyX\030\001 \002(\002\022\014\n\004joyY\030" +
-      "\002 \002(\002\022\014\n\004joyZ\030\003 \002(\002\022\017\n\007buttonA\030\004 \002(\010\022\017\n\007" +
-      "buttonB\030\005 \002(\010\022\023\n\013destHeading\030\006 \002(\005\"\037\n\003Gp" +
-      "s\022\013\n\003lat\030\001 \002(\002\022\013\n\003lon\030\002 \002(\002\",\n\006Sensor\022\021\n" +
-      "\tproximity\030\001 \002(\010\022\017\n\007heading\030\002 \002(\005"
+      "\002(\0132\010.Control\022\027\n\006sensor\030\003 \002(\0132\007.Sensor\"3" +
+      "\n\004Face\022\n\n\002id\030\001 \002(\021\022\t\n\001X\030\002 \002(\002\022\t\n\001Y\030\003 \002(\002" +
+      "\022\t\n\001Z\030\004 \002(\002\"?\n\006Sensor\022\021\n\tproximity\030\001 \002(\010" +
+      "\022\017\n\007heading\030\002 \002(\005\022\021\n\003gps\030\003 \002(\0132\004.Gps\";\n\007" +
+      "Control\022\027\n\004joy1\030\001 \002(\0132\t.Joystick\022\027\n\004joy2" +
+      "\030\002 \002(\0132\t.Joystick\"R\n\010Joystick\022\t\n\001X\030\001 \002(\002" +
+      "\022\t\n\001Y\030\002 \002(\002\022\t\n\001Z\030\003 \002(\002\022\t\n\001A\030\004 \002(\010\022\t\n\001B\030\005" +
+      " \002(\010\022\017\n\007heading\030\006 \002(\005\"\037\n\003Gps\022\013\n\003lat\030\001 \002(",
+      "\002\022\013\n\003lon\030\002 \002(\002"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3687,31 +4986,37 @@ public final class PocketBotProtocol {
     internal_static_PocketBotMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_PocketBotMessage_descriptor,
-        new java.lang.String[] { "Face", "Control", "Gps", "Sensor", });
+        new java.lang.String[] { "Face", "Control", "Sensor", });
     internal_static_Face_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Face_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Face_descriptor,
-        new java.lang.String[] { "FaceId", "FaceX", "FaceY", "FaceZ", });
-    internal_static_Control_descriptor =
+        new java.lang.String[] { "Id", "X", "Y", "Z", });
+    internal_static_Sensor_descriptor =
       getDescriptor().getMessageTypes().get(2);
+    internal_static_Sensor_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Sensor_descriptor,
+        new java.lang.String[] { "Proximity", "Heading", "Gps", });
+    internal_static_Control_descriptor =
+      getDescriptor().getMessageTypes().get(3);
     internal_static_Control_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Control_descriptor,
-        new java.lang.String[] { "JoyX", "JoyY", "JoyZ", "ButtonA", "ButtonB", "DestHeading", });
+        new java.lang.String[] { "Joy1", "Joy2", });
+    internal_static_Joystick_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_Joystick_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Joystick_descriptor,
+        new java.lang.String[] { "X", "Y", "Z", "A", "B", "Heading", });
     internal_static_Gps_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_Gps_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_Gps_descriptor,
         new java.lang.String[] { "Lat", "Lon", });
-    internal_static_Sensor_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_Sensor_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_Sensor_descriptor,
-        new java.lang.String[] { "Proximity", "Heading", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
