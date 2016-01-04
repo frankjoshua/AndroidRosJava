@@ -1,6 +1,8 @@
 package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -191,7 +193,19 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     @Override
     public void onUserNotAnswer(QBRTCSession qbrtcSession, Integer integer) {
-
+        final Activity activity = getActivity();
+        if(activity != null) {
+            AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+            alertDialog.setTitle("Remote Error");
+            alertDialog.setMessage("The remote robot did not answer.");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
     }
 
     @Override

@@ -60,7 +60,7 @@ public class SensorData {
 
     public void setJoystick1(final float x, final float y, final float z) {
         control.joy1.X = round(x, 2);
-        control.joy1.X = round(y, 2);
+        control.joy1.Y = round(y, 2);
         control.joy1.Z = round(z, 2);
         update();
     }
@@ -75,7 +75,7 @@ public class SensorData {
 
     public void setJoystick2(final float x, final float y, final float z, final boolean a, final boolean b, final int heading) {
         control.joy2.X = round(x, 2);
-        control.joy2.X = round(y, 2);
+        control.joy2.Y = round(y, 2);
         control.joy2.Z = round(z, 2);
         control.joy2.A = a;
         control.joy2.B = b;

@@ -99,9 +99,13 @@ public class RemoteControl implements ChildEventListener {
      * @param channel
      * @param json
      */
-    public void send(String channel, JSONObject json, final boolean required) {
+    public void send(String channel, Object json, final boolean asString) {
         //Send to firebase
-        mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json.toString());
+        if(asString){
+            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json.toString());
+        } else {
+            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json);
+        }
     }
 
 

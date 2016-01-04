@@ -23,15 +23,21 @@ import java.text.NumberFormat;
  */
 public class ControlFace extends BaseFace implements JoystickView.JoystickListener {
 
-    public static final String JOY_X = "JoyX";
-    public static final String JOY_Y = "JoyY";
-    public static final String JOY_Z = "JoyZ";
-    public static final String JOY_A = "JoyA";
-    public static final String JOY_B = "JoyB";
-    public static final String HEADING = "Heading";
+    public static final String JOY1_X = "Joy1X";
+    public static final String JOY1_Y = "Joy1Y";
+    public static final String JOY1_Z = "Joy1Z";
+    public static final String JOY1_A = "Joy1A";
+    public static final String JOY1_B = "Joy1B";
+    public static final String JOY1_HEADING = "Heading1";
+    public static final String JOY2_X = "Joy2X";
+    public static final String JOY2_Y = "Joy2Y";
+    public static final String JOY2_Z = "Joy2Z";
+    public static final String JOY2_A = "Joy2A";
+    public static final String JOY2_B = "Joy2B";
+    public static final String JOY2_HEADING = "Heading2";
 
-    /** PubNub message delay in millis */
-    public static final int PUBNUB_MAX_TRANSMIT_SPEED = 200;
+    /** remote message delay in millis */
+    public static final int REMOTE_MAX_TRANSMIT_SPEED = 200;
 
     private final TextView mInputTextView;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
@@ -98,23 +104,25 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         if(joystickView.getId() == R.id.joyStick) {
             final int heading = headingFromPosition(x, y);
             sensorData.setJoystick1(x, y, z, a, b, heading);
-            mJoy1.X = x;
-            mJoy1.Y = y;
-            mJoy1.Z = z;
-            mJoy1.A = a;
-            mJoy1.B = b;
-            mJoy1.heading = heading;
+            //Valus from sensor data are rounded so use those
+            mJoy1.X = sensorData.getControl().joy1.X;
+            mJoy1.Y = sensorData.getControl().joy1.Y;
+            mJoy1.Z = sensorData.getControl().joy1.Z;
+            mJoy1.A = sensorData.getControl().joy1.A;
+            mJoy1.B = sensorData.getControl().joy1.B;
+            mJoy1.heading = sensorData.getControl().joy1.heading;
         }
 
         if(joystickView.getId() == R.id.joyStickLeft) {
             final int heading = headingFromPosition(x, y);
-            sensorData.setJoystick1(x, y, z, a, b, heading);
-            mJoy2.X = x;
-            mJoy2.Y = y;
-            mJoy2.Z = z;
-            mJoy2.A = a;
-            mJoy2.B = b;
-            mJoy2.heading = heading;
+            sensorData.setJoystick2(x, y, z, a, b, heading);
+            //Valus from sensor data are rounded so use those
+            mJoy2.X = sensorData.getControl().joy2.X;
+            mJoy2.Y = sensorData.getControl().joy2.Y;
+            mJoy2.Z = sensorData.getControl().joy2.Z;
+            mJoy2.A = sensorData.getControl().joy2.A;
+            mJoy2.B = sensorData.getControl().joy2.B;
+            mJoy2.heading = sensorData.getControl().joy2.heading;
         }
 
         mRobotInterface.sendSensorData(false);
@@ -138,22 +146,33 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
      * @param force true if data must be sent
      */
     private void updateRemote(boolean force) {
-        if(force || SystemClock.uptimeMillis() - mLastUpdate > PUBNUB_MAX_TRANSMIT_SPEED){
-            mLastUpdate = SystemClock.uptimeMillis();
-            final JSONObject json = new JSONObject();
-            try {
-                json.put(JOY_X, mJoy1.X);
-                json.put(JOY_Y, mJoy1.Y);
-                json.put(JOY_Z, mJoy1.Z);
-                json.put(JOY_A, mJoy1.A);
-                json.put(JOY_B, mJoy1.B);
-                json.put(HEADING, mJoy1.heading);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            //Send to the remote robot
-            if(mChannel != null){
-                RemoteControl.get().send(mChannel, json, force);
+        if(force || SystemClock.uptimeMillis() - mLastUpdate > REMOTE_MAX_TRANSMIT_SPEED){
+            //Make sure channel is set
+            String channel = this.mChannel;
+            if(channel != null){
+                //Mark the time
+                mLastUpdate = SystemClock.uptimeMillis();
+                //Create a json object to send
+                final JSONObject json = new JSONObject();
+                try {
+                    json.put(JOY1_X, Float.toString(mJoy1.X));
+                    json.put(JOY1_Y, Float.toString(mJoy1.Y));
+                    json.put(JOY1_Z, Float.toString(mJoy1.Z));
+                    json.put(JOY1_A, mJoy1.A);
+                    json.put(JOY1_B, mJoy1.B);
+                    json.put(JOY1_HEADING, mJoy1.heading);
+                    json.put(JOY2_X, Float.toString(mJoy2.X));
+                    json.put(JOY2_Y, Float.toString(mJoy2.Y));
+                    json.put(JOY2_Z, Float.toString(mJoy2.Z));
+                    json.put(JOY2_A, mJoy2.A);
+                    json.put(JOY2_B, mJoy2.B);
+                    json.put(JOY2_HEADING, mJoy1.heading);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //Send to the remote robot
+                RemoteControl.get().send(channel, json, true);
             }
         }
     }
