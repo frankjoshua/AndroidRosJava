@@ -49,8 +49,8 @@ public class SensorData {
      * @param decimalPlace the numbers of decimals
      * @return
      */
-    public static float round(float d, int decimalPlace) {
-        return BigDecimal.valueOf(d).setScale(decimalPlace,BigDecimal.ROUND_HALF_UP).floatValue();
+    public static double round(double d, int decimalPlace) {
+        return BigDecimal.valueOf(d).setScale(decimalPlace,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     public void setProximity(boolean proximity) {
@@ -104,17 +104,17 @@ public class SensorData {
                 .setA(sensorData.getControl().joy1.A)
                 .setB(sensorData.getControl().joy1.B)
                 .setHeading(sensorData.getControl().joy1.heading)
-                .setX(sensorData.getControl().joy1.X)
-                .setY(sensorData.getControl().joy1.Y)
-                .setZ(sensorData.getControl().joy1.Z)
+                .setX((float) sensorData.getControl().joy1.X)
+                .setY((float) sensorData.getControl().joy1.Y)
+                .setZ((float) sensorData.getControl().joy1.Z)
                 .build();
         final PocketBotProtocol.Joystick joy2 = joyStickBuilder
                 .setA(sensorData.getControl().joy2.A)
                 .setB(sensorData.getControl().joy2.B)
                 .setHeading(sensorData.getControl().joy2.heading)
-                .setX(sensorData.getControl().joy2.X)
-                .setY(sensorData.getControl().joy2.Y)
-                .setZ(sensorData.getControl().joy2.Z)
+                .setX((float) sensorData.getControl().joy2.X)
+                .setY((float) sensorData.getControl().joy2.Y)
+                .setZ((float) sensorData.getControl().joy2.Z)
                 .build();
         final PocketBotProtocol.Control control = controlBuilder
                 .setJoy1(joy1)
@@ -183,9 +183,9 @@ public class SensorData {
         public boolean A;
         public boolean B;
         public int heading;
-        public float X;
-        public float Y;
-        public float Z;
+        public double X;
+        public double Y;
+        public double Z;
     }
 
     static public class Face {
