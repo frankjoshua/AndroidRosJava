@@ -37,7 +37,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY2_HEADING = "Heading2";
 
     /** remote message delay in millis */
-    public static final int REMOTE_MAX_TRANSMIT_SPEED = 200;
+    public static final int REMOTE_MAX_TRANSMIT_SPEED = 100;
 
     private final TextView mInputTextView;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
@@ -155,15 +155,16 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
                 //Create a json object to send
                 final JSONObject json = new JSONObject();
                 try {
-                    json.put(JOY1_X, Float.toString(mJoy1.X));
-                    json.put(JOY1_Y, Float.toString(mJoy1.Y));
-                    json.put(JOY1_Z, Float.toString(mJoy1.Z));
+                    //Convert floats to strings so they don't get cast as doubles
+                    json.put(JOY1_X, mJoy1.X);
+                    json.put(JOY1_Y, mJoy1.Y);
+                    json.put(JOY1_Z, mJoy1.Z);
                     json.put(JOY1_A, mJoy1.A);
                     json.put(JOY1_B, mJoy1.B);
                     json.put(JOY1_HEADING, mJoy1.heading);
-                    json.put(JOY2_X, Float.toString(mJoy2.X));
-                    json.put(JOY2_Y, Float.toString(mJoy2.Y));
-                    json.put(JOY2_Z, Float.toString(mJoy2.Z));
+                    json.put(JOY2_X, mJoy2.X);
+                    json.put(JOY2_Y, mJoy2.Y);
+                    json.put(JOY2_Z, mJoy2.Z);
                     json.put(JOY2_A, mJoy2.A);
                     json.put(JOY2_B, mJoy2.B);
                     json.put(JOY2_HEADING, mJoy1.heading);
