@@ -158,6 +158,11 @@ public class SensorData {
      * @return
      */
     public static byte[] wrapData(byte[] data) {
+        for(int i = 0; i < data.length; i++){
+            if(data[i] == CommandContract.START_BYTE){
+                throw new UnsupportedOperationException("Bad byte");
+            }
+        }
         //Create message to be sent
         final byte[] message = new byte[data.length + 2];
         //Add start byte
