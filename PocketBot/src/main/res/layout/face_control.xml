@@ -14,7 +14,7 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
-    <com.quickblox.videochat.webrtc.view.QBGLVideoView
+    <com.quickblox.videochat.webrtc.view.RTCGLVideoView
         android:id="@+id/remoteVideoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

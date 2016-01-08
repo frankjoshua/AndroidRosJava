@@ -24,6 +24,7 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
+import com.quickblox.videochat.webrtc.view.RTCGLVideoView;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
@@ -48,7 +49,7 @@ import java.util.Map;
 public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener, RobotSelectionDialog.OnRobotSelectedListener {
 
     private RobotFace mRobotFace;
-    private QBGLVideoView mRemoteVideoView;
+    private RTCGLVideoView mRemoteVideoView;
     private Button mConnectButton;
     private RemoteState mRemoteState = RemoteState.NOT_CONNECTED;
     private QBRTCSession mSession;
@@ -66,14 +67,9 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         final View view = inflater.inflate(R.layout.face_control, null);
         mConnectButton = (Button) view.findViewById(R.id.btnConnect);
         mConnectButton.setOnClickListener(this);
-        mRemoteVideoView = (QBGLVideoView) view.findViewById(R.id.remoteVideoView);
+        mRemoteVideoView = (RTCGLVideoView) view.findViewById(R.id.remoteVideoView);
         mRobotFace = new ControlFace(view);
         return view;
-    }
-
-    @Override
-    public void onReceiveNewSession(QBRTCSession qbrtcSession) {
-
     }
 
     @Override
@@ -123,7 +119,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 userInfo.put("key", "value");
 
                 //Init session
-                mSession = QBRTCClient.getInstance().createNewSessionWithOpponents(opponents, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
+                mSession = QBRTCClient.getInstance(activity).createNewSessionWithOpponents(opponents, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
 
                 //Start call
                 mSession.startCall(userInfo);
@@ -166,17 +162,14 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
     @Override
     public void onRemoteVideoTrackReceive(final QBRTCSession qbrtcSession, final QBRTCVideoTrack qbrtcVideoTrack, final Integer integer) {
-        //Setup Remote video
-        VideoRenderer remoteRenderer = new VideoRenderer(new VideoCallBacks(mRemoteVideoView, QBGLVideoView.Endpoint.REMOTE));
-        qbrtcVideoTrack.addRenderer(remoteRenderer);
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                //Setup Remote video
+                TelepresenceFaceFragment.fillVideoView(mRemoteVideoView, qbrtcVideoTrack, true);
                 mRemoteVideoView.setVisibility(View.VISIBLE);
-                mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
             }
-        });
-
+        });;
     }
 
     @Override

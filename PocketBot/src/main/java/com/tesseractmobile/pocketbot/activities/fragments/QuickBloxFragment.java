@@ -19,11 +19,15 @@ import com.quickblox.core.QBEntityCallbackImpl;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
-import com.quickblox.videochat.webrtc.QBRTCException;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
-import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
+import com.quickblox.videochat.webrtc.QBSignalingSpec;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCSessionConnectionCallbacks;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCSignalingCallback;
+import com.quickblox.videochat.webrtc.exception.QBRTCException;
+import com.quickblox.videochat.webrtc.exception.QBRTCSignalException;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
@@ -33,7 +37,7 @@ import java.util.Map;
 /**
  * Created by josh on 11/1/2015.
  */
-abstract public class QuickBloxFragment extends FaceFragment implements QBRTCClientSessionCallbacks, QBRTCClientConnectionCallbacks, QBRTCClientVideoTracksCallbacks {
+abstract public class QuickBloxFragment extends FaceFragment implements QBRTCClientSessionCallbacks, QBRTCClientVideoTracksCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback {
 
     private QBChatService chatService;
 
@@ -67,7 +71,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle bundle) {
-                PocketBotSettings.setQuickBloxId(getActivity(), session.getUserId());
+                PocketBotSettings.setQuickBloxId(activity, session.getUserId());
                 setUpQB(session, user, activity);
             }
 
@@ -84,7 +88,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     private void signUpUser(final QBUser user) {
-        QBAuth.createSession(new QBEntityCallbackImpl<QBSession>(){
+        QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
 
             @Override
             public void onError(List<String> errors) {
@@ -101,7 +105,8 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
                     @Override
                     public void onError(List<String> errors) {
-                        error(errors.toString());;
+                        error(errors.toString());
+                        ;
                     }
                 });
             }
@@ -109,7 +114,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     private void error(String s) {
-        Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
+        showDialog(s);
     }
 
     private void setUpQB(final QBSession session, final QBUser user, final Activity activity) {
@@ -118,31 +123,38 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         // INIT CHAT SERVICE
         if (!QBChatService.isInitialized()) {
             QBChatService.init(activity);
+            chatService = QBChatService.getInstance();
         }
 
         // LOG IN CHAT SERVICE
-        chatService = QBChatService.getInstance();
         chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
 
             @Override
             public void onSuccess() {
                 // success
-                QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
-                        .addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
-                            @Override
-                            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-                                if (!createdLocally) {
-                                    QBRTCClient.getInstance().addSignaling((QBWebRTCSignaling) qbSignaling);
-                                }
-                            }
-                        });
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
+                                .addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
+                                    @Override
+                                    public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
+                                        if (!createdLocally) {
+                                            QBRTCClient.getInstance(activity).addSignaling((QBWebRTCSignaling) qbSignaling);
+                                        }
+                                    }
+                                });
 
-                QBRTCClient.getInstance().addSessionCallbacksListener(QuickBloxFragment.this);
-                QBRTCClient.getInstance().addVideoTrackCallbacksListener(QuickBloxFragment.this);
-                QBRTCClient.getInstance().addConnectionCallbacksListener(QuickBloxFragment.this);
+                        QBRTCClient.getInstance(activity).addSessionCallbacksListener(QuickBloxFragment.this);
+                        QBRTCConfig.setMaxOpponentsCount(6);
+                        QBRTCConfig.setDisconnectTime(30);
+                        QBRTCConfig.setAnswerTimeInterval(30l);
+                        QBRTCConfig.setDebugEnabled(true);
+                        QBRTCClient.getInstance(activity).prepareToProcessCalls();
+                        onQBSetup(session, user);
+                    }
+                });
 
-                QBRTCClient.getInstance().prepareToProcessCalls(activity);
-                onQBSetup(session, user);
             }
 
             @Override
@@ -155,9 +167,80 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     abstract void onQBSetup(QBSession session, QBUser user);
 
+    @Override
+    public void onErrorSendingPacket(QBSignalingSpec.QBSignalCMD qbSignalCMD, Integer integer, QBRTCSignalException e) {
+        showDialog("Disconnected!");
+    }
 
     @Override
-    public void onError(QBRTCSession qbrtcSession, QBRTCException e) {
+    public void onSuccessSendingPacket(QBSignalingSpec.QBSignalCMD qbSignalCMD, Integer integer) {
+
+    }
+
+    @Override
+    final public void onReceiveNewSession(QBRTCSession qbrtcSession) {
+        //Listen for video
+        qbrtcSession.addVideoTrackCallbacksListener(QuickBloxFragment.this);
+        qbrtcSession.addSessionCallbacksListener(QuickBloxFragment.this);
+        qbrtcSession.addSignalingCallback(QuickBloxFragment.this);
+        //Answer calls
+        qbrtcSession.acceptCall(qbrtcSession.getUserInfo());
+        showDialog("New Session Received");
+    }
+
+    @Override
+    public void onUserNotAnswer(QBRTCSession qbrtcSession, Integer integer) {
+        showDialog("The remote robot did not answer.");
+    }
+
+    private void showDialog(final String error) {
+        final Activity activity = getActivity();
+        if(activity != null) {
+            AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+            alertDialog.setTitle("Remote Error");
+            alertDialog.setMessage(error);
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
+    }
+
+    @Override
+    public void onCallRejectByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
+        showDialog("Call Rejected");
+    }
+
+    @Override
+    public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer) {
+        showDialog("Received Hang Up From User");
+    }
+
+    @Override
+    public void onSessionClosed(QBRTCSession qbrtcSession) {
+        showDialog("Session Closed");
+    }
+
+    @Override
+    public void onSessionStartClose(QBRTCSession qbrtcSession) {
+
+    }
+
+    @Override
+    public void onLocalVideoTrackReceive(QBRTCSession qbrtcSession, QBRTCVideoTrack qbrtcVideoTrack) {
+
+    }
+
+    @Override
+    public void onCallAcceptByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
+        showDialog("Call Accepted");
+    }
+
+    @Override
+    public void onUserNoActions(QBRTCSession qbrtcSession, Integer integer) {
 
     }
 
@@ -168,7 +251,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     @Override
     public void onConnectedToUser(QBRTCSession qbrtcSession, Integer integer) {
-
+        showDialog("Connected to user");
     }
 
     @Override
@@ -192,44 +275,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     @Override
-    public void onUserNotAnswer(QBRTCSession qbrtcSession, Integer integer) {
-        final Activity activity = getActivity();
-        if(activity != null) {
-            AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-            alertDialog.setTitle("Remote Error");
-            alertDialog.setMessage("The remote robot did not answer.");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-        }
-    }
-
-    @Override
-    public void onCallRejectByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
-
-    }
-
-    @Override
-    public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer) {
-
-    }
-
-    @Override
-    public void onSessionClosed(QBRTCSession qbrtcSession) {
-
-    }
-
-    @Override
-    public void onSessionStartClose(QBRTCSession qbrtcSession) {
-
-    }
-
-    @Override
-    public void onLocalVideoTrackReceive(QBRTCSession qbrtcSession, QBRTCVideoTrack qbrtcVideoTrack) {
-
+    public void onError(QBRTCSession qbrtcSession, QBRTCException e) {
+        showDialog(e.toString());
     }
 }

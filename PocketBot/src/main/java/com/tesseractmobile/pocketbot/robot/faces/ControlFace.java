@@ -35,6 +35,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public static final String JOY2_A = "Joy2A";
     public static final String JOY2_B = "Joy2B";
     public static final String JOY2_HEADING = "Heading2";
+    public static final String BATTERY = "Battery";
 
     /** remote message delay in millis */
     public static final int REMOTE_MAX_TRANSMIT_SPEED = 100;
@@ -57,6 +58,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private SensorData.Joystick mJoy1 = new SensorData.Joystick();
     private SensorData.Joystick mJoy2 = new SensorData.Joystick();
     private MouthView.SpeechCompleteListener mSpeechCompleteListener;
+    private float mBattery;
 
     public ControlFace(final View view){
         numberFormat.setMinimumFractionDigits(2);
@@ -101,6 +103,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     @Override
     public void onPositionChange(final JoystickView joystickView, float x, float y, float z, final boolean a, final boolean b) {
         final SensorData sensorData = mRobotInterface.getSensorData();
+        say("Battery " + Integer.toString(sensorData.getSensor().battery) + "%");
         if(joystickView.getId() == R.id.joyStick) {
             final int heading = headingFromPosition(x, y);
             sensorData.setJoystick1(x, y, z, a, b, heading);
@@ -168,6 +171,9 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
                     json.put(JOY2_A, mJoy2.A);
                     json.put(JOY2_B, mJoy2.B);
                     json.put(JOY2_HEADING, mJoy1.heading);
+                    //Add battery information
+                    final SensorData sensorData = mRobotInterface.getSensorData();
+                    json.put(BATTERY, sensorData.getSensor().battery);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,11 @@ import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
+import com.quickblox.videochat.webrtc.view.RTCGLVideoView;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
@@ -34,7 +37,7 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
 
 
     private RobotFace mRobotFace;
-    private QBGLVideoView mRemoteVideoView;
+    private RTCGLVideoView mRemoteVideoView;
     private TextView mUserId;
     private Handler mHandler = new Handler();
 
@@ -48,18 +51,33 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view;
         view = inflater.inflate(R.layout.face_telepresence, null);
-        mRemoteVideoView = (QBGLVideoView) view.findViewById(R.id.remoteVideoView);
+        mRemoteVideoView = (RTCGLVideoView) view.findViewById(R.id.remoteVideoView);
         mUserId = (TextView) view.findViewById(R.id.tvUserId);
         mRobotFace = new TelePresenceFace(view);
+        final View progressBar = view.findViewById(R.id.pbSignIn);
+        final View btnSignIn = view.findViewById(R.id.sign_in_button);
+        final FragmentActivity activity = getActivity();
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
+                btnSignIn.setVisibility(View.INVISIBLE);
+                ((View.OnClickListener) activity).onClick(view);
+            }
+        });
+        DataStore.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+            @Override
+            public void onAuthComplete() {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnSignIn.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        });
         return view;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        //QBSettings.getInstance().fastConfigInit("92", "wJHdOcQSxXQGWx5", "BTFsj7Rtt27DAmT"); //Test
-
     }
 
     @Override
@@ -87,37 +105,47 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
         });
     }
 
-    @Override
-    public void onReceiveNewSession(final QBRTCSession qbrtcSession) {
-        // Set userInfo
-        // User can set any string key and value in user info
-        // Then retrieve this data from sessions which is returned in callbacks
-        // and parse them as he wish
-        final Map<String,String> userInfo = new HashMap<String,String>();
-        userInfo.put("Key", "Value");
-
-        // Accept incoming call
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                qbrtcSession.acceptCall(userInfo);
-            }
-        });
-
-    }
+//    @Override
+//    public void onReceiveNewSession(final QBRTCSession qbrtcSession) {
+//        // Set userInfo
+//        // User can set any string key and value in user info
+//        // Then retrieve this data from sessions which is returned in callbacks
+//        // and parse them as he wish
+//        final Map<String,String> userInfo = new HashMap<String,String>();
+//        userInfo.put("Key", "Value");
+//
+//        // Accept incoming call
+//        final FragmentActivity activity = getActivity();
+//        if(activity != null){
+//            activity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    qbrtcSession.acceptCall(userInfo);
+//                }
+//            });
+//        }
+//
+//    }
 
     @Override
     public void onRemoteVideoTrackReceive(final QBRTCSession qbrtcSession, final QBRTCVideoTrack qbrtcVideoTrack, final Integer integer) {
-        //Setup Remote video
-        VideoRenderer remoteRenderer = new VideoRenderer(new VideoCallBacks(mRemoteVideoView, QBGLVideoView.Endpoint.REMOTE));
-        qbrtcVideoTrack.addRenderer(remoteRenderer);
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                //Setup Remote video
+                fillVideoView(mRemoteVideoView, qbrtcVideoTrack, true);
                 mRemoteVideoView.setVisibility(View.VISIBLE);
-                mRemoteVideoView.setVideoTrack(qbrtcVideoTrack, QBGLVideoView.Endpoint.REMOTE);
             }
         });
+
+        throw new UnsupportedOperationException();
+    }
+
+    static public void fillVideoView(RTCGLVideoView videoView, QBRTCVideoTrack videoTrack, boolean remoteRenderer) {
+        videoTrack.addRenderer(new VideoRenderer(remoteRenderer ?
+                videoView.obtainVideoRenderer(RTCGLVideoView.RendererSurface.MAIN) :
+                videoView.obtainVideoRenderer(RTCGLVideoView.RendererSurface.SECOND)));
     }
 
     @Override
