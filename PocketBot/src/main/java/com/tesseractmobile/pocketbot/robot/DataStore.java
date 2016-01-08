@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.robot;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
@@ -18,7 +19,8 @@ import java.util.ArrayList;
 public class DataStore{
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
-    public static final String FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/";
+    public static final String API_VERSION = "betaV1";
+    public static final String FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/" + API_VERSION + "/";
     public static final String AUTH_DATA = "auth_data";
     static private DataStore instance;
 
@@ -73,6 +75,7 @@ public class DataStore{
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
+                Log.e("DataStore", "Token: " + token);
                 throw new UnsupportedOperationException(firebaseError.toString());
             }
         });

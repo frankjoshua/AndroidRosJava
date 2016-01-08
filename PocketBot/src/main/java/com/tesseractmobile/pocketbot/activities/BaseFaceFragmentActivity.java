@@ -1,7 +1,10 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -11,6 +14,7 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -66,7 +70,7 @@ import java.io.IOException;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceFragmentActivity extends FragmentActivity implements  SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class BaseFaceFragmentActivity extends FragmentActivity implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
@@ -111,6 +115,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
      * sign-in. */
     private ConnectionResult mGoogleConnectionResult;
     private SignInButton mSignInButton;
+    private BroadcastReceiver mBatteryReceiver;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -262,7 +267,21 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
         //Listen to proximity sensor
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_UI);
+        //Listen for battery status
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        mBatteryReceiver = new BroadcastReceiver(){
 
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //information about battery status
+                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                float batteryPct = level / (float)scale;
+                SensorData sensorData = mRobotInterFace.getSensorData();
+                sensorData.getSensor().battery = (int) (batteryPct * 100);
+            }
+        };
+        registerReceiver(mBatteryReceiver, filter);
     }
 
     @Override
@@ -270,6 +289,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements  Senso
         super.onPause();
         //Stop listening for orientation
         mSensorManager.unregisterListener(this);
+        //Stop listening for battery status
+        unregisterReceiver(mBatteryReceiver);
     }
 
     /**

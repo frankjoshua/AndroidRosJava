@@ -199,6 +199,7 @@ public class SensorData {
         public int heading;
         public boolean proximity;
         public SensorData.Gps gps = new SensorData.Gps();
+        public int battery;
     }
 
     static public class Control {

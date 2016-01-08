@@ -79,9 +79,9 @@ public class RemoteControl implements ChildEventListener {
         //Set the ID
         this.id = id;
         //Listen for messages from firebase
-        mFirebaseListen = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CONTROL).child(id);
+        mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
         mFirebaseListen.child(CONTROL).addChildEventListener(this);
-        mFirebaseTransmit = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CONTROL);
+        mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
     }
 
     /**

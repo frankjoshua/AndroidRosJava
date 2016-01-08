@@ -114,7 +114,9 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
                 usbSerialPort.open(connection);
                 usbSerialPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                //Just return and try again later
+                mConnected.set(false);
+                return;
             }
             mSerialIoManager = new SerialInputOutputManager(usbSerialPort, this);
             mExecutor.submit(mSerialIoManager);

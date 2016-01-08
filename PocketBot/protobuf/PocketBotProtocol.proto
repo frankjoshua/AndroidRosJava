@@ -7,21 +7,21 @@ message PocketBotMessage {
 message Face {
   //-1 == no face, faceId increases when new face is detected
   required sint32 id = 1;
-  //0.0 == center, 1.0 == left of robot, -1.0 == right of robot
+  //1.0 == center, 2.0 == left of robot, 0.0 == right of robot
   required float X = 2;
-  //0.0 == center, 1.0 == below robot, -1.0 == above robot
+  //1.0 == center, 2.0 == below robot, 0.0 == above robot
   required float Y = 3;
   //1.0 == close, 0.0 == far, 0.5 == medium
   required float Z = 4;
 }
 
 message Sensor {
-	//if something within 8cm == true
-	required bool proximity = 1;
-	//Compass heading in degrees 0-359
-	required int32 heading = 2;
-	//Current GPS position
-	required Gps gps = 3;
+  //if something within 8cm == true
+  required bool proximity = 1;
+  //Compass heading in degrees 0-359
+  required int32 heading = 2;
+  //Current GPS position
+  required Gps gps = 3;
 }
 
 message Control {
@@ -46,6 +46,7 @@ message Joystick {
   required int32 heading = 6;
 }
 
+//Not currently enabled
 message Gps {
   required float lat = 1;
   required float lon = 2;
