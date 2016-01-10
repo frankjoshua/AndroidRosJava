@@ -103,11 +103,23 @@ public class DataStore{
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Listen for completetion of user sign in
+     * @param onAuthCompleteListener
+     */
     public void registerOnAuthCompleteListener(OnAuthCompleteListener onAuthCompleteListener) {
         mOnAuthCompleteListeners.add(onAuthCompleteListener);
         if(mAuthData != null){
             onAuthCompleteListener.onAuthComplete();
         }
+    }
+
+    /**
+     * Stop listening to user sign ins
+     * @param onAuthCompleteListener
+     */
+    public void unregisterOnAuthCompleteListener(OnAuthCompleteListener onAuthCompleteListener) {
+        mOnAuthCompleteListeners.remove(onAuthCompleteListener);
     }
 
     public interface OnAuthCompleteListener {

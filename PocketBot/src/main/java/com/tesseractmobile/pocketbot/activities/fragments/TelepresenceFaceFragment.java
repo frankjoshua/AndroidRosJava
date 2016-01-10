@@ -105,28 +105,6 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
         });
     }
 
-//    @Override
-//    public void onReceiveNewSession(final QBRTCSession qbrtcSession) {
-//        // Set userInfo
-//        // User can set any string key and value in user info
-//        // Then retrieve this data from sessions which is returned in callbacks
-//        // and parse them as he wish
-//        final Map<String,String> userInfo = new HashMap<String,String>();
-//        userInfo.put("Key", "Value");
-//
-//        // Accept incoming call
-//        final FragmentActivity activity = getActivity();
-//        if(activity != null){
-//            activity.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    qbrtcSession.acceptCall(userInfo);
-//                }
-//            });
-//        }
-//
-//    }
-
     @Override
     public void onRemoteVideoTrackReceive(final QBRTCSession qbrtcSession, final QBRTCVideoTrack qbrtcVideoTrack, final Integer integer) {
 

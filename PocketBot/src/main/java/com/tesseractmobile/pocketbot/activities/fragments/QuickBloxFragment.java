@@ -18,6 +18,7 @@ import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
@@ -32,6 +33,9 @@ import com.quickblox.videochat.webrtc.exception.QBRTCException;
 import com.quickblox.videochat.webrtc.exception.QBRTCSignalException;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.DataStore;
+
+import org.jivesoftware.smack.SmackException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,25 +44,28 @@ import java.util.Map;
 /**
  * Created by josh on 11/1/2015.
  */
-abstract public class QuickBloxFragment extends FaceFragment implements QBRTCClientSessionCallbacks, QBRTCClientVideoTracksCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback {
+abstract public class QuickBloxFragment extends FaceFragment implements QBRTCClientSessionCallbacks, QBRTCClientVideoTracksCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback, DataStore.OnAuthCompleteListener {
 
     private QBChatService chatService;
     private QBRTCSession mCurrentRTCSession;
     private Handler mHandler = new Handler();
 
     @Override
-    public void onAttach(final Context context) {
-        super.onAttach(context);
+    public void onStart() {
+        super.onStart();
+        DataStore.get().registerOnAuthCompleteListener(this);
+    }
 
-        //Check if signed in
-        if(PocketBotSettings.isSignedIn(context)){
-
-        } else {
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        DataStore.get().unregisterOnAuthCompleteListener(this);
+        if(mCurrentRTCSession != null){
+            mCurrentRTCSession.hangUp(mCurrentRTCSession.getUserInfo());
+            mCurrentRTCSession.removeSessionnCallbacksListener(this);
+            mCurrentRTCSession.removeVideoTrackCallbacksListener(this);
+            mCurrentRTCSession.removeSignalingCallback(this);
         }
-
-        //Sign in user
-        signIn(context);
     }
 
     protected void signIn(final Context context) {
@@ -150,34 +157,42 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
             @Override
             public void onSuccess() {
-                //Set up WebRTC Signaling
-                QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
-                        .addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
-                            @Override
-                            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-                                if (!createdLocally) {
-                                    QBRTCClient.getInstance(context).addSignaling((QBWebRTCSignaling) qbSignaling);
-                                }
-                            }
-                        });
-
-                QBRTCClient.getInstance(context).addSessionCallbacksListener(QuickBloxFragment.this);
-                QBRTCConfig.setMaxOpponentsCount(6);
-                QBRTCConfig.setDisconnectTime(30);
-                QBRTCConfig.setAnswerTimeInterval(30l);
-                QBRTCConfig.setDebugEnabled(true);
-                //Ready for calls
-                QBRTCClient.getInstance(context).prepareToProcessCalls();
-                //Let extended classes know that calls are ready
-                onQBSetup(session, user);
+                postLogin(context, session, user);
             }
 
             @Override
             public void onError(List errors) {
-                //error
-                error(errors.toString());
+                if (errors.get(0).equals("You have already logged in chat")) {
+                    postLogin(context, session, user);
+                } else {
+                    //error
+                    error(errors.toString());
+                }
             }
         });
+    }
+
+    private void postLogin(final Context context, QBSession session, QBUser user) {
+        //Set up WebRTC Signaling
+        QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
+                .addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
+                    @Override
+                    public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
+                        if (!createdLocally) {
+                            QBRTCClient.getInstance(context).addSignaling((QBWebRTCSignaling) qbSignaling);
+                        }
+                    }
+                });
+
+        QBRTCClient.getInstance(context).addSessionCallbacksListener(QuickBloxFragment.this);
+        QBRTCConfig.setMaxOpponentsCount(6);
+        QBRTCConfig.setDisconnectTime(30);
+        QBRTCConfig.setAnswerTimeInterval(30l);
+        QBRTCConfig.setDebugEnabled(true);
+        //Ready for calls
+        QBRTCClient.getInstance(context).prepareToProcessCalls();
+        //Let extended classes know that calls are ready
+        onQBSetup(session, user);
     }
 
     abstract void onQBSetup(QBSession session, QBUser user);
@@ -230,16 +245,21 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     private void showDialog(final String error) {
         final Activity activity = getActivity();
         if(activity != null) {
-            AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-            alertDialog.setTitle("Remote Error");
-            alertDialog.setMessage(error);
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+                    alertDialog.setTitle("Remote Error");
+                    alertDialog.setMessage(error);
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
+            });
         }
     }
 
@@ -250,7 +270,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer) {
-        //showDialog("Received Hang Up From User");
+        //showDialog("The remote robot disconnected");
     }
 
     @Override
@@ -311,5 +331,10 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     @Override
     public void onError(QBRTCSession qbrtcSession, QBRTCException e) {
         showDialog(e.toString());
+    }
+
+    @Override
+    public void onAuthComplete() {
+        signIn(getContext());
     }
 }

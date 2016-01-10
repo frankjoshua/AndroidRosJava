@@ -12,6 +12,7 @@ import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
 import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
@@ -42,6 +43,30 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.robot_face, null);
         mRobotFace = new EfimFace(view);
+        final View btnSignIn = view.findViewById(R.id.sign_in_button);
+        final FragmentActivity activity = getActivity();
+        final View progressBar = view.findViewById(R.id.pbSignIn);
+        btnSignIn.setVisibility(View.VISIBLE);
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
+                btnSignIn.setVisibility(View.INVISIBLE);
+                ((View.OnClickListener) activity).onClick(view);
+            }
+        });
+        DataStore.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+            @Override
+            public void onAuthComplete() {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnSignIn.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        });
         return view;
     }
 

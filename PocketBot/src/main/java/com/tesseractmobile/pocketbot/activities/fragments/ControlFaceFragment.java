@@ -108,65 +108,29 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         //Save UserId
         PocketBotSettings.setLastRobotId(activity, remoteRobotId);
 
-        //Update state
-        setRemoteState(RemoteState.CONNECTED);
-
-//        //Connect to QuickBlox
-//        QBUser user = new QBUser(PocketBotSettings.getRobotId(activity), PocketBotSettings.getPassword(activity));
-//        QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
-//            @Override
-//            public void onSuccess(QBSession result, Bundle params) {
-//                //Initiate opponents list
-//                List<Integer> opponents = new ArrayList<Integer>();
-//                opponents.add(remoteNumber); //12345 - QBUser ID
-//
-//                //Set user information
-//                // User can set any string key and value in user info
-//                // Then retrieve this data from sessions which is returned in callbacks
-//                // and parse them as he wish
-//                Map<String, String> userInfo = new HashMap<>();
-//                userInfo.put("key", "value");
-//
-//                //Init session
-//                mSession = QBRTCClient.getInstance(activity).createNewSessionWithOpponents(opponents, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
-//
-//                //Start call
-//                mSession.startCall(userInfo);
-//
-//                //Connect to PubNub
-//                ((ControlFace) mRobotFace).setRemoteRobotId(remoteRobotId);
-//
-//                //Save UserId
-//                PocketBotSettings.setLastRobotId(activity, remoteRobotId);
-//
-//                //Update state
-//                setRemoteState(RemoteState.CONNECTED);
-//            }
-//
-//            @Override
-//            public void onError(List<String> errors) {
-//                throw new UnsupportedOperationException(errors.toString());
-//            }
-//        });
-
     }
 
-    private void setRemoteState(RemoteState newState) {
+    private void setRemoteState(final RemoteState newState) {
         this.mRemoteState = newState;
-        switch (mRemoteState){
-            case CONNECTING:
-                mConnectButton.setEnabled(false);
-                mConnectButton.setText("Connecting");
-                break;
-            case CONNECTED:
-                mConnectButton.setEnabled(true);
-                mConnectButton.setText("Disconnect");
-                break;
-            case NOT_CONNECTED:
-                mConnectButton.setEnabled(true);
-                mConnectButton.setText("Connect");
-                break;
-        }
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                switch (newState){
+                    case CONNECTING:
+                        mConnectButton.setEnabled(false);
+                        mConnectButton.setText("Connecting");
+                        break;
+                    case CONNECTED:
+                        mConnectButton.setEnabled(true);
+                        mConnectButton.setText("Disconnect");
+                        break;
+                    case NOT_CONNECTED:
+                        mConnectButton.setEnabled(true);
+                        mConnectButton.setText("Connect");
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -187,11 +151,19 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     }
 
     @Override
+    public void onCallAcceptByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
+        super.onCallAcceptByUser(qbrtcSession, integer, map);
+        //Update state
+        setRemoteState(RemoteState.CONNECTED);
+    }
+
+    @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 mRemoteVideoView.setVisibility(View.INVISIBLE);
+                setRemoteState(RemoteState.NOT_CONNECTED);
             }
         });
     }

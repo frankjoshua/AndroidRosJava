@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * Created by josh on 12/1/2015.
  */
-public class RemoteControl implements ChildEventListener {
+public class RemoteControl implements ChildEventListener, DataStore.OnAuthCompleteListener {
     public static final String CONTROL = "control";
     public static final String DATA = "data";
     //private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
@@ -71,17 +71,15 @@ public class RemoteControl implements ChildEventListener {
      */
     public void setId(String id) {
         if(this.id != null){
-            //Stop listening to the old channel
-           // pubnub.unsubscribe(this.id);
             //Stop listening for firebase messages
             mFirebaseListen.removeEventListener(this);
+            //Stop listening for auth registration
+            DataStore.get().unregisterOnAuthCompleteListener(this);
         }
         //Set the ID
         this.id = id;
-        //Listen for messages from firebase
-        mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
-        mFirebaseListen.child(CONTROL).addChildEventListener(this);
-        mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
+        //Listen for auth registration
+        DataStore.get().registerOnAuthCompleteListener(this);
     }
 
     /**
@@ -135,4 +133,11 @@ public class RemoteControl implements ChildEventListener {
     }
 
 
+    @Override
+    public void onAuthComplete() {
+        //Listen for messages from firebase
+        mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
+        mFirebaseListen.child(CONTROL).addChildEventListener(this);
+        mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
+    }
 }
