@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -17,7 +19,7 @@ import android.view.View;
 public class JoystickView extends View {
 
     //Main circle
-    private TouchCircle mainCircle;
+    private TouchPad mainPad;
     //Center Circle
     private TouchCircle touchCircle;
     //Toggle Circle
@@ -34,7 +36,7 @@ public class JoystickView extends View {
 
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mainCircle = new TouchCircle(Color.parseColor("#bcb9e5"), 150);
+        mainPad = new TouchPad(Color.parseColor("#bcb9e5"), 150);
         touchCircle = new TouchCircle(Color.parseColor("#e59100"), 200);
         toggleCircle = new TouchCircle(Color.BLUE, 100);
     }
@@ -43,15 +45,15 @@ public class JoystickView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         final int size = Math.min(w, h) / 10;
-        mainCircle.set(w / 2, h / 2);
+        mainPad.set(w / 2, h / 2);
         touchCircle.set(w / 2, h / 2);
 
         toggleCircle.set(size, h - size);
 
         toggleCircle.setSize(size);
-        mainCircle.setSize(Math.min(w, h) / 2);
+        mainPad.setSize(Math.min(w, h) / 2);
 
-        touchCircle.setSize(size);
+        touchCircle.setSize(Math.round(size * 1.5f));
 
         int[] circleColors = new int[]{
                 Color.parseColor("#bcb9e5"),
@@ -59,7 +61,7 @@ public class JoystickView extends View {
                 Color.parseColor("#b3a2c1")
         };
         final Shader circleShader = new LinearGradient(0, 0, w, h, circleColors, null, Shader.TileMode.CLAMP);
-        mainCircle.setShader(circleShader);
+        mainPad.setShader(circleShader);
 
         int[] touchColors = new int[]{
                 Color.parseColor("#e59100"),
@@ -73,7 +75,7 @@ public class JoystickView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mainCircle.draw(canvas);
+        mainPad.draw(canvas);
         toggleCircle.draw(canvas);
         touchCircle.draw(canvas);
     }
@@ -90,7 +92,7 @@ public class JoystickView extends View {
             setHasFocus(true);
         } else if (event.getAction() == MotionEvent.ACTION_UP){
             if(!mSticky) {
-                touchCircle.set(mainCircle.point.x, mainCircle.point.y);
+                touchCircle.set(mainPad.point.x, mainPad.point.y);
                 update();
                 setHasFocus(false);
             }
@@ -180,5 +182,32 @@ public class JoystickView extends View {
          * @param hasFocus
          */
         void onFocusChange(final JoystickView joystickView, final boolean hasFocus);
+    }
+
+    private class TouchPad {
+        public Paint paint = new Paint();
+        public RectF rect = new RectF();
+        public Point point = new Point();
+
+        public TouchPad(final int color, final int alpha) {
+            paint.setColor(color);
+            paint.setAlpha(alpha);
+        }
+
+        public void set(final int x, final int y) {
+            point.set(x, y);
+        }
+
+        public void setSize(final int size) {
+            rect.set(point.x - size, point.y - size, point.x + size, point.y + size);
+        }
+
+        public void setShader(final Shader circleShader) {
+            paint.setShader(circleShader);
+        }
+
+        public void draw(final Canvas canvas) {
+            canvas.drawRoundRect(rect, rect.width() / 10, rect.width() / 10, paint);
+        }
     }
 }
