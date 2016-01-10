@@ -175,7 +175,7 @@ public class UsbConnectionService extends BodyService implements Runnable, BodyI
      */
     protected void startThread() {
         lastCommandTime = System.currentTimeMillis();
-        final Thread thread = new Thread(null, this, "DemoKit");
+        final Thread thread = new Thread(null, this, "UsbSerialService");
         thread.start();
     }
 

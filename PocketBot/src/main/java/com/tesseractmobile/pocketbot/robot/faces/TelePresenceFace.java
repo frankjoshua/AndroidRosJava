@@ -68,7 +68,7 @@ public class TelePresenceFace extends BaseFace {
             final boolean b2 = (boolean) jsonObject.getBoolean(ControlFace.JOY2_B);
             final int heading2 = (int) jsonObject.getInt(ControlFace.JOY2_HEADING);
             sensorData.setJoystick2(x2, y2, z2, a2, b2, heading2);
-            mRobotInterface.sendSensorData(false);
+            mRobotInterface.sendSensorData(true);
             //Show joystick data in text view
             final String data =  "JoyX: " + numberFormat.format(x) + " JoyY: " + numberFormat.format(y);// + " JoyZ: " + numberFormat.format(z);
             mHandler.post(new Runnable() {

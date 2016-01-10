@@ -97,10 +97,11 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     }
 
     @Override
-    public void sendSensorData(boolean required) {
+    public void sendSensorData(final boolean required) {
+        Log.d("PocketBot",  "sendSensorData Required: " + required);
         final long uptime = SystemClock.uptimeMillis();
         if(required || uptime >= mLastSensorTransmision + mSensorDelay) {
-            //Log.d("PocketBot", mSensorDelay + " Data sent to body " + (uptime - mLastSensorTransmision));
+            Log.d("PocketBot", mSensorDelay + " Data sent to body " + (uptime - mLastSensorTransmision));
             mLastSensorTransmision = uptime;
             if(mBodyInterface.isConnected()){
                 final PocketBotProtocol.PocketBotMessage data = SensorData.toPocketBotMessage(mSensorData);
@@ -109,7 +110,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
 
             }
         } else {
-            //Log.d("PocketBot", mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
+            Log.d("PocketBot", mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
         }
     }
 
