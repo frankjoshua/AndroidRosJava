@@ -139,7 +139,6 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
             }
         });
 
-        throw new UnsupportedOperationException();
     }
 
     static public void fillVideoView(RTCGLVideoView videoView, QBRTCVideoTrack videoTrack, boolean remoteRenderer) {

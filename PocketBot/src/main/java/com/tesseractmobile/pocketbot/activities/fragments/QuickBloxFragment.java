@@ -2,8 +2,10 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -31,6 +33,7 @@ import com.quickblox.videochat.webrtc.exception.QBRTCSignalException;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,121 +43,133 @@ import java.util.Map;
 abstract public class QuickBloxFragment extends FaceFragment implements QBRTCClientSessionCallbacks, QBRTCClientVideoTracksCallbacks, QBRTCSessionConnectionCallbacks, QBRTCSignalingCallback {
 
     private QBChatService chatService;
+    private QBRTCSession mCurrentRTCSession;
+    private Handler mHandler = new Handler();
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
 
         //Check if signed in
-        if(PocketBotSettings.isSignedIn(activity)){
+        if(PocketBotSettings.isSignedIn(context)){
 
         } else {
 
         }
 
         //Sign in user
-        signIn(activity);
+        signIn(context);
     }
 
-    protected void signIn(final Activity activity) {
-        final String login = PocketBotSettings.getRobotId(activity);
-        final String password = PocketBotSettings.getPassword(activity);
-
-        if(TextUtils.isEmpty(login) || TextUtils.isEmpty(password)){
-            //Launch sign in fragment
-            FragmentTransaction fragmentTransaction = ((FragmentActivity) activity).getSupportFragmentManager().beginTransaction();
-            new SignInDialog().show(fragmentTransaction, "SIGN_IN_FRAGMENT");
-            return;
-        }
-
+    protected void signIn(final Context context) {
+        //Get the username and password
+        final String login = PocketBotSettings.getRobotId(context);
+        final String password = PocketBotSettings.getPassword(context);
+        //Create a user
         final QBUser user = new QBUser(login, password);
-        QBAuth.createSession(login, password, new QBEntityCallbackImpl<QBSession>() {
+        //Create a session
+        QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle bundle) {
-                PocketBotSettings.setQuickBloxId(activity, session.getUserId());
-                setUpQB(session, user, activity);
+                //Save the id so other robots can use it to call
+                PocketBotSettings.setQuickBloxId(context, session.getUserId());
+
+                //After signin continue to set up call
+                setUpQB(session, user, context);
             }
 
             @Override
             public void onError(List<String> errors) {
                 //error
                 if (errors.get(0).equals("Unauthorized")) {
-                    signUpUser(user);
+                    //User has no account, so sign them up
+                    signUpUser(user, context);
                 } else {
+                    //Unhandled Error
                     error(errors.toString());
                 }
             }
         });
     }
 
-    private void signUpUser(final QBUser user) {
+    /**
+     * Creates a new user account
+     * @param user
+     */
+    private void signUpUser(final QBUser user, final Context context) {
+        //Create a read only aplication session to sign up the user
         QBAuth.createSession(new QBEntityCallbackImpl<QBSession>() {
 
             @Override
-            public void onError(List<String> errors) {
-                error(errors.toString());
-            }
-
-            @Override
             public void onSuccess(final QBSession session, Bundle params) {
+                //User the Auth connection to sign up the user
                 QBUsers.signUp(user, new QBEntityCallbackImpl<QBUser>() {
                     @Override
                     public void onSuccess(QBUser result, Bundle params) {
-                        setUpQB(session, user, getActivity());
+                        //After signin continue to set up call
+                        //setUpQB(session, user, context);
+                        signIn(context);
                     }
 
                     @Override
                     public void onError(List<String> errors) {
+                        //Unhandled Error
                         error(errors.toString());
-                        ;
                     }
                 });
             }
+
+            @Override
+            public void onError(List<String> errors) {
+                //Unhandled Error
+                error(errors.toString());
+            }
+
         });
     }
 
+    /**
+     * Shows a dialog with the error string
+     * @param s
+     */
     private void error(String s) {
         showDialog(s);
     }
 
-    private void setUpQB(final QBSession session, final QBUser user, final Activity activity) {
+    private void setUpQB(final QBSession session, final QBUser user, final Context context) {
+        //Set user ID (could be redundant)
         user.setId(session.getUserId());
 
         // INIT CHAT SERVICE
         if (!QBChatService.isInitialized()) {
-            QBChatService.init(activity);
-            chatService = QBChatService.getInstance();
+            QBChatService.init(context);
         }
 
-        // LOG IN CHAT SERVICE
-        chatService.login(user, new QBEntityCallbackImpl<QBUser>() {
+        //Chat service is used to start WebRTC signaling
+        QBChatService.getInstance().login(user, new QBEntityCallbackImpl<QBUser>() {
 
             @Override
             public void onSuccess() {
-                // success
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
-                                .addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
-                                    @Override
-                                    public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-                                        if (!createdLocally) {
-                                            QBRTCClient.getInstance(activity).addSignaling((QBWebRTCSignaling) qbSignaling);
-                                        }
-                                    }
-                                });
+                //Set up WebRTC Signaling
+                QBChatService.getInstance().getVideoChatWebRTCSignalingManager()
+                        .addSignalingManagerListener(new QBVideoChatSignalingManagerListener() {
+                            @Override
+                            public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
+                                if (!createdLocally) {
+                                    QBRTCClient.getInstance(context).addSignaling((QBWebRTCSignaling) qbSignaling);
+                                }
+                            }
+                        });
 
-                        QBRTCClient.getInstance(activity).addSessionCallbacksListener(QuickBloxFragment.this);
-                        QBRTCConfig.setMaxOpponentsCount(6);
-                        QBRTCConfig.setDisconnectTime(30);
-                        QBRTCConfig.setAnswerTimeInterval(30l);
-                        QBRTCConfig.setDebugEnabled(true);
-                        QBRTCClient.getInstance(activity).prepareToProcessCalls();
-                        onQBSetup(session, user);
-                    }
-                });
-
+                QBRTCClient.getInstance(context).addSessionCallbacksListener(QuickBloxFragment.this);
+                QBRTCConfig.setMaxOpponentsCount(6);
+                QBRTCConfig.setDisconnectTime(30);
+                QBRTCConfig.setAnswerTimeInterval(30l);
+                QBRTCConfig.setDebugEnabled(true);
+                //Ready for calls
+                QBRTCClient.getInstance(context).prepareToProcessCalls();
+                //Let extended classes know that calls are ready
+                onQBSetup(session, user);
             }
 
             @Override
@@ -178,14 +193,33 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     @Override
-    final public void onReceiveNewSession(QBRTCSession qbrtcSession) {
+    final public void onReceiveNewSession(final QBRTCSession qbrtcSession) {
+        newSessionCreated(qbrtcSession);
+
+        //Answer calls
+        final Map<String,String> userInfo = new HashMap<String,String>();
+        userInfo.put("Key", "Value");
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                qbrtcSession.acceptCall(userInfo);
+            }
+        });
+
+        //showDialog("New Session Received");
+    }
+
+    /**
+     * This must be called when a new session is created
+     * @param qbrtcSession
+     */
+    protected void newSessionCreated(QBRTCSession qbrtcSession) {
+        //Save the current session
+        mCurrentRTCSession = qbrtcSession;
         //Listen for video
         qbrtcSession.addVideoTrackCallbacksListener(QuickBloxFragment.this);
         qbrtcSession.addSessionCallbacksListener(QuickBloxFragment.this);
         qbrtcSession.addSignalingCallback(QuickBloxFragment.this);
-        //Answer calls
-        qbrtcSession.acceptCall(qbrtcSession.getUserInfo());
-        showDialog("New Session Received");
     }
 
     @Override
@@ -216,12 +250,12 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     @Override
     public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer) {
-        showDialog("Received Hang Up From User");
+        //showDialog("Received Hang Up From User");
     }
 
     @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
-        showDialog("Session Closed");
+        //showDialog("Session Closed");
     }
 
     @Override
@@ -236,7 +270,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     @Override
     public void onCallAcceptByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
-        showDialog("Call Accepted");
+        //showDialog("Call Accepted");
     }
 
     @Override
@@ -251,7 +285,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
 
     @Override
     public void onConnectedToUser(QBRTCSession qbrtcSession, Integer integer) {
-        showDialog("Connected to user");
+        //showDialog("Connected to user");
     }
 
     @Override

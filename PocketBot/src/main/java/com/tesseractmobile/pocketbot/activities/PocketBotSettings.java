@@ -3,11 +3,9 @@ package com.tesseractmobile.pocketbot.activities;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.support.v4.app.FragmentActivity;
 
 import com.tesseractmobile.pocketbot.BuildConfig;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
-import com.tesseractmobile.pocketbot.service.BluetoothClassicService;
 
 import java.util.UUID;
 
@@ -27,7 +25,7 @@ public class PocketBotSettings {
     public static final String USER_NAME = "user_name";
     public static final String PASSWORD = "password";
     public static final String SIGNED_IN = "signed_in";
-    public static final String USER_ID = "user_id";
+    public static final String LAST_ROBOT_ID = "user_id";
     public static final String API_AI_KEY = "api_ai_key";
     public static final String API_AI_DEFAULT_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";//"1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     public static final String API_AI_TOKEN = "api_ai_token";
@@ -179,12 +177,18 @@ public class PocketBotSettings {
      * @param context
      * @return
      */
-    public static String getLastUserId(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(USER_ID, "");
+    public static String getLastRobotId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(LAST_ROBOT_ID, "");
     }
 
-    public static boolean setLastUserId(Context context, String userId) {
-        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(USER_ID, userId).commit();
+    /**
+     * Save the UUID of the last robot connected
+     * @param context
+     * @param userId
+     * @return
+     */
+    public static boolean setLastRobotId(Context context, String userId) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putString(LAST_ROBOT_ID, userId).commit();
     }
 
     public static String getRobotId(Context context) {

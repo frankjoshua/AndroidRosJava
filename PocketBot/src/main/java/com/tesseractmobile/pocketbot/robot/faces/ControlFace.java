@@ -43,7 +43,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private final TextView mInputTextView;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
     //Channel that the remote robot is listening on
-    private String mChannel;
+    private String mRemoteRobotId;
     private long mLastUpdate = SystemClock.uptimeMillis();
     private String inputText;
 
@@ -151,7 +151,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private void updateRemote(boolean force) {
         if(force || SystemClock.uptimeMillis() - mLastUpdate > REMOTE_MAX_TRANSMIT_SPEED){
             //Make sure channel is set
-            String channel = this.mChannel;
+            String channel = this.mRemoteRobotId;
             if(channel != null){
                 //Mark the time
                 mLastUpdate = SystemClock.uptimeMillis();
@@ -209,7 +209,11 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         }
     }
 
-    public void setChannel(final String channel){
-        mChannel = channel;
+    /**
+     * Set the UUID of the remote robot to contorl
+     * @param channel
+     */
+    public void setRemoteRobotId(final String channel){
+        mRemoteRobotId = channel;
     }
 }
