@@ -59,7 +59,7 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
     }
 
     private void startThread() {
-        final Thread thread = new Thread(null, this, "DemoKit");
+        final Thread thread = new Thread(null, this, "UsbSerialThread");
         thread.start();
     }
 

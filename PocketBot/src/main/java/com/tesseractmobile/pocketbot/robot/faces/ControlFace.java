@@ -193,7 +193,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         }
         if(joystickView.getId() == R.id.joyStickLeft && hasFocus == false) {
             final SensorData sensorData = mRobotInterface.getSensorData();
-            sensorData.setJoystick1(0, 0, 0);
+            sensorData.setJoystick2(0, 0, 0);
             mRobotInterface.sendSensorData(true);
             mJoy2.X = 0;
             mJoy2.Y = 0;

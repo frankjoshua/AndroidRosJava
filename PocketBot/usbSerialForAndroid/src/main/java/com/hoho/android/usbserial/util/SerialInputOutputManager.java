@@ -40,8 +40,8 @@ public class SerialInputOutputManager implements Runnable {
     private static final String TAG = SerialInputOutputManager.class.getSimpleName();
     private static final boolean DEBUG = true;
 
-    private static final int READ_WAIT_MILLIS = 200;
-    private static final int BUFSIZ = 40960;
+    private static final int READ_WAIT_MILLIS = 20;
+    private static final int BUFSIZ = 4096;
 
     private final UsbSerialPort mDriver;
 
@@ -139,6 +139,11 @@ public class SerialInputOutputManager implements Runnable {
                     break;
                 }
                 step();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (Exception e) {
             Log.w(TAG, "Run ending due to exception: " + e.getMessage(), e);
