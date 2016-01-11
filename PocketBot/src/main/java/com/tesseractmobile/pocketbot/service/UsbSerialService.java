@@ -79,13 +79,13 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
     }
 
     @Override
-    public void sendBytes(byte[] bytes) {
+    public void sendBytes(final byte[] bytes) {
         //Check for error
         if(mErrorState || mConnected.get() == false){
             return;
         }
         //Send data to the Serial Manager
-        Log.d("UsbSerialService", "Data " + bytes.length);
+        Log.d(TAG, "Data " + bytes.length);
         mSerialIoManager.writeAsync(SensorData.wrapData(bytes));
     }
 
@@ -146,7 +146,9 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
 
     @Override
     public void onRunError(Exception e) {
+        Log.d(TAG, e.toString());
         //This probally means USB was disconected
         mErrorState = true;
+        mConnected.set(false);
     }
 }
