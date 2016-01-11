@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
+import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
@@ -48,6 +49,6 @@ public class EfimFaceFragment extends FaceFragment implements RemoteListener {
 
     @Override
     public void onMessageReceived(Object message) {
-        ((EfimFace) mRobotFace).sendJson((JSONObject) message);
+        ((EfimFace) mRobotFace).onControlReceived((SensorData.Control) message);
     }
 }

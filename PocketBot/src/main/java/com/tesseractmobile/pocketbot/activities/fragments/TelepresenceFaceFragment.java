@@ -20,6 +20,8 @@ import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
+import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.robot.faces.TelePresenceFace;
@@ -127,7 +129,7 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
 
     @Override
     public void onMessageReceived(Object message) {
-        ((TelePresenceFace) mRobotFace).sendJson((JSONObject) message);
+        ((TelePresenceFace) mRobotFace).onControlReceived((SensorData.Control) message);
     }
 
     @Override

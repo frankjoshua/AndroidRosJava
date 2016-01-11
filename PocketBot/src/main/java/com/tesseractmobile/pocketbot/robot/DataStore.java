@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class DataStore{
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
-    public static final String API_VERSION = "betaV1";
+    public static final String API_VERSION = "betaV2";
     public static final String FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/" + API_VERSION + "/";
     public static final String AUTH_DATA = "auth_data";
     static private DataStore instance;
@@ -97,7 +97,7 @@ public class DataStore{
     }
 
     public Firebase getUserListRef() {
-        if(mAuthData != null){
+        if (mAuthData != null){
             return mFirebase.child(USERS).child(mAuthData.getUid());
         }
         throw new UnsupportedOperationException();

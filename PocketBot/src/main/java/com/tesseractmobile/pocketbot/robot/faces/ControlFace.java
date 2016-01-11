@@ -156,30 +156,30 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
                 //Mark the time
                 mLastUpdate = SystemClock.uptimeMillis();
                 //Create a json object to send
-                final JSONObject json = new JSONObject();
-                try {
-                    //Convert floats to strings so they don't get cast as doubles
-                    json.put(JOY1_X, mJoy1.X);
-                    json.put(JOY1_Y, mJoy1.Y);
-                    json.put(JOY1_Z, mJoy1.Z);
-                    json.put(JOY1_A, mJoy1.A);
-                    json.put(JOY1_B, mJoy1.B);
-                    json.put(JOY1_HEADING, mJoy1.heading);
-                    json.put(JOY2_X, mJoy2.X);
-                    json.put(JOY2_Y, mJoy2.Y);
-                    json.put(JOY2_Z, mJoy2.Z);
-                    json.put(JOY2_A, mJoy2.A);
-                    json.put(JOY2_B, mJoy2.B);
-                    json.put(JOY2_HEADING, mJoy1.heading);
-                    //Add battery information
-                    final SensorData sensorData = mRobotInterface.getSensorData();
-                    json.put(BATTERY, sensorData.getSensor().battery);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+//                final JSONObject json = new JSONObject();
+//                try {
+//                    //Convert floats to strings so they don't get cast as doubles
+//                    json.put(JOY1_X, mJoy1.X);
+//                    json.put(JOY1_Y, mJoy1.Y);
+//                    json.put(JOY1_Z, mJoy1.Z);
+//                    json.put(JOY1_A, mJoy1.A);
+//                    json.put(JOY1_B, mJoy1.B);
+//                    json.put(JOY1_HEADING, mJoy1.heading);
+//                    json.put(JOY2_X, mJoy2.X);
+//                    json.put(JOY2_Y, mJoy2.Y);
+//                    json.put(JOY2_Z, mJoy2.Z);
+//                    json.put(JOY2_A, mJoy2.A);
+//                    json.put(JOY2_B, mJoy2.B);
+//                    json.put(JOY2_HEADING, mJoy1.heading);
+//                    //Add battery information
+//                    final SensorData sensorData = mRobotInterface.getSensorData();
+//                    json.put(BATTERY, sensorData.getSensor().battery);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                final SensorData sensorData = mRobotInterface.getSensorData();
                 //Send to the remote robot
-                RemoteControl.get().send(channel, json, true);
+                RemoteControl.get().send(channel, sensorData.getControl(), false);
             }
         }
     }

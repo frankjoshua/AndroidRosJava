@@ -95,14 +95,14 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     /**
      * Pass data to remote robot
      * @param channel
-     * @param json
+     * @param object
      */
-    public void send(String channel, Object json, final boolean asString) {
+    public void send(String channel, Object object, final boolean asString) {
         //Send to firebase
         if(asString){
-            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json.toString());
+            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(object.toString());
         } else {
-            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(json);
+            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(object);
         }
     }
 
@@ -114,7 +114,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-        onObjectReceived(dataSnapshot.getValue(JSONObject.class));
+        onObjectReceived(dataSnapshot.getValue(SensorData.Control.class));
     }
 
     @Override

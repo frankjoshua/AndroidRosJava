@@ -181,6 +181,10 @@ public class SensorData {
         return message;
     }
 
+    public void setControl(Control control) {
+        this.control = control;
+    }
+
     static public class Gps {
         public float lat;
         public float lon;
