@@ -109,13 +109,20 @@ public class UsbSerialService extends BodyService implements Runnable, BodyInter
         final List<UsbSerialDriver> drivers = UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
         if(drivers.size() > 0) {
             final UsbSerialPort usbSerialPort = drivers.get(0).getPorts().get(0);
-            UsbDeviceConnection connection = mUsbManager.openDevice(usbSerialPort.getDriver().getDevice());
+            final UsbDeviceConnection connection = mUsbManager.openDevice(usbSerialPort.getDriver().getDevice());
+            if(connection == null){
+                //Just return and try again later
+                mConnected.set(false);
+                mErrorState = true;
+                return;
+            }
             try {
                 usbSerialPort.open(connection);
                 usbSerialPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
             } catch (IOException e) {
                 //Just return and try again later
                 mConnected.set(false);
+                mErrorState = true;
                 return;
             }
             mSerialIoManager = new SerialInputOutputManager(usbSerialPort, this);
