@@ -1,11 +1,14 @@
 package com.tesseractmobile.pocketbot.activities;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 
 import com.tesseractmobile.pocketbot.service.BodyService;
 import com.tesseractmobile.pocketbot.service.UsbSerialService;
@@ -38,8 +41,9 @@ public class UsbSerialFragmentActivity extends AiFragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         final Intent bindIntent = new Intent(this, UsbSerialService.class);
-        if(bindService(bindIntent, conn, Service.BIND_AUTO_CREATE) == false){
+        if (bindService(bindIntent, conn, Service.BIND_AUTO_CREATE) == false) {
             throw new UnsupportedOperationException();
         }
     }

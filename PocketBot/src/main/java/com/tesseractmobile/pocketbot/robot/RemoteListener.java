@@ -10,4 +10,10 @@ public interface RemoteListener {
      * @param message
      */
     void onMessageReceived(Object message);
+
+    /**
+     * Called when connection is dropped
+     * Possibly because of loss of internet
+     */
+    void onConnectionLost();
 }

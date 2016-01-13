@@ -20,8 +20,6 @@ import com.tesseractmobile.pocketbot.views.CameraSourcePreview;
 import com.tesseractmobile.pocketbot.views.FaceGraphic;
 import com.tesseractmobile.pocketbot.views.GraphicOverlay;
 
-import java.io.IOException;
-
 /**
  * Created by josh on 10/18/2015.
  */
@@ -117,10 +115,10 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(PocketBotSettings.SHOW_PREVIEW)){
+        if(key.equals(PocketBotSettings.KEY_SHOW_PREVIEW)){
             final boolean showPreview = sharedPreferences.getBoolean(key, false);
             updateView(showPreview);
-        } else if(key.equals(PocketBotSettings.FAST_TRACKING)){
+        } else if(key.equals(PocketBotSettings.KEY_FAST_TRACKING)){
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

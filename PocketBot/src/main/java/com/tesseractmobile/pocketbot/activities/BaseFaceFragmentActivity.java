@@ -473,7 +473,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(PocketBotSettings.SELECTED_FACE.equals(key)){
+        if(PocketBotSettings.KEY_SELECTED_FACE.equals(key)){
             final int faceId = sharedPreferences.getInt(key, PocketBotSettings.DEFAULT_FACE_ID);
             switchFace(faceId);
         } else {
@@ -505,7 +505,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
                     @Override
                     public void onRobotSelected(RobotInfo.Settings model) {
-                        PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robotId);
+                        PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robot_id);
                     }
                 });
                 break;

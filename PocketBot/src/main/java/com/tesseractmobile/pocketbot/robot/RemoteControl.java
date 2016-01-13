@@ -1,9 +1,12 @@
 package com.tesseractmobile.pocketbot.robot;
 
+import android.provider.ContactsContract;
+
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import org.json.JSONObject;
 
@@ -53,7 +56,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * Register to listen for remote control messages
      * @param remoteListener
      */
-    public void registerRemoteListener(final RemoteListener remoteListener){
+    public synchronized void registerRemoteListener(final RemoteListener remoteListener){
         mRemoteListeners.add(remoteListener);
     }
 
@@ -61,7 +64,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * Stop listening to remote messages
      * @param remoteListener
      */
-    public void unregisterRemoteListener(final RemoteListener remoteListener){
+    public synchronized void unregisterRemoteListener(final RemoteListener remoteListener){
         mRemoteListeners.remove(remoteListener);
     }
 
@@ -69,7 +72,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * The channel id to listen to
      * @param id
      */
-    public void setId(String id) {
+    private void setId(String id) {
         if(this.id != null){
             //Stop listening for firebase messages
             mFirebaseListen.removeEventListener(this);
@@ -86,9 +89,18 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * Call when remote message is received
      * @param message
      */
-    private void onObjectReceived(Object message) {
+    private synchronized void onObjectReceived(Object message) {
         for (RemoteListener remoteListener : mRemoteListeners) {
             remoteListener.onMessageReceived(message);
+        }
+    }
+
+    /**
+     * Call when connection is lost
+     */
+    private synchronized void onConnectionLost(){
+        for (RemoteListener remoteListener : mRemoteListeners) {
+            remoteListener.onConnectionLost();
         }
     }
 
@@ -139,5 +151,26 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
         mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
         mFirebaseListen.child(CONTROL).addChildEventListener(this);
         mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
+
+        //Listen for disconnect
+        Firebase connectedRef = new Firebase(DataStore.BASE_FIREBASE_URL + ".info/connected");
+        connectedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                if (connected == false) {
+                    onConnectionLost();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError error) {
+
+            }
+        });
+    }
+
+    public Firebase getControlRef() {
+        return mFirebaseTransmit;
     }
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.SensorData;
@@ -215,5 +216,9 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
      */
     public void setRemoteRobotId(final String channel){
         mRemoteRobotId = channel;
+        //Set disconnect command
+        if(channel != null){
+            RemoteControl.get().getControlRef().child(channel).child(RemoteControl.CONTROL).child(RemoteControl.DATA).child("joy1").onDisconnect().setValue(new SensorData.Joystick());
+        }
     }
 }

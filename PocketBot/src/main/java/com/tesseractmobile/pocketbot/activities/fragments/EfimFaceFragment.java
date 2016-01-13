@@ -51,4 +51,10 @@ public class EfimFaceFragment extends FaceFragment implements RemoteListener {
     public void onMessageReceived(Object message) {
         ((EfimFace) mRobotFace).onControlReceived((SensorData.Control) message);
     }
+
+    @Override
+    public void onConnectionLost() {
+        //Send stop to face
+        ((EfimFace) mRobotFace).onControlReceived(new SensorData.Control());
+    }
 }

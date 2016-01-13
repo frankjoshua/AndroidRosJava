@@ -1,20 +1,13 @@
 package com.tesseractmobile.pocketbot.service;
 
 import android.annotation.TargetApi;
-import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.SystemClock;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -22,9 +15,6 @@ import com.tesseractmobile.ble.BleDevicesScanner;
 import com.tesseractmobile.ble.BleManager;
 import com.tesseractmobile.ble.BleUtils;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
-import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
-import com.tesseractmobile.pocketbot.robot.BodyInterface;
-import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.nio.charset.Charset;
@@ -416,7 +406,7 @@ public class BluetoothService extends BodyService implements BleManager.BleManag
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(PocketBotSettings.USE_BLUETOOTH.equals(key)){
+        if(PocketBotSettings.KEY_USE_BLUETOOTH.equals(key)){
             final boolean useBlueTooth = sharedPreferences.getBoolean(key, PocketBotSettings.DEFAULT_USE_BLUETOOTH);
             setUseBluetooth(useBlueTooth);
         }

@@ -11,13 +11,14 @@ public class RobotInfo {
 
     @JsonIgnoreProperties(ignoreUnknown=true)
     public static class Settings{
+        public boolean isConnected;
         public Prefs prefs;
 
         @JsonIgnoreProperties(ignoreUnknown=true)
         public static class Prefs{
-            public int qbId;
-            public String robotName;
-            public String robotId;
+            public int quickblox_id;
+            public String robot_name;
+            public String robot_id;
         }
     }
 }

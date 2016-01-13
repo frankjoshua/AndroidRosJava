@@ -191,6 +191,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         QBRTCConfig.setDebugEnabled(true);
         //Ready for calls
         QBRTCClient.getInstance(context).prepareToProcessCalls();
+        //showDialog("Listening for calls");
         //Let extended classes know that calls are ready
         onQBSetup(session, user);
     }
@@ -221,7 +222,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             }
         });
 
-        //showDialog("New Session Received");
+
     }
 
     /**
@@ -235,6 +236,8 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         qbrtcSession.addVideoTrackCallbacksListener(QuickBloxFragment.this);
         qbrtcSession.addSessionCallbacksListener(QuickBloxFragment.this);
         qbrtcSession.addSignalingCallback(QuickBloxFragment.this);
+        //Debugging
+        //showDialog("New Session Received");
     }
 
     @Override

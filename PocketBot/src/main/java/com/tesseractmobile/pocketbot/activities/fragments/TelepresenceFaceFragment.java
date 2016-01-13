@@ -133,6 +133,12 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     }
 
     @Override
+    public void onConnectionLost() {
+        //Send stop to face
+        ((TelePresenceFace) mRobotFace).onControlReceived(new SensorData.Control());
+    }
+
+    @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
         mHandler.post(new Runnable() {
             @Override

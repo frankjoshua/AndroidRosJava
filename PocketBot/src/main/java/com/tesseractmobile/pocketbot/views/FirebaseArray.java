@@ -28,6 +28,8 @@
 
 package com.tesseractmobile.pocketbot.views;
 
+import android.provider.ContactsContract;
+
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;

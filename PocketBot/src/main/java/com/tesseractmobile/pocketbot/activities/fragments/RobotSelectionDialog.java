@@ -59,21 +59,28 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         //Hide sign in
         mSignInView.setVisibility(View.GONE);
         //Set adapter
+        final String currentRobotId = PocketBotSettings.getRobotId(getContext());
         final Firebase userListRef = DataStore.get().getUserListRef().child(DataStore.ROBOTS);
-        final Firebase robotListRef = DataStore.get().getRobotListRef();
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {
-                viewHolder.robotName.setText(model.prefs.robotName);
-                viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dismiss();
-                        if (mOnRobotSelectedListener != null) {
-                            mOnRobotSelectedListener.onRobotSelected(model);
+                viewHolder.robotName.setText(model.prefs.robot_name);
+
+                if(model.isConnected && !currentRobotId.equals(model.prefs.robot_id)){
+                    viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dismiss();
+                            if (mOnRobotSelectedListener != null) {
+                                mOnRobotSelectedListener.onRobotSelected(model);
+                            }
                         }
-                    }
-                });
+                    });
+                    viewHolder.robotName.setAlpha(1);
+                } else {
+                    viewHolder.robotName.setAlpha(.5f);
+                    viewHolder.robotName.setOnClickListener(null);
+                }
             }
         });
     }

@@ -41,8 +41,8 @@ public class ApiAiKeyDialog extends android.support.v4.app.DialogFragment {
         rootView.findViewById(R.id.btnDefault).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PocketBotSettings.setApiAiKey(ctx, PocketBotSettings.API_AI_DEFAULT_KEY);
-                PocketBotSettings.setApiAiToken(ctx, PocketBotSettings.API_AI_DEFAULT_TOKEN);
+                PocketBotSettings.setApiAiKey(ctx, PocketBotSettings.DEFAULT_API_AI_KEY);
+                PocketBotSettings.setApiAiToken(ctx, PocketBotSettings.DEFAULT_API_AI_TOKEN);
                 dismiss();
             }
         });
