@@ -30,6 +30,7 @@ public class PocketBotSettings {
     public static final String KEY_LAST_ROBOT_ID = "user_id";
     public static final String KEY_API_AI_KEY = "api_ai_key";
     public static final String KEY_ALLOW_TELEPRESENCE = "allow_tele";
+    private static final String KEY_AUTO_SIGN_IN = "auto_sign_in";
     //Defaults
     public static final boolean DEFAULT_SHOW_TEXT_PREVIEW = true;
     public static final boolean DEFAULT_SHOW_PREVIEW = true;
@@ -37,6 +38,7 @@ public class PocketBotSettings {
     public static final int DEFAULT_FACE_ID = 0;
     public static final String DEFAULT_API_AI_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";//"1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     public static final String DEFAULT_API_AI_TOKEN = "443dddf4747d4408b0e9451d4d53f201  ";//"443dddf4747d4408b0e9451d4d53f201";
+    private static final boolean DEFAULT_AUTO_SIGN_IN = false;
 
 
     /**
@@ -257,8 +259,16 @@ public class PocketBotSettings {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(KEY_QB_ID, -1);
     }
 
+    public static boolean isAutoSignIn(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(KEY_AUTO_SIGN_IN, DEFAULT_AUTO_SIGN_IN).commit();
+    }
+
     public static SharedPreferences getSharedPrefs(final Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public static boolean setAutoSignIn(final Context context, final boolean b) {
+        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(KEY_AUTO_SIGN_IN, b).commit();
     }
 
     public static Object getObject(final SharedPreferences sharedPreferences, final String key) {
@@ -290,8 +300,11 @@ public class PocketBotSettings {
             return sharedPreferences.getString(PocketBotSettings.KEY_BLUETOOTH_DEVICE, "");
         } else if (key.equals(PocketBotSettings.KEY_ROBOT_ID)) {
             return sharedPreferences.getString(PocketBotSettings.KEY_ROBOT_ID, "");
+        } else if (key.equals(PocketBotSettings.KEY_AUTO_SIGN_IN)) {
+            return sharedPreferences.getBoolean(PocketBotSettings.KEY_AUTO_SIGN_IN, PocketBotSettings.DEFAULT_AUTO_SIGN_IN);
         }  else {
             throw new UnsupportedOperationException("Unknown key: " + key);
         }
     }
+
 }

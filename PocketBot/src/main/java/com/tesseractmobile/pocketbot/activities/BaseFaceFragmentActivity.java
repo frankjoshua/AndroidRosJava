@@ -162,6 +162,9 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignInButton.setSize(SignInButton.SIZE_STANDARD);
         findViewById(R.id.sign_in_button).setOnClickListener(this);
+        if (PocketBotSettings.isAutoSignIn(this)) {
+            startSignin();
+        }
     }
 
     private void updateUI() {
@@ -184,6 +187,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             DataStore.get().setAuthToken(PocketBotSettings.getRobotId(this), token);
             Toast.makeText(this, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
             mSignInButton.setEnabled(true);
+            //Auto sign in next time
+            PocketBotSettings.setAutoSignIn(this, true);
         }
     }
 
@@ -510,19 +515,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 });
                 break;
             case R.id.sign_in_button:
-                mSignInButton.setEnabled(false);
-                mGoogleLoginClicked = true;
-                if (!mGoogleApiClient.isConnecting()) {
-                    if (mGoogleConnectionResult != null) {
-                        resolveSignInError();
-                    } else if (mGoogleApiClient.isConnected()) {
-                        getGoogleOAuthTokenAndLogin();
-                    } else {
-                    /* connect API now */
-                        Log.d(TAG, "Trying to connect to Google API");
-                        mGoogleApiClient.connect();
-                    }
-                }
+                startSignin();
                 break;
             case R.id.btnTelepresence:
                 PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, 2);
@@ -550,6 +543,22 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 break;
             default:
                 throw new UnsupportedOperationException("Not implemented");
+        }
+    }
+
+    private void startSignin() {
+        mSignInButton.setEnabled(false);
+        mGoogleLoginClicked = true;
+        if (!mGoogleApiClient.isConnecting()) {
+            if (mGoogleConnectionResult != null) {
+                resolveSignInError();
+            } else if (mGoogleApiClient.isConnected()) {
+                getGoogleOAuthTokenAndLogin();
+            } else {
+            /* connect API now */
+                Log.d(TAG, "Trying to connect to Google API");
+                mGoogleApiClient.connect();
+            }
         }
     }
 
