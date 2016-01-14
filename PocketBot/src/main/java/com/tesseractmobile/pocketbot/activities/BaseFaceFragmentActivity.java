@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.activities;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,6 +36,8 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -179,7 +182,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
     private void onTokenReceived(final String token){
 
-
+        Log.d(TAG, "Received token: " + token);
         mGoogleIntentInProgress = false;
 
         if (!mGoogleApiClient.isConnecting()) {
@@ -555,7 +558,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             } else if (mGoogleApiClient.isConnected()) {
                 getGoogleOAuthTokenAndLogin();
             } else {
-            /* connect API now */
+                /* connect API now */
                 Log.d(TAG, "Trying to connect to Google API");
                 mGoogleApiClient.connect();
             }
@@ -564,15 +567,37 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
     /* A helper method to resolve the current ConnectionResult error. */
     private void resolveSignInError() {
+        Log.e(TAG, "Resolving sign in Error");
         if (mGoogleConnectionResult.hasResolution()) {
             try {
                 mGoogleIntentInProgress = true;
                 mGoogleConnectionResult.startResolutionForResult(this, RC_GOOGLE_LOGIN);
+                Log.d(TAG, "Launching google login");
             } catch (IntentSender.SendIntentException e) {
+                Log.e(TAG, "IntentSender.SendIntentException " + e.toString());
                 // The intent was canceled before it was sent.  Return to the default
                 // state and attempt to connect to get an updated ConnectionResult.
                 mGoogleIntentInProgress = false;
                 mGoogleApiClient.connect();
+            }
+        } else {
+            Log.e(TAG, "No sign error resolution");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == RC_GOOGLE_LOGIN && resultCode == Activity.RESULT_OK){
+            /* This was a request by the Google API */
+            if (resultCode != RESULT_OK) {
+                mGoogleLoginClicked = false;
+            }
+            mGoogleIntentInProgress = false;
+            if (!mGoogleApiClient.isConnecting()) {
+                mGoogleApiClient.connect();
+                Log.d(TAG, "Connecting Google Sign In");
             }
         }
     }
@@ -588,7 +613,9 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
                 try {
                     String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
+                    Log.d(TAG, "Trying to connect to Google API");
                     token = GoogleAuthUtil.getToken(BaseFaceFragmentActivity.this, Plus.AccountApi.getAccountName(mGoogleApiClient), scope);
+                    Log.d(TAG, "Token read: " + token);
                 } catch (IOException transientEx) {
                     /* Network or server error */
                     Log.e(TAG, "Error authenticating with Google: " + transientEx);
