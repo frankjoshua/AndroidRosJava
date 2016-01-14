@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Created by josh on 12/27/2015.
  */
-public class DataStore{
+public class DataStore implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
     public static final String API_VERSION = "betaV2";
@@ -39,9 +39,11 @@ public class DataStore{
     private ArrayList<OnAuthCompleteListener> mOnAuthCompleteListeners = new ArrayList<OnAuthCompleteListener>();
 
     private FirebasePreferenceSync mFirebasePreferenceSync;
+    private String mRobotId;
 
     private DataStore(final Context context){
         mFirebasePreferenceSync = new FirebasePreferenceSync(context);
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
     }
 
     static public void init(final Context context){
@@ -64,26 +66,12 @@ public class DataStore{
         mFirebase = new Firebase(FIREBASE_URL);
         mFirebase.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
             @Override
-            public void onAuthenticated(AuthData authData) {
+            public void onAuthenticated(final AuthData authData) {
                 mAuthData = authData;
-                final Firebase robotRef = getRobots().child(robotId);
-                final Firebase userRef = mFirebase.child(USERS).child(authData.getUid());
-                //Setup User
-                userRef.child(AUTH_DATA).setValue(authData);
+                setupUser(authData, robotId);
+                setupRobot(robotId);
                 //Start syncing preferences
                 mFirebasePreferenceSync.start(getRobots());
-                //Save current robot to list of allowed robots
-                userRef.child(ROBOTS).child(robotId).setValue(true);
-                //Mark robot last connect status
-                robotRef.child(SETTINGS).child(LAST_ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);
-                //Mark user last connect status
-                userRef.child(LAST_ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);
-                //Set robot online status
-                robotRef.child(SETTINGS).child(IS_CONNECTED).setValue(true);
-                robotRef.child(SETTINGS).child(IS_CONNECTED).onDisconnect().setValue(false);
-                //Set user online status
-                userRef.child(SETTINGS).child(IS_CONNECTED).setValue(true);
-                userRef.child(IS_CONNECTED).onDisconnect().setValue(false);
                 //Let everyone know we are logged in
                 for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
                     onAuthCompleteListener.onAuthComplete();
@@ -96,6 +84,41 @@ public class DataStore{
                 throw new UnsupportedOperationException(firebaseError.toString());
             }
         });
+    }
+
+    private void setupRobot(final String robotId) {
+
+        if(mRobotId != null){
+            //Disconnect last robot
+            final Firebase lastRobotRef = getRobots().child(mRobotId);
+            //Mark robot last connect status
+            lastRobotRef.child(SETTINGS).child(LAST_ONLINE).setValue(ServerValue.TIMESTAMP);
+            //Set robot online status
+            lastRobotRef.child(SETTINGS).child(IS_CONNECTED).setValue(false);
+            lastRobotRef.child(SETTINGS).child(IS_CONNECTED).setValue(false);
+        }
+        final Firebase robotRef = getRobots().child(robotId);
+        //Save ID
+        mRobotId = robotId;
+        //Mark robot last connect status
+        robotRef.child(SETTINGS).child(LAST_ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);
+        //Set robot online status
+        robotRef.child(SETTINGS).child(IS_CONNECTED).setValue(true);
+        robotRef.child(SETTINGS).child(IS_CONNECTED).onDisconnect().setValue(false);
+    }
+
+    private void setupUser(final AuthData authData, final String robotId) {
+        final Firebase userRef = mFirebase.child(USERS).child(authData.getUid());
+        //Setup User
+        userRef.child(AUTH_DATA).setValue(authData);
+        //Save current robot to list of allowed robots
+        userRef.child(ROBOTS).child(robotId).setValue(true);
+        //Mark user last connect status
+        userRef.child(LAST_ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);
+
+        //Set user online status
+        userRef.child(SETTINGS).child(IS_CONNECTED).setValue(true);
+        userRef.child(IS_CONNECTED).onDisconnect().setValue(false);
     }
 
     private Firebase getRobots() {
@@ -139,6 +162,23 @@ public class DataStore{
         mOnAuthCompleteListeners.remove(onAuthCompleteListener);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences, final String key) {
+        if(key.equals(PocketBotSettings.KEY_ROBOT_ID)){
+            setupRobot(sharedPreferences.getString(PocketBotSettings.KEY_ROBOT_ID, ""));
+        }
+    }
+
+    public void deleteRobot(final String robot_id) {
+        //Delete robot from user
+        final Firebase userRef = mFirebase.child(USERS).child(mAuthData.getUid());
+        userRef.child(ROBOTS).child(robot_id).removeValue();
+        //Delete robot
+        getRobots().child(robot_id).removeValue();
+        //Delete robot control
+        mFirebase.child(RemoteControl.CONTROL).child(robot_id).removeValue();
+    }
+
     public interface OnAuthCompleteListener {
         void onAuthComplete();
     }
@@ -166,6 +206,7 @@ public class DataStore{
             firebase.child(mRobotId).child(SETTINGS).child(PREFS).addChildEventListener(this);
             //Set inital preferences
             onSharedPreferenceChanged(PocketBotSettings.getSharedPrefs(mContext), PocketBotSettings.KEY_ROBOT_NAME);
+            onSharedPreferenceChanged(PocketBotSettings.getSharedPrefs(mContext), PocketBotSettings.KEY_QB_ID);
             mFirebase.child(mRobotId).child(SETTINGS).child(PREFS).child(PocketBotSettings.KEY_ROBOT_ID).setValue(mRobotId);
             //Register for preference changes
             PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, this);

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.users.model.QBUser;
@@ -170,6 +171,10 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
     @Override
     public void onRobotSelected(RobotInfo.Settings robotinfo) {
+        if(robotinfo.prefs.robot_id.equals(PocketBotSettings.getRobotId(getContext()))){
+            Toast.makeText(getContext(), "You must select a remote robot", Toast.LENGTH_LONG).show();
+            return;
+        }
         connectToRemoteRobot(robotinfo.prefs.quickblox_id, robotinfo.prefs.robot_id);
     }
 

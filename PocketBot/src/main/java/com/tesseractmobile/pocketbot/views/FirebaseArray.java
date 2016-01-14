@@ -98,44 +98,43 @@ class FirebaseArray implements ChildEventListener {
         return mSnapshots.get(index);
     }
 
-    private int getIndexForKey(String key) {
+    private int getIndexForKey(final DataSnapshot dataSnapshot) {
+        final String key = (String) dataSnapshot.child("prefs").child("robot_id").getValue();
         int index = 0;
         for (DataSnapshot snapshot : mSnapshots) {
-            if (snapshot.getKey().equals(key)) {
+            if (snapshot.child("prefs").child("robot_id").getValue().equals(key)) {
                 return index;
             } else {
                 index++;
             }
         }
-        throw new IllegalArgumentException("Key not found");
+        return index;
+        //throw new IllegalArgumentException("Key not found");
     }
 
     // Start of ChildEventListener methods
     public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
-        int index = 0;
-        if (previousChildKey != null) {
-            index = getIndexForKey(previousChildKey) + 1;
-        }
+        int index = getIndexForKey(snapshot);
         mSnapshots.add(index, snapshot);
         notifyChangedListeners(OnChangedListener.EventType.Added, index);
     }
 
     public void onChildChanged(DataSnapshot snapshot, String previousChildKey) {
-        int index = getIndexForKey(snapshot.getKey());
+        int index = getIndexForKey(snapshot);
         mSnapshots.set(index, snapshot);
         notifyChangedListeners(OnChangedListener.EventType.Changed, index);
     }
 
     public void onChildRemoved(DataSnapshot snapshot) {
-        int index = getIndexForKey(snapshot.getKey());
+        int index = getIndexForKey(snapshot);
         mSnapshots.remove(index);
         notifyChangedListeners(OnChangedListener.EventType.Removed, index);
     }
 
     public void onChildMoved(DataSnapshot snapshot, String previousChildKey) {
-        int oldIndex = getIndexForKey(snapshot.getKey());
+        int oldIndex = getIndexForKey(snapshot);
         mSnapshots.remove(oldIndex);
-        int newIndex = previousChildKey == null ? 0 : (getIndexForKey(previousChildKey) + 1);
+        int newIndex = snapshot.getKey() == null ? 0 : (getIndexForKey(snapshot));
         mSnapshots.add(newIndex, snapshot);
         notifyChangedListeners(OnChangedListener.EventType.Moved, newIndex, oldIndex);
     }

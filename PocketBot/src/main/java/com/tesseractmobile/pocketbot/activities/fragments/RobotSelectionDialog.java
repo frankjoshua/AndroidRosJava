@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.DialogFragment;
@@ -66,21 +67,44 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {
                 viewHolder.robotName.setText(model.prefs.robot_name);
 
-                if(model.isConnected && !currentRobotId.equals(model.prefs.robot_id)){
-                    viewHolder.robotName.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            dismiss();
-                            if (mOnRobotSelectedListener != null) {
-                                mOnRobotSelectedListener.onRobotSelected(model);
-                            }
-                        }
-                    });
+                String status = "Robot Status: ";
+                final boolean isCurrentRobot = currentRobotId.equals(model.prefs.robot_id);
+                if(model.isConnected){
                     viewHolder.robotName.setAlpha(1);
+                    viewHolder.robotStatus.setAlpha(1);
+                    viewHolder.btnDelete.setVisibility(View.INVISIBLE);
+                    status += "Online";
                 } else {
                     viewHolder.robotName.setAlpha(.5f);
-                    viewHolder.robotName.setOnClickListener(null);
+                    viewHolder.robotStatus.setAlpha(.5f);
+                    viewHolder.btnDelete.setVisibility(View.VISIBLE);
+                    status += "Offline";
                 }
+
+                if(isCurrentRobot){
+                    viewHolder.mainLayout.setBackgroundColor(Color.parseColor("#444400ff"));
+                    viewHolder.btnDelete.setVisibility(View.INVISIBLE);
+                } else {
+                    viewHolder.mainLayout.setBackgroundColor(Color.parseColor("#44000000"));
+                    viewHolder.btnDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            DataStore.get().deleteRobot(model.prefs.robot_id);
+                        }
+                    });
+                }
+
+                viewHolder.robotStatus.setText(status);
+
+                viewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    dismiss();
+                    if (mOnRobotSelectedListener != null) {
+                        mOnRobotSelectedListener.onRobotSelected(model);
+                    }
+                    }
+                });
             }
         });
     }
