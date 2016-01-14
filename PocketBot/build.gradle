@@ -25,18 +25,21 @@ repositories {
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.0"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         applicationId "com.tesseractmobile.pocketbot"
         minSdkVersion 12
-        targetSdkVersion 18
+        targetSdkVersion 23
         versionCode 13
         versionName "1.8"
 
         // Enabling multidex support.
         multiDexEnabled false
+
+        //Enable Testing
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -60,6 +63,7 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'LICENSE.txt'
     }
 
     dexOptions {
@@ -71,12 +75,12 @@ dependencies {
     //compile project(':openCVLibrary300')
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:multidex:1.0.0'
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:support-v4:23.0.1'
     //compile 'com.google.android.gms:play-services:7.8.0'
 
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'ai.api:sdk:1.7.1@aar'
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'commons-io:commons-io:2.4'
     //Firebase
     compile 'com.firebase:firebase-client-android:2.5.0+'
@@ -95,5 +99,11 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.google.android.gms:play-services-plus:8.4.0'
     //RecyclerView
-    compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile 'com.android.support:recyclerview-v7:23.0.1'
+    //Testing
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support:support-annotations:23.0.1'
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
 }

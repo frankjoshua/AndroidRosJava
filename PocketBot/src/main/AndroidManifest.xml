@@ -90,6 +90,9 @@
             android:name=".activities.FirebaseFaceFragmentActivity"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"></activity>
 
+        <activity
+            android:name=".activities.BaseFaceFragmentActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"></activity>
 
         <service android:name=".service.UsbConnectionService"></service>
         <service android:name=".service.UsbSerialService"></service>
