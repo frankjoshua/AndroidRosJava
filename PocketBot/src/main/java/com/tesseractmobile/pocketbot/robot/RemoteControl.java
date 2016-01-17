@@ -243,4 +243,8 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     public Firebase getControlRef() {
         return mFirebaseTransmit;
     }
+
+    public long getLag() {
+        return mTimeSinceLastControl;
+    }
 }

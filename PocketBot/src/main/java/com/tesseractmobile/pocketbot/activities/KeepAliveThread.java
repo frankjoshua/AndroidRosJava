@@ -3,6 +3,7 @@ package com.tesseractmobile.pocketbot.activities;
 import android.util.Log;
 
 import com.tesseractmobile.pocketbot.robot.Constants;
+import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.io.IOException;
@@ -30,8 +31,8 @@ public class KeepAliveThread extends Thread{
                         e.printStackTrace();
                     }
                     //Keep Arduino awake
-                    if(executeCommand() ==  false) {
-                        if(mRunning.get()){
+                    if(mRunning.get()) {
+                        if(RemoteControl.get().getLag() > 200 || executeCommand() ==  false){
                             mKeepAliveListener.onInternetTimeout();
                             Log.e("Thread", "Connection Lost, sending stop command!");
                         }
