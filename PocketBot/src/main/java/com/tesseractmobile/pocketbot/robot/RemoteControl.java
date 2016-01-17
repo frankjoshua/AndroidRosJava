@@ -1,15 +1,18 @@
 package com.tesseractmobile.pocketbot.robot;
 
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ServerValue;
 import com.firebase.client.ValueEventListener;
 
 import org.json.JSONObject;
 
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -19,6 +22,8 @@ import java.util.Date;
 public class RemoteControl implements ChildEventListener, DataStore.OnAuthCompleteListener {
     public static final String CONTROL = "control";
     public static final String DATA = "data";
+    private static final String CONNECTED = "connected";
+    private static final String TIMESTAMP = "time_stamp";
     //private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
     private Firebase mFirebaseListen;
     private Firebase mFirebaseTransmit;
@@ -29,9 +34,27 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     final private ArrayList<RemoteListener> mRemoteListeners = new ArrayList<RemoteListener>();
     /** Singleton */
     static private RemoteControl instance;
+    private Long mTimeStamp;
+    private long mTimeSinceLastControl;
+    private String mTransmitUUID;
 
     private RemoteControl(final String id){
         setId(id);
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    timeStamp();
+                }
+            }
+        });
+        thread.start();
     }
 
     /**
@@ -106,18 +129,26 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
 
     /**
      * Pass data to remote robot
-     * @param channel
+     * @param uuid
      * @param object
      */
-    public void send(String channel, Object object, final boolean asString) {
+    public void send(String uuid, Object object, final boolean asString) {
+        mTransmitUUID = uuid;
         //Send to firebase
         if(asString){
-            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(object.toString());
+            mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object.toString());
         } else {
-            mFirebaseTransmit.child(channel).child(CONTROL).child(DATA).setValue(object);
+            mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object);
         }
+        timeStamp();
     }
 
+    void timeStamp(){
+        if(mTransmitUUID != null) {
+            //Set time stamp
+            mFirebaseTransmit.child(mTransmitUUID).child(CONTROL).child(CONNECTED).child(TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+        }
+    }
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -149,15 +180,15 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     public void onAuthComplete() {
         //Listen for messages from firebase
         mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
-        mFirebaseListen.child(CONTROL).addChildEventListener(this);
+        //mFirebaseListen.child(CONTROL).addChildEventListener(this);
+        //Setup transmitter
         mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
-
-        //Listen for disconnect
+        //Listen for controler disconnect
         Firebase connectedRef = new Firebase(DataStore.BASE_FIREBASE_URL + ".info/connected");
         connectedRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                boolean connected = snapshot.getValue(Boolean.class);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean connected = dataSnapshot.getValue(Boolean.class);
                 if (connected == false) {
                     onConnectionLost();
                 }
@@ -165,6 +196,45 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
 
             @Override
             public void onCancelled(FirebaseError error) {
+
+            }
+        });
+        //Listen for remote disconnect
+        mFirebaseListen.child(CONTROL).child(CONNECTED).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                //Get first time stamp
+                final Long timeStamp = dataSnapshot.getValue(Long.class);
+                if(Constants.LOGGING){
+                    Log.d("TimeStamp", "Control Timestamp: " + timeStamp.toString());
+                }
+                mTimeStamp = timeStamp;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                final Long timeStamp = dataSnapshot.getValue(Long.class);
+                //Get change in time
+                mTimeSinceLastControl = timeStamp - mTimeStamp;
+                //Save current time
+                mTimeStamp = timeStamp;
+                if(Constants.LOGGING){
+                    Log.d("TimeStamp", "Lag: " + mTimeSinceLastControl);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
 
             }
         });

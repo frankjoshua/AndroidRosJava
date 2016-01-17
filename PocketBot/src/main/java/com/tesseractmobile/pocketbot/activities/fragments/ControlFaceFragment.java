@@ -18,6 +18,7 @@ import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.RTCGLVideoView;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.Constants;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
 import com.tesseractmobile.pocketbot.robot.faces.ControlFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
@@ -173,7 +174,10 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     public void onRobotSelected(RobotInfo.Settings robotinfo) {
         if(robotinfo.prefs.robot_id.equals(PocketBotSettings.getRobotId(getContext()))){
             Toast.makeText(getContext(), "You must select a remote robot", Toast.LENGTH_LONG).show();
-            return;
+            //Allow if testing
+            if(Constants.LOGGING == false){
+                return;
+            }
         }
         connectToRemoteRobot(robotinfo.prefs.quickblox_id, robotinfo.prefs.robot_id);
     }
