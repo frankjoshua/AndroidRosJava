@@ -60,6 +60,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
+import com.tesseractmobile.pocketbot.robot.Constants;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.Robot;
@@ -73,7 +74,7 @@ import java.io.IOException;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceFragmentActivity extends FragmentActivity implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class BaseFaceFragmentActivity extends FragmentActivity implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, KeepAliveThread.KeepAliveListener {
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
@@ -119,6 +120,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     private ConnectionResult mGoogleConnectionResult;
     private SignInButton mSignInButton;
     private BroadcastReceiver mBatteryReceiver;
+    private KeepAliveThread mKeepAliveThread;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -168,6 +170,25 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         if (PocketBotSettings.isAutoSignIn(this)) {
             startSignin();
         }
+
+        //Keep alive thread
+        mKeepAliveThread = new KeepAliveThread(this);
+        if(PocketBotSettings.isKeepAlive(this)) {
+            mKeepAliveThread.startThread();
+        }
+
+    }
+
+    @Override
+    public void onHeartBeat() {
+        //Keep Arduino awake
+        mRobotInterFace.sendSensorData(false);
+    }
+
+    @Override
+    public void onInternetTimeout() {
+        mRobotInterFace.getSensorData().setControl(new SensorData.Control());
+        mRobotInterFace.sendSensorData(true);
     }
 
     private void updateUI() {
@@ -351,10 +372,12 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     public void onSensorChanged(SensorEvent event) {
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            mGravity = lowPass(event.values.clone(), mGravity);
+            //mGravity = lowPass(event.values.clone(), mGravity);
+            mGravity = lowPass(event.values, mGravity);
         }
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-            mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
+            //mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
+            mGeomagnetic = lowPass(event.values, mGeomagnetic);
         }
         SensorData sensorData = mRobotInterFace.getSensorData();
         if (mGravity != null && mGeomagnetic != null) {
@@ -484,6 +507,15 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         if(PocketBotSettings.KEY_SELECTED_FACE.equals(key)){
             final int faceId = sharedPreferences.getInt(key, PocketBotSettings.DEFAULT_FACE_ID);
             switchFace(faceId);
+        } else if(PocketBotSettings.KEY_KEEP_ALIVE.equals(key)) {
+            final boolean keepAlive = sharedPreferences.getBoolean(key, PocketBotSettings.DEFAULT_KEEP_ALIVE);
+            if(keepAlive){
+                //Start the thread
+                mKeepAliveThread.startThread();
+            } else {
+                //Stop the thread
+                mKeepAliveThread.stopThread();
+            }
         } else {
             runOnUiThread(new Runnable() {
                 @Override

@@ -16,10 +16,10 @@
         android:summary="Text preview"
         android:defaultValue="true" />
     <CheckBoxPreference
-        android:key="bluetooth"
-        android:title="Bluetooth"
-        android:summary="Scan for Bluetooth devices"
-        android:defaultValue="false" />
+        android:key="keep_alive"
+        android:title="Keep Alive"
+        android:summary="Send 10hz heart beat to Arduino"
+        android:defaultValue="true" />
     <CheckBoxPreference
         android:key="fast_tracking"
         android:title="Fast Face Tracking"

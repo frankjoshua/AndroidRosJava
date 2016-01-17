@@ -25,6 +25,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     private static final int START_LISTENING_AFTER_PROMPT = 2;
 
     private static final int TIME_BETWEEN_HUMAN_SPOTTING = 10000;
+    public static final String TAG = "PocketBot";
 
 
     private Emotion mEmotion;
@@ -98,19 +99,29 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
 
     @Override
     public void sendSensorData(final boolean required) {
-        Log.d("PocketBot",  "sendSensorData Required: " + required);
+        if(Constants.LOGGING){
+            Log.d(TAG,  "sendSensorData Required: " + required);
+        }
         final long uptime = SystemClock.uptimeMillis();
         if(required || uptime >= mLastSensorTransmision + mSensorDelay) {
-            Log.d("PocketBot", mSensorDelay + " Data sent to body " + (uptime - mLastSensorTransmision));
+            if(Constants.LOGGING){
+                Log.d(TAG, mSensorDelay + " Data sent to body " + (uptime - mLastSensorTransmision));
+            }
             mLastSensorTransmision = uptime;
             if(mBodyInterface.isConnected()){
                 final PocketBotProtocol.PocketBotMessage data = SensorData.toPocketBotMessage(mSensorData);
                 //Send raw data
+                if(Constants.LOGGING){
+                    Log.d(TAG, mSensorData.getControl().toString());
+                }
                 mBodyInterface.sendBytes(data.toByteArray());
 
             }
         } else {
-            Log.d("PocketBot", mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
+            if(Constants.LOGGING){
+                Log.d(TAG, mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
+            }
+            System.gc();
         }
     }
 

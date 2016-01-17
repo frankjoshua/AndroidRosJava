@@ -28,6 +28,7 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbRequest;
 import android.os.Build;
+import android.provider.SyncStateContract;
 import android.util.Log;
 
 import java.io.IOException;
@@ -235,7 +236,7 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
                             + " bytes at offset " + offset + " length=" + src.length);
                 }
 
-                Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
+                //Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
                 offset += amtWritten;
             }
             return offset;

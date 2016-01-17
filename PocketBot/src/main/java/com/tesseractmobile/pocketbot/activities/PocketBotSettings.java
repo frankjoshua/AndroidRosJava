@@ -31,6 +31,7 @@ public class PocketBotSettings {
     public static final String KEY_API_AI_KEY = "api_ai_key";
     public static final String KEY_ALLOW_TELEPRESENCE = "allow_tele";
     private static final String KEY_AUTO_SIGN_IN = "auto_sign_in";
+    public static final String KEY_KEEP_ALIVE = "keep_alive";
     //Defaults
     public static final boolean DEFAULT_SHOW_TEXT_PREVIEW = true;
     public static final boolean DEFAULT_SHOW_PREVIEW = true;
@@ -39,6 +40,7 @@ public class PocketBotSettings {
     public static final String DEFAULT_API_AI_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";//"1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     public static final String DEFAULT_API_AI_TOKEN = "443dddf4747d4408b0e9451d4d53f201  ";//"443dddf4747d4408b0e9451d4d53f201";
     private static final boolean DEFAULT_AUTO_SIGN_IN = false;
+    public static final boolean DEFAULT_KEEP_ALIVE = true;
 
 
     /**
@@ -271,6 +273,10 @@ public class PocketBotSettings {
         return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(KEY_AUTO_SIGN_IN, b).commit();
     }
 
+    public static boolean isKeepAlive(final Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_KEEP_ALIVE, DEFAULT_KEEP_ALIVE);
+    }
+
     public static Object getObject(final SharedPreferences sharedPreferences, final String key) {
         if(key.equals(PocketBotSettings.KEY_SELECTED_FACE)){
             return sharedPreferences.getInt(key, 0);
@@ -302,7 +308,9 @@ public class PocketBotSettings {
             return sharedPreferences.getString(PocketBotSettings.KEY_ROBOT_ID, "");
         } else if (key.equals(PocketBotSettings.KEY_AUTO_SIGN_IN)) {
             return sharedPreferences.getBoolean(PocketBotSettings.KEY_AUTO_SIGN_IN, PocketBotSettings.DEFAULT_AUTO_SIGN_IN);
-        }  else {
+        } else if (key.equals(PocketBotSettings.KEY_KEEP_ALIVE)) {
+            return sharedPreferences.getBoolean(PocketBotSettings.KEY_KEEP_ALIVE, PocketBotSettings.DEFAULT_KEEP_ALIVE);
+        } else {
             throw new UnsupportedOperationException("Unknown key: " + key);
         }
     }

@@ -90,15 +90,16 @@ public class SensorData {
         update();
     }
 
+    //Builders
+    final static private PocketBotProtocol.PocketBotMessage.Builder messageBuilder = PocketBotProtocol.PocketBotMessage.newBuilder();
+    final static private PocketBotProtocol.Face.Builder faceBuilder = PocketBotProtocol.Face.newBuilder();
+    final static private PocketBotProtocol.Control.Builder controlBuilder = PocketBotProtocol.Control.newBuilder();
+    final static private PocketBotProtocol.Sensor.Builder sensorBuilder = PocketBotProtocol.Sensor.newBuilder();
+    final static private PocketBotProtocol.Gps.Builder gpsBuilder = PocketBotProtocol.Gps.newBuilder();
+    final static private PocketBotProtocol.Joystick.Builder joyStickBuilder = PocketBotProtocol.Joystick.newBuilder();
 
     public static PocketBotProtocol.PocketBotMessage toPocketBotMessage(final SensorData sensorData) {
-        //Builders
-        final PocketBotProtocol.PocketBotMessage.Builder messageBuilder = PocketBotProtocol.PocketBotMessage.newBuilder();
-        final PocketBotProtocol.Face.Builder faceBuilder = PocketBotProtocol.Face.newBuilder();
-        final PocketBotProtocol.Control.Builder controlBuilder = PocketBotProtocol.Control.newBuilder();
-        final PocketBotProtocol.Sensor.Builder sensorBuilder = PocketBotProtocol.Sensor.newBuilder();
-        final PocketBotProtocol.Gps.Builder gpsBuilder = PocketBotProtocol.Gps.newBuilder();
-        final PocketBotProtocol.Joystick.Builder joyStickBuilder = PocketBotProtocol.Joystick.newBuilder();
+
 
         //Objects
         final PocketBotProtocol.Face face = faceBuilder
@@ -216,5 +217,11 @@ public class SensorData {
     static public class Control {
         public SensorData.Joystick joy1 = new SensorData.Joystick();
         public SensorData.Joystick joy2 = new SensorData.Joystick();
+
+        @Override
+        public String toString() {
+            final String toString = "X: " + Double.toString(joy1.X) + " Y: " + Double.toString(joy1.Y);
+            return toString;
+        }
     }
 }
