@@ -15,39 +15,48 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class KeepAliveThread extends Thread{
 
     final private KeepAliveListener mKeepAliveListener;
+    final private InternetAliveListener mInternetAliveListener;
     final private AtomicBoolean mRunning = new AtomicBoolean(false);
+    private Thread mNetThread;
 
-    public KeepAliveThread(KeepAliveListener keepAliveListener) {
+    public KeepAliveThread(final KeepAliveListener keepAliveListener, final InternetAliveListener internetAliveListener) {
         super("KeepAliveThread");
+        if(keepAliveListener == null){
+            throw new UnsupportedOperationException();
+        }
         mKeepAliveListener = keepAliveListener;
-
-        Thread netThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    //Keep Arduino awake
-                    if(mRunning.get()) {
-                        if(RemoteControl.get().getLag() > 200 || executeCommand() ==  false){
-                            mKeepAliveListener.onInternetTimeout();
-                            Log.e("Thread", "Connection Lost, sending stop command!");
+        mInternetAliveListener = internetAliveListener;
+        if(mInternetAliveListener != null) {
+            mNetThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (mRunning.get()) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //Keep Arduino awake
+                        if (mRunning.get()) {
+                            final long lag = RemoteControl.get().getLag();
+                            if (Constants.LOGGING) {
+                                Log.d("Thread", "Lag: " + lag);
+                            }
+                            if (lag > 500 || executeCommand() == false) {
+                                mInternetAliveListener.onInternetTimeout();
+                                Log.e("Thread", "Connection Lost, sending stop command!");
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        netThread.start();
-        start();
     }
 
     @Override
     public void run() {
-        while(true){
+        while(mRunning.get()){
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -98,11 +107,17 @@ public class KeepAliveThread extends Thread{
     public void startThread() {
         Log.d("Thread", "Starting KeepAliveThread");
         mRunning.set(true);
+        start();
+        if(mNetThread != null){
+            mNetThread.start();
+        }
     }
 
     public void stopThread() {
         Log.d("Thread", "Stopping KeepAliveThread");
-        mRunning.set(false);
+        if(mNetThread != null){
+            mRunning.set(false);
+        }
     }
 
     public interface KeepAliveListener {
@@ -110,7 +125,9 @@ public class KeepAliveThread extends Thread{
          * Send on a regular basis to wake up robot
          */
         void onHeartBeat();
+    }
 
+    public interface InternetAliveListener {
         /**
          * Called if internet ping times out
          */

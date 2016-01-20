@@ -58,7 +58,7 @@ public class PocketBotApp extends Application{
         DataStore.init(this);
 
         //Start up remote control service
-        RemoteControl.init(PocketBotSettings.getRobotId(this));
+        RemoteControl.init(this, PocketBotSettings.getRobotId(this));
 
     }
 

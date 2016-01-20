@@ -1,5 +1,8 @@
 package com.tesseractmobile.pocketbot.robot;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -9,6 +12,8 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ServerValue;
 import com.firebase.client.ValueEventListener;
+import com.tesseractmobile.pocketbot.activities.KeepAliveThread;
+import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
 import org.json.JSONObject;
 
@@ -19,11 +24,12 @@ import java.util.Date;
 /**
  * Created by josh on 12/1/2015.
  */
-public class RemoteControl implements ChildEventListener, DataStore.OnAuthCompleteListener {
+public class RemoteControl implements ChildEventListener, DataStore.OnAuthCompleteListener, KeepAliveThread.KeepAliveListener, SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String CONTROL = "control";
     public static final String DATA = "data";
     private static final String CONNECTED = "connected";
     private static final String TIMESTAMP = "time_stamp";
+    private KeepAliveThread mKeepAliveThread;
     //private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
     private Firebase mFirebaseListen;
     private Firebase mFirebaseTransmit;
@@ -34,36 +40,25 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     final private ArrayList<RemoteListener> mRemoteListeners = new ArrayList<RemoteListener>();
     /** Singleton */
     static private RemoteControl instance;
-    private Long mTimeStamp;
-    private long mTimeSinceLastControl;
+    private long mTimeStamp;
     private String mTransmitUUID;
 
-    private RemoteControl(final String id){
+    private RemoteControl(final Context context, final String id){
         setId(id);
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    timeStamp();
-                }
-            }
-        });
-        thread.start();
+        if(PocketBotSettings.isKeepAlive(context)){
+            mKeepAliveThread = new KeepAliveThread(this, null);
+            mKeepAliveThread.startThread();
+        }
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
     }
 
     /**
      * Initialize the RemoteControl
      * @param id
      */
-    static public void init(final String id){
+    static public void init(final Context context, final String id){
         if(instance == null){
-            instance = new RemoteControl(id);
+            instance = new RemoteControl(context, id);
         }
     }
 
@@ -146,7 +141,10 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     void timeStamp(){
         if(mTransmitUUID != null) {
             //Set time stamp
-            mFirebaseTransmit.child(mTransmitUUID).child(CONTROL).child(CONNECTED).child(TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+            mFirebaseTransmit.child(mTransmitUUID).child(CONNECTED).child(TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+        } else {
+            //Set local time stamp
+            mTimeStamp = SystemClock.uptimeMillis();
         }
     }
 
@@ -180,7 +178,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     public void onAuthComplete() {
         //Listen for messages from firebase
         mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
-        //mFirebaseListen.child(CONTROL).addChildEventListener(this);
+        mFirebaseListen.child(CONTROL).addChildEventListener(this);
         //Setup transmitter
         mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
         //Listen for controler disconnect
@@ -200,7 +198,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             }
         });
         //Listen for remote disconnect
-        mFirebaseListen.child(CONTROL).child(CONNECTED).addChildEventListener(new ChildEventListener() {
+        mFirebaseListen.child(CONNECTED).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 //Get first time stamp
@@ -214,13 +212,11 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 final Long timeStamp = dataSnapshot.getValue(Long.class);
-                //Get change in time
-                mTimeSinceLastControl = timeStamp - mTimeStamp;
                 //Save current time
-                mTimeStamp = timeStamp;
-                if(Constants.LOGGING){
-                    Log.d("TimeStamp", "Lag: " + mTimeSinceLastControl);
-                }
+                mTimeStamp = SystemClock.uptimeMillis();
+//                if(Constants.LOGGING){
+//                    Log.d("TimeStamp", "Lag: " + getLag());
+//                }
             }
 
             @Override
@@ -245,6 +241,23 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     }
 
     public long getLag() {
-        return mTimeSinceLastControl;
+        return SystemClock.uptimeMillis() - mTimeStamp;
+    }
+
+    @Override
+    public void onHeartBeat() {
+        timeStamp();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(PocketBotSettings.KEY_KEEP_ALIVE)){
+            if(sharedPreferences.getBoolean(key, PocketBotSettings.DEFAULT_KEEP_ALIVE)){
+                mKeepAliveThread = new KeepAliveThread(this, null);
+                mKeepAliveThread.startThread();
+            } else {
+                mKeepAliveThread.stopThread();
+            }
+        }
     }
 }

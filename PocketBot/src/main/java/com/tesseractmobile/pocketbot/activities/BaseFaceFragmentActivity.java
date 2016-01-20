@@ -74,7 +74,7 @@ import java.io.IOException;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceFragmentActivity extends FragmentActivity implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, KeepAliveThread.KeepAliveListener {
+public class BaseFaceFragmentActivity extends FragmentActivity implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
@@ -137,7 +137,15 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         findViewById(R.id.btnApiAi).setOnClickListener(this);
         findViewById(R.id.btnRemoteFace).setOnClickListener(this);
         findViewById(R.id.btnFeedback).setOnClickListener(this);
-        findViewById(R.id.tvRobotName).setOnClickListener(this);
+        findViewById(R.id.llTop).setOnClickListener(this);
+        findViewById(R.id.tvModes).setOnClickListener(this);
+        findViewById(R.id.tvSettings).setOnClickListener(this);
+        findViewById(R.id.tvEmotions).setOnClickListener(this);
+
+        //Hide views
+        findViewById(R.id.llModes).setVisibility(View.GONE);
+        findViewById(R.id.emotionsFragment).setVisibility(View.GONE);
+        findViewById(R.id.settingsFragment).setVisibility(View.GONE);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
@@ -172,8 +180,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         }
 
         //Keep alive thread
-        mKeepAliveThread = new KeepAliveThread(this);
         if(PocketBotSettings.isKeepAlive(this)) {
+            mKeepAliveThread = new KeepAliveThread(this, this);
             mKeepAliveThread.startThread();
         }
 
@@ -511,6 +519,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             final boolean keepAlive = sharedPreferences.getBoolean(key, PocketBotSettings.DEFAULT_KEEP_ALIVE);
             if(keepAlive){
                 //Start the thread
+                mKeepAliveThread = new KeepAliveThread(this, this);
                 mKeepAliveThread.startThread();
             } else {
                 //Stop the thread
@@ -538,7 +547,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     public void onClick(View view) {
         final int id = view.getId();
         switch (id){
-            case R.id.tvRobotName:
+            case R.id.llTop:
                 RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
                 robotSelectionDialog.setSignInOnClickListener(this);
                 robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
@@ -576,8 +585,29 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 i.setData(Uri.parse(url));
                 startActivity(i);
                 break;
+            case R.id.tvModes:
+                //Toggle Modes View visibility
+                final View modesLayout = findViewById(R.id.llModes);
+                toggleViewVisibility(modesLayout);
+                break;
+            case R.id.tvSettings:
+                final View settingsFragment = findViewById(R.id.settingsFragment);
+                toggleViewVisibility(settingsFragment);
+                break;
+            case R.id.tvEmotions:
+                final View emotionsFragment = findViewById(R.id.emotionsFragment);
+                toggleViewVisibility(emotionsFragment);
+                break;
             default:
                 throw new UnsupportedOperationException("Not implemented");
+        }
+    }
+
+    private void toggleViewVisibility(final View view) {
+        if(view.getVisibility() == View.GONE){
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
         }
     }
 
