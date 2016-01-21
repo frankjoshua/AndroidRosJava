@@ -27,6 +27,8 @@ public class PocketBotApp extends Application{
         super.onCreate();
         //Track errors
         Fabric.with(this, new Crashlytics());
+        //Get robot id first so Shared preference listeners don't trigger
+        final String robotId = PocketBotSettings.getRobotId(this);
         //Init Robot
         Robot.init();
         //Setup Quickblox
@@ -58,7 +60,7 @@ public class PocketBotApp extends Application{
         DataStore.init(this);
 
         //Start up remote control service
-        RemoteControl.init(this, PocketBotSettings.getRobotId(this));
+        RemoteControl.init(this, robotId);
 
     }
 
