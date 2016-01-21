@@ -34,6 +34,7 @@ import com.quickblox.videochat.webrtc.exception.QBRTCSignalException;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
+import com.tesseractmobile.pocketbot.robot.Robot;
 
 import org.jivesoftware.smack.SmackException;
 
@@ -53,13 +54,13 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     @Override
     public void onStart() {
         super.onStart();
-        DataStore.get().registerOnAuthCompleteListener(this);
+        Robot.get().registerOnAuthCompleteListener(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        DataStore.get().unregisterOnAuthCompleteListener(this);
+        Robot.get().unregisterOnAuthCompleteListener(this);
         if(mCurrentRTCSession != null){
             mCurrentRTCSession.hangUp(mCurrentRTCSession.getUserInfo());
             mCurrentRTCSession.removeSessionnCallbacksListener(this);

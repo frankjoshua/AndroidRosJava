@@ -14,6 +14,7 @@ import com.firebase.client.ServerValue;
 import com.firebase.client.ValueEventListener;
 import com.tesseractmobile.pocketbot.activities.KeepAliveThread;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
 import org.json.JSONObject;
 
@@ -43,8 +44,8 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     private long mTimeStamp;
     private String mTransmitUUID;
 
-    private RemoteControl(final Context context, final String id){
-        setId(id);
+    private RemoteControl(final Context context, final DataStore dataStore, final String id){
+        setId(dataStore, id);
         if(PocketBotSettings.isKeepAlive(context)){
             mKeepAliveThread = new KeepAliveThread(this, null);
             mKeepAliveThread.startThread();
@@ -56,9 +57,9 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * Initialize the RemoteControl
      * @param id
      */
-    static public void init(final Context context, final String id){
+    static public void init(final Context context, final DataStore dataStore, final String id){
         if(instance == null){
-            instance = new RemoteControl(context, id);
+            instance = new RemoteControl(context, dataStore, id);
         }
     }
 
@@ -90,17 +91,17 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * The channel id to listen to
      * @param id
      */
-    private void setId(String id) {
+    private void setId(final DataStore dataStore, final String id) {
         if(this.id != null){
             //Stop listening for firebase messages
             mFirebaseListen.removeEventListener(this);
             //Stop listening for auth registration
-            DataStore.get().unregisterOnAuthCompleteListener(this);
+            dataStore.unregisterOnAuthCompleteListener(this);
         }
         //Set the ID
         this.id = id;
         //Listen for auth registration
-        DataStore.get().registerOnAuthCompleteListener(this);
+        dataStore.registerOnAuthCompleteListener(this);
     }
 
     /**

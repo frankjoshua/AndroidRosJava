@@ -36,6 +36,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.tesseractmobile.pocketbot.robot.DataStore;
+import com.tesseractmobile.pocketbot.robot.Robot;
 
 import java.util.ArrayList;
 
@@ -55,7 +56,7 @@ class FirebaseArray implements ChildEventListener {
     public FirebaseArray(Query ref) {
         mQuery = ref;
         mSnapshots = new ArrayList<DataSnapshot>();
-        final Firebase robots = DataStore.get().getRobotListRef();
+        final Firebase robots = Robot.get().getDataStore().getRobotListRef();
         //mQuery.addChildEventListener(this);
         mQuery.addChildEventListener(new ChildEventListener() {
             @Override

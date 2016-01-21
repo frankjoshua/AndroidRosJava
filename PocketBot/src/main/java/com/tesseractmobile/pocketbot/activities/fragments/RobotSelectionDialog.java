@@ -20,6 +20,7 @@ import com.firebase.client.ValueEventListener;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
 import com.tesseractmobile.pocketbot.views.FirebaseRecyclerAdapter;
 import com.tesseractmobile.pocketbot.views.RobotInfoViewHolder;
@@ -47,7 +48,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         mRobotRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         //Setup list view after logging in
-        DataStore.get().registerOnAuthCompleteListener(this);
+        Robot.get().registerOnAuthCompleteListener(this);
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Select your robot")
@@ -61,7 +62,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         mSignInView.setVisibility(View.GONE);
         //Set adapter
         final String currentRobotId = PocketBotSettings.getRobotId(getContext());
-        final Firebase userListRef = DataStore.get().getUserListRef().child(DataStore.ROBOTS);
+        final Firebase userListRef = Robot.get().getDataStore().getUserListRef().child(DataStore.ROBOTS);
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {
@@ -89,7 +90,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
                     viewHolder.btnDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            DataStore.get().deleteRobot(model.prefs.robot_id);
+                            Robot.get().deleteRobot(model.prefs.robot_id);
                         }
                     });
                 }

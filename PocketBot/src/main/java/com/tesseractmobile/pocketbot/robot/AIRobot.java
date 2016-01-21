@@ -3,7 +3,7 @@ package com.tesseractmobile.pocketbot.robot;
 /**
  * Created by josh on 11/16/2015.
  */
-public class AIRobot extends BaseRobot {
+abstract public class AIRobot extends BaseRobot {
     private AI mAI;
 
     private SpeechListener mSpeechListener;

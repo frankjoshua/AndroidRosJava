@@ -216,7 +216,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
         if (!mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
-            DataStore.get().setAuthToken(PocketBotSettings.getRobotId(this), token);
+            Robot.get().setAuthToken(PocketBotSettings.getRobotId(this), token);
             Toast.makeText(this, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
             mSignInButton.setEnabled(true);
             //Auto sign in next time

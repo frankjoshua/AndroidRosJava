@@ -46,15 +46,16 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
     }
 
-    static public void init(final Context context){
+    static public DataStore init(final Context context){
         if(instance == null){
             instance = new DataStore(context);
         }
-    }
-
-    static public DataStore get(){
         return instance;
     }
+
+//    static public DataStore get(){
+//        return instance;
+//    }
 
     /**
      * Signs in to Firebase using Google Auth

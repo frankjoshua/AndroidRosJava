@@ -29,8 +29,12 @@ public class PocketBotApp extends Application{
         Fabric.with(this, new Crashlytics());
         //Get robot id first so Shared preference listeners don't trigger
         final String robotId = PocketBotSettings.getRobotId(this);
+        //Init DataStore
+        final DataStore dataStore = DataStore.init(this);
+        //Start up remote control service
+        RemoteControl.init(this, dataStore, robotId);
         //Init Robot
-        Robot.init();
+        Robot.init(dataStore);
         //Setup Quickblox
         QBSettings.getInstance().fastConfigInit("30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
         //Bind to voice recognition service to hold constant connection
@@ -56,11 +60,7 @@ public class PocketBotApp extends Application{
         //Start Firebase - before DataStore
         Firebase.setAndroidContext(this);
 
-        //Init DataStore
-        DataStore.init(this);
 
-        //Start up remote control service
-        RemoteControl.init(this, robotId);
 
     }
 

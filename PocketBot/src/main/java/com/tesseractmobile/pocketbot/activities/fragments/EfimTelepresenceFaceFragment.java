@@ -15,6 +15,7 @@ import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
@@ -56,7 +57,7 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
                 ((View.OnClickListener) activity).onClick(view);
             }
         });
-        DataStore.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+        Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
             @Override
             public void onAuthComplete() {
                 activity.runOnUiThread(new Runnable() {
