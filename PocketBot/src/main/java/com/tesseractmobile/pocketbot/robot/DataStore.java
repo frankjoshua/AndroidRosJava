@@ -179,6 +179,8 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         getRobots().child(robot_id).removeValue();
         //Delete robot control
         mFirebase.child(RemoteControl.CONTROL).child(robot_id).removeValue();
+        //Delete robot sensor data
+        mFirebase.child(DataStore.SENSORS).child(robot_id).removeValue();
     }
 
     /**
