@@ -179,12 +179,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             startSignin();
         }
 
-        //Keep alive thread
-        if(PocketBotSettings.isKeepAlive(this)) {
-            mKeepAliveThread = new KeepAliveThread(this, this);
-            mKeepAliveThread.startThread();
-        }
-
     }
 
     @Override
@@ -285,6 +279,11 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
         //Listen for speech to update preview
         mRobotInterFace.registerSpeechListener(this);
+        //Keep alive thread
+        if(PocketBotSettings.isKeepAlive(this)) {
+            mKeepAliveThread = new KeepAliveThread(this, this);
+            mKeepAliveThread.startThread();
+        }
     }
 
     @Override
@@ -294,6 +293,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);
         //Stop listening for speech to update preview
         mRobotInterFace.unregisterSpeechListener(this);
+        //Keep alive thread
+        if(PocketBotSettings.isKeepAlive(this)) {
+            mKeepAliveThread.stopThread();
+        }
     }
 
     @Override

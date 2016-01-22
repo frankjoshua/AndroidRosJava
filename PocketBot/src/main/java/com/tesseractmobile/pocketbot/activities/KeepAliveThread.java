@@ -44,7 +44,7 @@ public class KeepAliveThread extends Thread{
                             }
                             if (lag > 500 || executeCommand() == false) {
                                 mInternetAliveListener.onInternetTimeout();
-                                Log.e("Thread", "Connection Lost, sending stop command!");
+                                Log.e(getName(), "Connection Lost, sending stop command!");
                             }
                         }
                     }
@@ -66,7 +66,7 @@ public class KeepAliveThread extends Thread{
             if(mRunning.get()) {
                 mKeepAliveListener.onHeartBeat();
                 if (Constants.LOGGING) {
-                    Log.d("Thread", "Triggering a sensor send");
+                    Log.d(getName(), "Triggering a sensor send");
                 }
             }
 
@@ -75,7 +75,7 @@ public class KeepAliveThread extends Thread{
 
     /**
      * Pings internet and return true if sucessful
-     * Also true if error
+     * Also false if error
      * @return
      */
     private boolean executeCommand(){
@@ -94,18 +94,18 @@ public class KeepAliveThread extends Thread{
         catch (InterruptedException ignore)
         {
             ignore.printStackTrace();
-            System.out.println(" Exception:"+ignore);
+            Log.d(getName(), " Exception:" + ignore);
         }
         catch (IOException e)
         {
             e.printStackTrace();
-            System.out.println(" Exception:"+e);
+            Log.e(getName(), " Exception:" + e);
         }
-        return true;
+        return false;
     }
 
     public void startThread() {
-        Log.d("Thread", "Starting KeepAliveThread");
+        Log.d(getName(), "Starting KeepAliveThread");
         mRunning.set(true);
         start();
         if(mNetThread != null){
@@ -114,10 +114,8 @@ public class KeepAliveThread extends Thread{
     }
 
     public void stopThread() {
-        Log.d("Thread", "Stopping KeepAliveThread");
-        if(mNetThread != null){
-            mRunning.set(false);
-        }
+        Log.d(getName(), "Stopping KeepAliveThread");
+        mRunning.set(false);
     }
 
     public interface KeepAliveListener {

@@ -48,6 +48,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
         setId(dataStore, id);
         if(PocketBotSettings.isKeepAlive(context)){
             mKeepAliveThread = new KeepAliveThread(this, null);
+            mKeepAliveThread.setName("RemoteKeepAliveThread");
             mKeepAliveThread.startThread();
         }
         PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
@@ -255,6 +256,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
         if(key.equals(PocketBotSettings.KEY_KEEP_ALIVE)){
             if(sharedPreferences.getBoolean(key, PocketBotSettings.DEFAULT_KEEP_ALIVE)){
                 mKeepAliveThread = new KeepAliveThread(this, null);
+                mKeepAliveThread.setName("RemoteKeepAliveThread");
                 mKeepAliveThread.startThread();
             } else {
                 mKeepAliveThread.stopThread();
