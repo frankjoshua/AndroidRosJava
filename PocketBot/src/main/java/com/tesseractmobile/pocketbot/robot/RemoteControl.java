@@ -197,7 +197,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * Stop sending keep alive message
      */
     public void disconnect(){
-        mFirebaseTransmit.child(mTransmitUUID).child(CONTROL).removeEventListener(mChildEventListener);
+        mFirebaseStatus.child(mTransmitUUID).child(DataStore.SENSORS).removeEventListener(mChildEventListener);
         mTransmitUUID = null;
     }
 

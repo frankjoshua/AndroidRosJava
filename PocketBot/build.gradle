@@ -32,9 +32,9 @@ android {
         applicationId "com.tesseractmobile.pocketbot"
         minSdkVersion 12
         targetSdkVersion 23
-        //15 - 1.9.2 released 1/21/16
-        versionCode 16
-        versionName "1.9.3"
+        //16 - 1.9.3 released 1/21/16
+        versionCode 17
+        versionName "1.9.4"
 
         // Enabling multidex support.
         multiDexEnabled false
