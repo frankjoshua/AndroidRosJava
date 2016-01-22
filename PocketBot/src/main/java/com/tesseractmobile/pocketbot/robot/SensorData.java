@@ -188,6 +188,10 @@ public class SensorData {
         this.control = control;
     }
 
+    public void setSensor(final Sensor sensor) {
+        this.sensor = sensor;
+    }
+
     static public class Gps {
         public float lat;
         public float lon;

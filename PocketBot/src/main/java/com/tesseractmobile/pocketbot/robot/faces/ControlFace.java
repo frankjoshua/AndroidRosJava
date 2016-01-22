@@ -7,36 +7,19 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tesseractmobile.pocketbot.R;
-import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+import com.tesseractmobile.pocketbot.robot.StatusListener;
 import com.tesseractmobile.pocketbot.views.JoystickView;
 import com.tesseractmobile.pocketbot.views.MouthView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.NumberFormat;
 
 /**
  * Created by josh on 10/25/2015.
  */
-public class ControlFace extends BaseFace implements JoystickView.JoystickListener {
-
-    public static final String JOY1_X = "Joy1X";
-    public static final String JOY1_Y = "Joy1Y";
-    public static final String JOY1_Z = "Joy1Z";
-    public static final String JOY1_A = "Joy1A";
-    public static final String JOY1_B = "Joy1B";
-    public static final String JOY1_HEADING = "Heading1";
-    public static final String JOY2_X = "Joy2X";
-    public static final String JOY2_Y = "Joy2Y";
-    public static final String JOY2_Z = "Joy2Z";
-    public static final String JOY2_A = "Joy2A";
-    public static final String JOY2_B = "Joy2B";
-    public static final String JOY2_HEADING = "Heading2";
-    public static final String BATTERY = "Battery";
+public class ControlFace extends BaseFace implements JoystickView.JoystickListener, StatusListener {
 
     /** remote message delay in millis */
     public static final int REMOTE_MAX_TRANSMIT_SPEED = 100;
@@ -59,7 +42,6 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private SensorData.Joystick mJoy1 = new SensorData.Joystick();
     private SensorData.Joystick mJoy2 = new SensorData.Joystick();
     private MouthView.SpeechCompleteListener mSpeechCompleteListener;
-    private float mBattery;
 
     public ControlFace(final View view){
         numberFormat.setMinimumFractionDigits(2);
@@ -104,7 +86,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     @Override
     public void onPositionChange(final JoystickView joystickView, float x, float y, float z, final boolean a, final boolean b) {
         final SensorData sensorData = mRobotInterface.getSensorData();
-        say("Battery " + Integer.toString(sensorData.getSensor().battery) + "%");
+
         if(joystickView.getId() == R.id.joyStick) {
             final int heading = headingFromPosition(x, y);
             sensorData.setJoystick1(x, y, z, a, b, heading);
@@ -158,7 +140,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
                 mLastUpdate = SystemClock.uptimeMillis();
                 //Send to the remote robot
                 final SensorData sensorData = mRobotInterface.getSensorData();
-                RemoteControl.get().send(channel, sensorData.getControl(), false);
+                RemoteControl.get().send(sensorData.getControl(), false);
             }
         }
     }
@@ -190,13 +172,24 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
 
     /**
      * Set the UUID of the remote robot to contorl
-     * @param channel
+     * @param uuid
      */
-    public void setRemoteRobotId(final String channel){
-        mRemoteRobotId = channel;
+    public void setRemoteRobotId(final String uuid){
+        mRemoteRobotId = uuid;
         //Set disconnect command
-        if(channel != null){
-            RemoteControl.get().getControlRef().child(channel).child(RemoteControl.CONTROL).child(RemoteControl.DATA).child("joy1").onDisconnect().setValue(new SensorData.Joystick());
+        if(uuid != null){
+            RemoteControl.get().getControlRef().child(uuid).child(RemoteControl.CONTROL).child(RemoteControl.DATA).child("joy1").onDisconnect().setValue(new SensorData.Joystick());
+            RemoteControl.get().connect(uuid, this);
+        } else {
+            //Disconnect on null channel
+            RemoteControl.get().disconnect();
         }
+    }
+
+    @Override
+    public void onRemoteSensorUpdate(final SensorData sensorData) {
+        //Received sensor data from remote robot
+        say("Heading: " + Integer.toString(sensorData.getSensor().heading) + " Battery " + Integer.toString(sensorData.getSensor().battery) + "%\n"
+        + "JoyX: " + sensorData.getControl().joy1.X + " JoyY: " + sensorData.getControl().joy1.Y);
     }
 }

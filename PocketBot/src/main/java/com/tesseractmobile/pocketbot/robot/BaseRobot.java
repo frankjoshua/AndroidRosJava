@@ -34,6 +34,8 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     private ArrayList<SpeechStateListener> mSpeechStateListeners = new ArrayList<SpeechStateListener>();
     private VoiceRecognitionService mVoiceRecognitionService;
     final private SensorData mSensorData = new SensorData();
+    final private DataStore mDataStore;
+
     protected BodyInterface mBodyInterface = new BodyInterface() {
         @Override
         public void sendObject(Object object) {
@@ -73,6 +75,10 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
             }
         }
     };
+
+    public BaseRobot(final DataStore dataStore){
+        mDataStore = dataStore;
+    }
 
     @Override
     public void setEmotion(Emotion emotion) {
@@ -116,6 +122,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
                 }
                 mBodyInterface.sendBytes(data.toByteArray());
 
+                mDataStore.sendSensorData(mSensorData);
             }
         } else {
             if(Constants.LOGGING){
@@ -326,5 +333,30 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public synchronized void unregisterSpeechChangeListener(final SpeechStateListener speechStateListener){
         mSpeechStateListeners.remove(speechStateListener);
+    }
+
+    @Override
+    public void setAuthToken(String robotId, String token) {
+        mDataStore.setAuthToken(robotId, token);
+    }
+
+    @Override
+    public void registerOnAuthCompleteListener(DataStore.OnAuthCompleteListener onAuthCompleteListener) {
+        mDataStore.registerOnAuthCompleteListener(onAuthCompleteListener);
+    }
+
+    @Override
+    public void unregisterOnAuthCompleteListener(DataStore.OnAuthCompleteListener onAuthCompleteListener) {
+        mDataStore.unregisterOnAuthCompleteListener(onAuthCompleteListener);
+    }
+
+    @Override
+    public void deleteRobot(String robotId) {
+        mDataStore.deleteRobot(robotId);
+    }
+
+    @Override
+    public DataStore getDataStore() {
+        return mDataStore;
     }
 }

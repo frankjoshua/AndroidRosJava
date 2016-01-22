@@ -13,10 +13,9 @@ import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 public class Robot extends AIRobot {
 
     static private RobotInterface mRobot;
-    final private DataStore mDataStore;
 
     private Robot(final DataStore dataStore){
-        mDataStore = dataStore;
+        super(dataStore);
     };
 
     static public void init(final DataStore dataStore){
@@ -29,28 +28,5 @@ public class Robot extends AIRobot {
         return mRobot;
     }
 
-    @Override
-    public void setAuthToken(String robotId, String token) {
-        mDataStore.setAuthToken(robotId, token);
-    }
 
-    @Override
-    public void registerOnAuthCompleteListener(DataStore.OnAuthCompleteListener onAuthCompleteListener) {
-        mDataStore.registerOnAuthCompleteListener(onAuthCompleteListener);
-    }
-
-    @Override
-    public void unregisterOnAuthCompleteListener(DataStore.OnAuthCompleteListener onAuthCompleteListener) {
-        mDataStore.unregisterOnAuthCompleteListener(onAuthCompleteListener);
-    }
-
-    @Override
-    public void deleteRobot(String robotId) {
-        mDataStore.deleteRobot(robotId);
-    }
-
-    @Override
-    public DataStore getDataStore() {
-        return mDataStore;
-    }
 }

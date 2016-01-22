@@ -40,7 +40,7 @@ public class KeepAliveThread extends Thread{
                         if (mRunning.get()) {
                             final long lag = RemoteControl.get().getLag();
                             if (Constants.LOGGING) {
-                                Log.d("Thread", "Lag: " + lag);
+                                Log.d(getName(), "Lag: " + lag);
                             }
                             if (lag > 500 || executeCommand() == false) {
                                 mInternetAliveListener.onInternetTimeout();

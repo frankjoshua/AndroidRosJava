@@ -3,7 +3,6 @@ package com.tesseractmobile.pocketbot.robot;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.firebase.client.ChildEventListener;
@@ -14,19 +13,15 @@ import com.firebase.client.ServerValue;
 import com.firebase.client.ValueEventListener;
 import com.tesseractmobile.pocketbot.activities.KeepAliveThread;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
-import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
-import org.json.JSONObject;
-
-import java.nio.channels.UnsupportedAddressTypeException;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by josh on 12/1/2015.
  */
 public class RemoteControl implements ChildEventListener, DataStore.OnAuthCompleteListener, KeepAliveThread.KeepAliveListener, SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String CONTROL = "control";
+    public static final String STATUS = "robot_status";
     public static final String DATA = "data";
     private static final String CONNECTED = "connected";
     private static final String TIMESTAMP = "time_stamp";
@@ -37,12 +32,18 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
 
     /** the pubnub channel to listen to */
     private String id;
-
+    /** Listen to control data from Remote */
     final private ArrayList<RemoteListener> mRemoteListeners = new ArrayList<RemoteListener>();
+    /** Notify of status update from current connected robot */
+    private StatusListener mStatusListener;
+
     /** Singleton */
     static private RemoteControl instance;
     private long mTimeStamp;
     private String mTransmitUUID;
+    private ChildEventListener mChildEventListener;
+    private Firebase mFirebaseStatus;
+    final private SensorData mSensorData = new SensorData();
 
     private RemoteControl(final Context context, final DataStore dataStore, final String id){
         setId(dataStore, id);
@@ -125,25 +126,85 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     }
 
     /**
-     * Pass data to remote robot
+     * Create a connection to the remote robot and start tracking status
      * @param uuid
-     * @param object
      */
-    public void send(String uuid, Object object, final boolean asString) {
+    public void connect(final String uuid, final StatusListener statusListener){
         mTransmitUUID = uuid;
-        //Send to firebase
-        if(asString){
-            mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object.toString());
-        } else {
-            mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object);
-        }
-        timeStamp();
+        mChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                final StatusListener listener = statusListener;
+                if(listener != null){
+                    //Read in sensor data
+                    if(dataSnapshot.getKey().equals("sensor")) {
+                        final SensorData.Sensor sensor = dataSnapshot.getValue(SensorData.Sensor.class);
+                        mSensorData.setSensor(sensor);
+                    } else if(dataSnapshot.getKey().equals("control")) {
+                        final SensorData.Control control = dataSnapshot.getValue(SensorData.Control.class);
+                        mSensorData.setControl(control);
+                    } else if(dataSnapshot.getKey().equals("face")) {
+                        final SensorData.Face face = dataSnapshot.getValue(SensorData.Face.class);
+                        mSensorData.setFace(face.id);
+                        mSensorData.setFace(face.X, face.Y, face.Z);
+                    }
+                    //Update listener
+                    listener.onRemoteSensorUpdate(mSensorData);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        };
+        mFirebaseStatus.child(uuid).child(DataStore.SENSORS).addChildEventListener(mChildEventListener);
     }
 
-    void timeStamp(){
-        if(mTransmitUUID != null) {
+    /**
+     * Pass data to remote robot
+     * @param object
+     */
+    public void send(final Object object, final boolean asString) {
+        final String uuid = mTransmitUUID;
+        if(uuid != null) {
+            //Send to firebase
+            if (asString) {
+                mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object.toString());
+            } else {
+                mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object);
+            }
+            timeStamp(uuid);
+        }
+    }
+
+    /**
+     * Stop sending keep alive message
+     */
+    public void disconnect(){
+        mFirebaseTransmit.child(mTransmitUUID).child(CONTROL).removeEventListener(mChildEventListener);
+        mTransmitUUID = null;
+    }
+
+    void timeStamp(final String uuid){
+        if(uuid != null) {
             //Set time stamp
-            mFirebaseTransmit.child(mTransmitUUID).child(CONNECTED).child(TIMESTAMP).setValue(ServerValue.TIMESTAMP);
+            mFirebaseTransmit.child(uuid).child(CONNECTED).child(TIMESTAMP).setValue(ServerValue.TIMESTAMP);
         } else {
             //Set local time stamp
             mTimeStamp = SystemClock.uptimeMillis();
@@ -183,6 +244,8 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
         mFirebaseListen.child(CONTROL).addChildEventListener(this);
         //Setup transmitter
         mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
+        //Listen for status updates
+        mFirebaseStatus = new Firebase(DataStore.FIREBASE_URL).child(STATUS);
         //Listen for controler disconnect
         Firebase connectedRef = new Firebase(DataStore.BASE_FIREBASE_URL + ".info/connected");
         connectedRef.addValueEventListener(new ValueEventListener() {
@@ -204,21 +267,22 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 //Get first time stamp
-                final Long timeStamp = dataSnapshot.getValue(Long.class);
-                if(Constants.LOGGING){
-                    Log.d("TimeStamp", "Control Timestamp: " + timeStamp.toString());
-                }
-                mTimeStamp = timeStamp;
+//                final Long timeStamp = dataSnapshot.getValue(Long.class);
+//                if(Constants.LOGGING){
+//                    Log.d("TimeStamp", "Control Timestamp: " + timeStamp.toString());
+//                }
+//                mTimeStamp = timeStamp;
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                final Long timeStamp = dataSnapshot.getValue(Long.class);
+                //final Long timeStamp = dataSnapshot.getValue(Long.class);
                 //Save current time
+                if(Constants.LOGGING){
+                    Log.d("TimeStamp", "Lag: " + getLag());
+                }
                 mTimeStamp = SystemClock.uptimeMillis();
-//                if(Constants.LOGGING){
-//                    Log.d("TimeStamp", "Lag: " + getLag());
-//                }
+
             }
 
             @Override
@@ -242,13 +306,18 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
         return mFirebaseTransmit;
     }
 
+    /**
+     * Time since last remote command received
+     * Does not indicate lost connection just the time since last update
+     * @return
+     */
     public long getLag() {
         return SystemClock.uptimeMillis() - mTimeStamp;
     }
 
     @Override
     public void onHeartBeat() {
-        timeStamp();
+        timeStamp(mTransmitUUID);
     }
 
     @Override

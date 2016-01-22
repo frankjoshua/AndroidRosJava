@@ -16,4 +16,5 @@ public interface RemoteListener {
      * Possibly because of loss of internet
      */
     void onConnectionLost();
+
 }

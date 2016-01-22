@@ -8,6 +8,10 @@ abstract public class AIRobot extends BaseRobot {
 
     private SpeechListener mSpeechListener;
 
+    public AIRobot(final DataStore dataStore) {
+        super(dataStore);
+    }
+
     /**
      * Set the AI service to use
      * @param ai

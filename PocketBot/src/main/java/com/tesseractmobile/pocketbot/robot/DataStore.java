@@ -13,7 +13,6 @@ import com.firebase.client.ServerValue;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Created by josh on 12/27/2015.
@@ -21,7 +20,7 @@ import java.util.Map;
 public class DataStore implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
-    public static final String API_VERSION = "betaV2";
+    public static final String API_VERSION = "betaV3";
     public static final String BASE_FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/";
     public static final String FIREBASE_URL = BASE_FIREBASE_URL + API_VERSION + "/";
     public static final String AUTH_DATA = "auth_data";
@@ -29,6 +28,8 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     public static final String LAST_ONLINE = "lastOnline";
     public static final String IS_CONNECTED = "isConnected";
     public static final String PREFS = "prefs";
+    public static final String SENSORS = "sensors";
+    public static final String SENSOR_DATA = "sensor_data";
     static private DataStore instance;
 
     /** Stores user and robot data */
@@ -131,14 +132,14 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
      * @return
      */
     public Firebase getRobotListRef() {
-        if(mAuthData != null){
+        if(isLoggedIn()){
             return getRobots();
         }
         throw new UnsupportedOperationException();
     }
 
     public Firebase getUserListRef() {
-        if (mAuthData != null){
+        if (isLoggedIn()){
             return mFirebase.child(USERS).child(mAuthData.getUid());
         }
         throw new UnsupportedOperationException();
@@ -150,7 +151,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
      */
     public void registerOnAuthCompleteListener(OnAuthCompleteListener onAuthCompleteListener) {
         mOnAuthCompleteListeners.add(onAuthCompleteListener);
-        if(mAuthData != null){
+        if(isLoggedIn()){
             onAuthCompleteListener.onAuthComplete();
         }
     }
@@ -178,6 +179,20 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         getRobots().child(robot_id).removeValue();
         //Delete robot control
         mFirebase.child(RemoteControl.CONTROL).child(robot_id).removeValue();
+    }
+
+    /**
+     * Upload the sensor data to the cloud
+     * @param sensorData
+     */
+    public void sendSensorData(final SensorData sensorData) {
+        if(isLoggedIn()){
+            mFirebase.child(RemoteControl.STATUS).child(mRobotId).child(SENSORS).setValue(sensorData);
+        }
+    }
+
+    private boolean isLoggedIn() {
+        return mAuthData != null && mRobotId != null;
     }
 
     public interface OnAuthCompleteListener {
@@ -225,37 +240,6 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
                 mFirebase.child(mRobotId).child(SETTINGS).child(PREFS).addChildEventListener(this);
                 return;
             }
-//            final Object value;
-//            if(key.equals(PocketBotSettings.KEY_ROBOT_ID)){
-//                //Remove old event listener
-//                mFirebase.child(mRobotId).child(SETTINGS).child(PREFS).removeEventListener((ChildEventListener) this);
-//                //Get new Id
-//                mRobotId = sharedPreferences.getString(key, mRobotId);
-//                //Create new event listener
-//                mFirebase.child(mRobotId).child(SETTINGS).child(PREFS).addChildEventListener(this);
-//                //Update Id
-//                mRobotSettings.robotId = mRobotId;
-//                return;
-//            } else if(key.equals(PocketBotSettings.KEY_SELECTED_FACE)){
-//                mRobotSettings.selectedFace = sharedPreferences.getInt(key, 0);
-//            } else if (key.equals(PocketBotSettings.KEY_FAST_TRACKING)) {
-//                mRobotSettings.fastFaceTracking = sharedPreferences.getBoolean(key, false);
-//            } else if (key.equals(PocketBotSettings.KEY_SHOW_PREVIEW)) {
-//                mRobotSettings.showVideoPreview = sharedPreferences.getBoolean(key, false);
-//            } else if (key.equals(PocketBotSettings.KEY_QB_ID)) {
-//                mRobotSettings.qbId = sharedPreferences.getInt(key, -1);
-//            } else if (key.equals(PocketBotSettings.KEY_API_AI_KEY)) {
-//                mRobotSettings.apiaiKey = sharedPreferences.getString(key, "");
-//            } else if (key.equals(PocketBotSettings.KEY_API_AI_TOKEN)) {
-//                mRobotSettings.apiaiToken = sharedPreferences.getString(key, "");
-//            } else if (key.equals(PocketBotSettings.KEY_ROBOT_NAME)) {
-//                mRobotSettings.robotName = sharedPreferences.getString(key, "");
-//            } else if (key.equals(PocketBotSettings.KEY_PASSWORD)) {
-//                mRobotSettings.password = sharedPreferences.getString(key, "");
-//            } else {
-//                //Setting not tracked
-//                return;
-//            }
 
             //Update setting to Firebase if robot id exist
             final String id = sharedPreferences.getString(PocketBotSettings.KEY_ROBOT_ID, "Error");
@@ -267,8 +251,6 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             snapshotToPreference(dataSnapshot);
-//            RobotSettings robotSettings = dataSnapshot.getValue(RobotSettings.class);
-//            mRobotSettings.sync(mContext, robotSettings);
         }
 
         private boolean snapshotToPreference(DataSnapshot dataSnapshot) {
@@ -288,8 +270,6 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
             snapshotToPreference(dataSnapshot);
-//            RobotSettings robotSettings = dataSnapshot.getValue(RobotSettings.class);
-//            mRobotSettings.sync(mContext, robotSettings);
         }
 
         @Override
@@ -307,81 +287,5 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
 
         }
 
-//        static private class RobotSettings {
-//            //Fields must be public for Jackson
-//            public int selectedFace;
-//            public boolean fastFaceTracking;
-//            public boolean showVideoPreview;
-//            public String robotName;
-//            public String apiaiKey;
-//            public String apiaiToken;
-//            public String password;
-//            public int qbId;
-//            public String robotId;
-//            public boolean syncInProgress;
-//
-//            public RobotSettings(){
-//                //For Jackson
-//            }
-//
-//            public RobotSettings(final Context context) {
-//                selectedFace = PocketBotSettings.getSelectedFace(context);
-//                fastFaceTracking = PocketBotSettings.getFastTrackingMode(context);
-//                showVideoPreview = PocketBotSettings.isShowPreview(context);
-//                robotName = PocketBotSettings.getRobotName(context);
-//                apiaiKey = PocketBotSettings.getApiAiKey(context);
-//                apiaiToken = PocketBotSettings.getApiAiToken(context);
-//                password = PocketBotSettings.getPassword(context);
-//                qbId = PocketBotSettings.getQuickBloxId(context);
-//                robotId = PocketBotSettings.getRobotId(context);
-//            }
-//
-//            /**
-//             * Look for changes then update SharedPreferences if need
-//             * @param context
-//             * @param robotSettings
-//             */
-//            public void sync(final Context context, final RobotSettings robotSettings){
-//                syncInProgress = true;
-//                if(robotSettings.selectedFace != selectedFace){
-//                    selectedFace = robotSettings.selectedFace;
-//                    PocketBotSettings.setSelectedFace(context, selectedFace);
-//                }
-//                if(robotSettings.fastFaceTracking != fastFaceTracking){
-//                    fastFaceTracking = robotSettings.fastFaceTracking;
-//                    PocketBotSettings.setUseFastFaceTracking(context, fastFaceTracking);
-//                }
-//                if(robotSettings.showVideoPreview != showVideoPreview){
-//                    showVideoPreview = robotSettings.showVideoPreview;
-//                    PocketBotSettings.setShowPreview(context, showVideoPreview);
-//                }
-//                if(robotSettings.robotName != null && !robotSettings.robotName.equals(robotName)){
-//                    robotName = robotSettings.robotName;
-//                    PocketBotSettings.setRobotName(context, robotName);
-//                }
-//                if(robotSettings.apiaiKey != null && !robotSettings.apiaiKey.equals(apiaiKey)){
-//                    apiaiKey = robotSettings.apiaiKey;
-//                    PocketBotSettings.setApiAiKey(context, apiaiKey);
-//                }
-//                if(robotSettings.apiaiToken != null && !robotSettings.apiaiToken.equals(apiaiToken)){
-//                    apiaiToken = robotSettings.apiaiToken;
-//                    PocketBotSettings.setApiAiToken(context, apiaiToken);
-//                }
-//                if(robotSettings.password != null && !robotSettings.password.equals(password)){
-//                    password = robotSettings.password;
-//                    PocketBotSettings.setPassword(context, password);
-//                }
-//                if(robotSettings.qbId != qbId){
-//                    qbId = robotSettings.qbId;
-//                    PocketBotSettings.setQuickBloxId(context, qbId);
-//                }
-//                if(robotSettings.robotId != null && !robotSettings.robotId.equals(robotId)){
-//                    robotId = robotSettings.robotId;
-//                    PocketBotSettings.setRobotId(context, robotId);
-//                }
-//                syncInProgress = false;
-//            }
-//
-//        }
     }
 }
