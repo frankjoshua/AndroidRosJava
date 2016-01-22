@@ -36,8 +36,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -60,8 +58,6 @@ import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
-import com.tesseractmobile.pocketbot.robot.Constants;
-import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
@@ -552,6 +548,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         switch (id){
             case R.id.llTop:
                 RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
+                robotSelectionDialog.setOnlyUserRobots(true);
                 robotSelectionDialog.setSignInOnClickListener(this);
                 robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
                 robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {

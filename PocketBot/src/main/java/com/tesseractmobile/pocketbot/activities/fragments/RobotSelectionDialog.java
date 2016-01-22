@@ -30,13 +30,20 @@ import com.tesseractmobile.pocketbot.views.RobotInfoViewHolder;
  */
 public class RobotSelectionDialog extends DialogFragment implements DataStore.OnAuthCompleteListener, View.OnClickListener {
 
+    public static final String ONLY_USER_ROBOTS = "ONLY_USER_ROBOTS";
     private RecyclerView mRobotRecyclerView;
     private OnRobotSelectedListener mOnRobotSelectedListener;
     private View mSignInView;
     private View.OnClickListener mSignInOnClickListener;
+    private boolean mOnlyUserRobots;
+
+    public void setOnlyUserRobots(final boolean b){
+        mOnlyUserRobots = b;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        //Create the layout
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.robot_selector, null);
 
@@ -63,7 +70,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         //Set adapter
         final String currentRobotId = PocketBotSettings.getRobotId(getContext());
         final Firebase userListRef = Robot.get().getDataStore().getUserListRef().child(DataStore.ROBOTS);
-        mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef) {
+        mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef, mOnlyUserRobots) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {
                 viewHolder.robotName.setText(model.prefs.robot_name);
@@ -78,7 +85,12 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
                 } else {
                     viewHolder.robotName.setAlpha(.5f);
                     viewHolder.robotStatus.setAlpha(.5f);
-                    viewHolder.btnDelete.setVisibility(View.VISIBLE);
+                    if(mOnlyUserRobots){
+                        //Show delete button
+                        viewHolder.btnDelete.setVisibility(View.VISIBLE);
+                    } else {
+                        viewHolder.btnDelete.setVisibility(View.INVISIBLE);
+                    }
                     status += "Offline";
                 }
 
@@ -87,12 +99,15 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
                     viewHolder.btnDelete.setVisibility(View.INVISIBLE);
                 } else {
                     viewHolder.mainLayout.setBackgroundColor(Color.parseColor("#44000000"));
-                    viewHolder.btnDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Robot.get().deleteRobot(model.prefs.robot_id);
-                        }
-                    });
+                    if(mOnlyUserRobots){
+                        //Listen to delte button clicks
+                        viewHolder.btnDelete.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Robot.get().deleteRobot(model.prefs.robot_id);
+                            }
+                        });
+                    }
                 }
 
                 viewHolder.robotStatus.setText(status);

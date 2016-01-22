@@ -95,11 +95,11 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
      * @param ref        The Firebase location to watch for data changes. Can also be a slice of a location, using some
      *                   combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
      */
-    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Query ref) {
+    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Query ref, final boolean onlyUserRobots) {
         mModelClass = modelClass;
         mModelLayout = modelLayout;
         mViewHolderClass = viewHolderClass;
-        mSnapshots = new FirebaseArray(ref);
+        mSnapshots = new FirebaseArray(ref, onlyUserRobots);
 
         mSnapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
             @Override
@@ -132,8 +132,8 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
      * @param ref        The Firebase location to watch for data changes. Can also be a slice of a location, using some
      *                   combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
      */
-    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Firebase ref) {
-        this(modelClass, modelLayout, viewHolderClass, (Query) ref);
+    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Firebase ref, final boolean onlyUserRobots) {
+        this(modelClass, modelLayout, viewHolderClass, (Query) ref, onlyUserRobots);
     }
 
 

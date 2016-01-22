@@ -53,8 +53,12 @@ class FirebaseArray implements ChildEventListener {
     private OnChangedListener mListener;
     private ArrayList<DataSnapshot> mSnapshots;
 
-    public FirebaseArray(Query ref) {
-        mQuery = ref;
+    public FirebaseArray(final Query ref, final boolean onlyUserRobots) {
+        if(onlyUserRobots){
+            mQuery = ref.orderByValue().equalTo(true);
+        } else {
+            mQuery = ref;
+        }
         mSnapshots = new ArrayList<DataSnapshot>();
         final Firebase robots = Robot.get().getDataStore().getRobotListRef();
         //mQuery.addChildEventListener(this);
