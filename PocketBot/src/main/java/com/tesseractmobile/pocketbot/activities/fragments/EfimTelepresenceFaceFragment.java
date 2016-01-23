@@ -33,6 +33,7 @@ import java.util.Map;
 public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements RemoteListener{
 
     private static final String TAG = EfimTelepresenceFaceFragment.class.getSimpleName();
+    public static final int ID_FACE_TELEPRESENCE_EFIM = 3;
     private EfimFace mRobotFace;
 
     @Override

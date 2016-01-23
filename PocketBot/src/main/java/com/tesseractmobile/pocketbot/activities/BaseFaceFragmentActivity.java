@@ -431,15 +431,15 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         final FaceFragment faceFragment;
         final boolean isUseFaceTracking;
         switch (faceId){
-            case 0:
+            case FaceFragment.ID_FACE_EFIM:
                 faceFragment = new EfimFaceFragment();
                 isUseFaceTracking = true && checkGooglePlayServices();
                 break;
-            case 1:
+            case ControlFaceFragment.ID_FACE_CONTROL:
                 faceFragment = new ControlFaceFragment();
                 isUseFaceTracking = false;
                 break;
-            case 2:
+            case TelepresenceFaceFragment.ID_FACE_TELEPRESENCE:
                 if(PocketBotSettings.allowTelepresence(this)) {
                     faceFragment = new TelepresenceFaceFragment();
                     isUseFaceTracking = false;
@@ -449,7 +449,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                     return;
                 }
                 break;
-            case 3:
+            case EfimTelepresenceFaceFragment.ID_FACE_TELEPRESENCE_EFIM:
                 faceFragment = new EfimTelepresenceFaceFragment();
                 isUseFaceTracking = false;//true && checkGooglePlayServices();
                 break;
@@ -562,16 +562,16 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 startSignin();
                 break;
             case R.id.btnTelepresence:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, 2);
+                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, TelepresenceFaceFragment.ID_FACE_TELEPRESENCE);
                 break;
             case R.id.btnControl:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, 1);
+                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, ControlFaceFragment.ID_FACE_CONTROL);
                 break;
             case R.id.btnFace:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, 0);
+                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, FaceFragment.ID_FACE_EFIM);
                 break;
             case R.id.btnRemoteFace:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, 3);
+                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, EfimTelepresenceFaceFragment.ID_FACE_TELEPRESENCE_EFIM);
                 break;
             case R.id.btnApiAi:
                 FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();

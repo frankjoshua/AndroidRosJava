@@ -15,6 +15,8 @@ import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
  */
 abstract public class FaceFragment extends CallbackFragment {
 
+    public static final int ID_FACE_EFIM = 0;
+
     abstract public RobotFace getRobotFace(final RobotInterface robotInterface);
 
 }

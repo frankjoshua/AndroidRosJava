@@ -39,6 +39,7 @@ import java.util.Map;
 public class TelepresenceFaceFragment extends QuickBloxFragment implements RemoteListener {
 
 
+    public static final int ID_FACE_TELEPRESENCE = 2;
     private RobotFace mRobotFace;
     private RTCGLVideoView mRemoteVideoView;
     private TextView mUserId;

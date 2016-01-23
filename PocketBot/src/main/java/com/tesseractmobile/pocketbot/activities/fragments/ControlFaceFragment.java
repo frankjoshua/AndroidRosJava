@@ -34,6 +34,7 @@ import java.util.Map;
  */
 public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener, RobotSelectionDialog.OnRobotSelectedListener {
 
+    public static final int ID_FACE_CONTROL = 1;
     private RobotFace mRobotFace;
     private RTCGLVideoView mRemoteVideoView;
     private Button mConnectButton;
