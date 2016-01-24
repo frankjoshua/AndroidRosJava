@@ -1,4 +1,4 @@
-package com.tesseractmobile.pocketbot.activities.fragments;
+package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,27 +11,19 @@ import android.widget.TextView;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
-import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.RTCGLVideoView;
-import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 import com.tesseractmobile.pocketbot.R;
-import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.SensorData;
-import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.robot.faces.TelePresenceFace;
 
-import org.json.JSONObject;
 import org.webrtc.VideoRenderer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by josh on 10/31/2015.
@@ -39,7 +31,6 @@ import java.util.Map;
 public class TelepresenceFaceFragment extends QuickBloxFragment implements RemoteListener {
 
 
-    public static final int ID_FACE_TELEPRESENCE = 2;
     private RobotFace mRobotFace;
     private RTCGLVideoView mRemoteVideoView;
     private TextView mUserId;
@@ -49,6 +40,11 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
     public RobotFace getRobotFace(RobotInterface robotInterface) {
         mRobotFace.setRobotInterface(robotInterface);
         return mRobotFace;
+    }
+
+    @Override
+    public boolean isUseFaceTracking() {
+        return false;
     }
 
     @Override

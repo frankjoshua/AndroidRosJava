@@ -11,8 +11,8 @@ import android.view.ViewGroup;
  */
 abstract public class CallbackFragment extends Fragment{
 
-    public static interface OnCompleteListener {
-        public abstract void onComplete();
+    public interface OnCompleteListener {
+        void onComplete();
     }
 
     private OnCompleteListener mOnCompleteListener;

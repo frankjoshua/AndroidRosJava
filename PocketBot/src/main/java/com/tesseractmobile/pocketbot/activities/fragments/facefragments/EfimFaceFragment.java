@@ -1,4 +1,4 @@
-package com.tesseractmobile.pocketbot.activities.fragments;
+package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,8 +12,6 @@ import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
-
-import org.json.JSONObject;
 
 /**
  * Created by josh on 10/18/2015.
@@ -38,6 +36,11 @@ public class EfimFaceFragment extends FaceFragment implements RemoteListener {
     public RobotFace getRobotFace(final RobotInterface robotInterface) {
         mRobotFace.setRobotInterface(robotInterface);
         return mRobotFace;
+    }
+
+    @Override
+    public boolean isUseFaceTracking() {
+        return true;
     }
 
     @Override

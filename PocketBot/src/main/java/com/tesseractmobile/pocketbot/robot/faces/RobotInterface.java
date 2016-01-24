@@ -1,6 +1,5 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
-import com.tesseractmobile.pocketbot.activities.fragments.QuickBloxFragment;
 import com.tesseractmobile.pocketbot.robot.AI;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.DataStore;
@@ -10,7 +9,6 @@ import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.SpeechStateListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
-import com.tesseractmobile.pocketbot.views.MouthView;
 
 /**
  * Created by josh on 10/17/2015.

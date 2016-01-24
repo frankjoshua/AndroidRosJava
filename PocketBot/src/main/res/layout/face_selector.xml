@@ -5,7 +5,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/lvEmotions"
+        android:id="@+id/lvFaces"
         android:layout_gravity="center_horizontal"
         android:choiceMode="singleChoice" />
 </LinearLayout>

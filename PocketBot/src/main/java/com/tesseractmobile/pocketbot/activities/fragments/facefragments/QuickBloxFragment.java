@@ -1,4 +1,4 @@
-package com.tesseractmobile.pocketbot.activities.fragments;
+package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -6,10 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
@@ -18,7 +14,6 @@ import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.QBEntityCallbackImpl;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
@@ -35,8 +30,6 @@ import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Robot;
-
-import org.jivesoftware.smack.SmackException;
 
 import java.util.HashMap;
 import java.util.List;

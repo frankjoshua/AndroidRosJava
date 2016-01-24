@@ -49,15 +49,11 @@ import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.fragments.ApiAiKeyDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.ControlFaceFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.EfimFaceFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.EfimTelepresenceFaceFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.FaceFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.LockedFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.TelepresenceFaceFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
@@ -127,11 +123,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
         setContentView(R.layout.main);
         //Set on click listeners
-        findViewById(R.id.btnTelepresence).setOnClickListener(this);
-        findViewById(R.id.btnControl).setOnClickListener(this);
-        findViewById(R.id.btnFace).setOnClickListener(this);
         findViewById(R.id.btnApiAi).setOnClickListener(this);
-        findViewById(R.id.btnRemoteFace).setOnClickListener(this);
         findViewById(R.id.btnFeedback).setOnClickListener(this);
         findViewById(R.id.llTop).setOnClickListener(this);
         findViewById(R.id.tvModes).setOnClickListener(this);
@@ -141,7 +133,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         //Hide views
         findViewById(R.id.llModes).setVisibility(View.GONE);
         findViewById(R.id.emotionsFragment).setVisibility(View.GONE);
-        findViewById(R.id.settingsFragment).setVisibility(View.GONE);
+        //findViewById(R.id.settingsFragment).setVisibility(View.GONE);
 
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
@@ -428,34 +420,9 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     private void switchFace(int faceId){
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = supportFragmentManager.beginTransaction();
-        final FaceFragment faceFragment;
-        final boolean isUseFaceTracking;
-        switch (faceId){
-            case FaceFragment.ID_FACE_EFIM:
-                faceFragment = new EfimFaceFragment();
-                isUseFaceTracking = true && checkGooglePlayServices();
-                break;
-            case ControlFaceFragment.ID_FACE_CONTROL:
-                faceFragment = new ControlFaceFragment();
-                isUseFaceTracking = false;
-                break;
-            case TelepresenceFaceFragment.ID_FACE_TELEPRESENCE:
-                if(PocketBotSettings.allowTelepresence(this)) {
-                    faceFragment = new TelepresenceFaceFragment();
-                    isUseFaceTracking = false;
-                } else {
-                    ft.replace(R.id.faceView, new LockedFragment(), FRAGMENT_FACE);
-                    ft.commitAllowingStateLoss();
-                    return;
-                }
-                break;
-            case EfimTelepresenceFaceFragment.ID_FACE_TELEPRESENCE_EFIM:
-                faceFragment = new EfimTelepresenceFaceFragment();
-                isUseFaceTracking = false;//true && checkGooglePlayServices();
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown face id " + faceId);
-        }
+        final FaceFragment faceFragment = FaceFragmentFactory.getFaceFragment(faceId);
+        final boolean isUseFaceTracking = faceFragment.isUseFaceTracking() && checkGooglePlayServices();
+
 
         if(supportFragmentManager.findFragmentByTag(FRAGMENT_FACE) != null){
             ft.replace(R.id.faceView, faceFragment, FRAGMENT_FACE);
@@ -561,18 +528,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             case R.id.sign_in_button:
                 startSignin();
                 break;
-            case R.id.btnTelepresence:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, TelepresenceFaceFragment.ID_FACE_TELEPRESENCE);
-                break;
-            case R.id.btnControl:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, ControlFaceFragment.ID_FACE_CONTROL);
-                break;
-            case R.id.btnFace:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, FaceFragment.ID_FACE_EFIM);
-                break;
-            case R.id.btnRemoteFace:
-                PocketBotSettings.setSelectedFace(BaseFaceFragmentActivity.this, EfimTelepresenceFaceFragment.ID_FACE_TELEPRESENCE_EFIM);
-                break;
             case R.id.btnApiAi:
                 FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
                 ApiAiKeyDialog apiAiKeyDialog = new ApiAiKeyDialog();
@@ -591,7 +546,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 toggleViewVisibility(modesLayout);
                 break;
             case R.id.tvSettings:
-                final View settingsFragment = findViewById(R.id.settingsFragment);
+                final View settingsFragment = findViewById(R.id.llSettings);
                 toggleViewVisibility(settingsFragment);
                 break;
             case R.id.tvEmotions:

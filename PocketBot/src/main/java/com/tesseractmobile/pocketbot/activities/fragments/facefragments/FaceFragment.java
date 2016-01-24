@@ -1,4 +1,4 @@
-package com.tesseractmobile.pocketbot.activities.fragments;
+package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
@@ -15,8 +16,12 @@ import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
  */
 abstract public class FaceFragment extends CallbackFragment {
 
-    public static final int ID_FACE_EFIM = 0;
-
     abstract public RobotFace getRobotFace(final RobotInterface robotInterface);
+
+    /**
+     * True if using face tracing
+     * @return
+     */
+    abstract public boolean isUseFaceTracking();
 
 }

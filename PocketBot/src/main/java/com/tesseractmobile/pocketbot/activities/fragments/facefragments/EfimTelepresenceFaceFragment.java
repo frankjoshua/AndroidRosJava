@@ -1,8 +1,7 @@
-package com.tesseractmobile.pocketbot.activities.fragments;
+package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +19,6 @@ import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.faces.EfimFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
-import com.tesseractmobile.pocketbot.robot.faces.TelePresenceFace;
-
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by josh on 10/18/2015.
@@ -33,13 +26,17 @@ import java.util.Map;
 public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements RemoteListener{
 
     private static final String TAG = EfimTelepresenceFaceFragment.class.getSimpleName();
-    public static final int ID_FACE_TELEPRESENCE_EFIM = 3;
     private EfimFace mRobotFace;
 
     @Override
     public RobotFace getRobotFace(final RobotInterface robotInterface) {
         mRobotFace.setRobotInterface(robotInterface);
         return mRobotFace;
+    }
+
+    @Override
+    public boolean isUseFaceTracking() {
+        return false;
     }
 
     @Override

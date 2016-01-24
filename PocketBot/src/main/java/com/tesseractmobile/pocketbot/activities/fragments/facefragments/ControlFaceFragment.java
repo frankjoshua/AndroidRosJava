@@ -1,4 +1,4 @@
-package com.tesseractmobile.pocketbot.activities.fragments;
+package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +18,7 @@ import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.RTCGLVideoView;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.robot.Constants;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
 import com.tesseractmobile.pocketbot.robot.faces.ControlFace;
@@ -34,7 +35,6 @@ import java.util.Map;
  */
 public class ControlFaceFragment extends QuickBloxFragment implements View.OnClickListener, RobotSelectionDialog.OnRobotSelectedListener {
 
-    public static final int ID_FACE_CONTROL = 1;
     private RobotFace mRobotFace;
     private RTCGLVideoView mRemoteVideoView;
     private Button mConnectButton;
@@ -47,6 +47,11 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
     public RobotFace getRobotFace(RobotInterface robotInterface) {
         mRobotFace.setRobotInterface(robotInterface);
         return mRobotFace;
+    }
+
+    @Override
+    public boolean isUseFaceTracking() {
+        return false;
     }
 
     @Override
