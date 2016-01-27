@@ -18,7 +18,7 @@ import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
  */
 public class EfimFaceFragment extends FaceFragment implements RemoteListener {
 
-    private EfimFace mRobotFace;
+    private RobotFace mRobotFace;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class EfimFaceFragment extends FaceFragment implements RemoteListener {
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.robot_face, null);
-        mRobotFace = new EfimFace(view);
+        setFace(new EfimFace(view));
         return view;
     }
 
@@ -59,5 +59,9 @@ public class EfimFaceFragment extends FaceFragment implements RemoteListener {
     public void onConnectionLost() {
         //Send stop to face
         ((EfimFace) mRobotFace).onControlReceived(new SensorData.Control());
+    }
+
+    protected void setFace(final RobotFace face){
+        mRobotFace = face;
     }
 }

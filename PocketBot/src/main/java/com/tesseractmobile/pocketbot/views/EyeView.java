@@ -18,6 +18,7 @@ import android.graphics.Shader;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -83,19 +84,32 @@ public class EyeView extends View {
         mUpperEyelidRectSrc.set(mUpperEyelidRect);
         mLowerEyelidRectSrc.set(mLowerEyelidRect);
         //Setup gradients
-        final Shader pupilShader = new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
+        final Shader pupilShader = getPupilGradient(w, h);
         mPupilPaint.setShader(pupilShader);
 
-        final Shader centerShader = new LinearGradient(0, 0, w, h, Color.parseColor("#b5b5b5"), Color.parseColor("#ffffff"), Shader.TileMode.CLAMP);
+        final Shader centerShader = getEyeBallGradient(w, h);
         mCenterPaint.setShader(centerShader);
 
-        final Shader innerShader = new LinearGradient(0, 0, w, h, Color.parseColor("#000000"), Color.parseColor("#4e4e4e"), Shader.TileMode.CLAMP);
+        final Shader innerShader = getEyeOuterGradient(w, h);
         mInnerRingPaint.setShader(innerShader);
 
         //Open the eyes
         open();
         //Look straight ahead
         look(1.0f, 1.0f);
+    }
+
+    @NonNull
+    protected LinearGradient getPupilGradient(int w, int h) {
+        return new LinearGradient(0, 0, w, h, Color.argb(255, 80, 80, 80), Color.argb(255, 0, 0, 0), Shader.TileMode.CLAMP);
+    }
+
+    protected LinearGradient getEyeBallGradient(final int w, final int h){
+        return new LinearGradient(0, 0, w, h, Color.parseColor("#b5b5b5"), Color.parseColor("#ffffff"), Shader.TileMode.CLAMP);
+    }
+
+    protected LinearGradient getEyeOuterGradient(final int w, final int h){
+        return new LinearGradient(0, 0, w, h, Color.parseColor("#000000"), Color.parseColor("#4e4e4e"), Shader.TileMode.CLAMP);
     }
 
     public EyeView(final Context context, final AttributeSet attrs) {
@@ -106,7 +120,7 @@ public class EyeView extends View {
         mEyeCanvas = new Canvas(mEye);
 
         mEyeLidPaint = new Paint();
-        mEyeLidPaint.setColor(Color.parseColor("#191919"));
+        mEyeLidPaint.setColor(getEyelidColor());
         mEyeLidPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         
         mCenterPaint = new Paint();
@@ -119,7 +133,7 @@ public class EyeView extends View {
         mInnerRingPaint.setAntiAlias(true);
         
         mIrisPaint = new Paint();
-        mIrisPaint.setColor(Color.argb(255, 137, 223, 255));
+        mIrisPaint.setColor(getIrisColor());
         mIrisPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
         mIrisPaint.setAntiAlias(true);
   
@@ -142,6 +156,14 @@ public class EyeView extends View {
         } else {
             animation = null;
         }
+    }
+
+    protected int getIrisColor() {
+        return Color.argb(255, 137, 223, 255);
+    }
+
+    protected int getEyelidColor() {
+        return Color.parseColor("#191919");
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
+import com.tesseractmobile.pocketbot.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class FaceFragmentFactory {
     public static final int ID_FACE_CONTROL = 1;
     public static final int ID_FACE_TELEPRESENCE = 2;
     public static final int ID_FACE_TELEPRESENCE_EFIM = 3;
+    public static final int ID_FACE_ALIEN = 4;
 
     public static FaceFragment getFaceFragment(final int faceId) {
         final FaceFragment faceFragment;
@@ -28,6 +31,9 @@ public class FaceFragmentFactory {
             case ID_FACE_TELEPRESENCE_EFIM:
                 faceFragment = new EfimTelepresenceFaceFragment();
                 break;
+            case ID_FACE_ALIEN:
+                faceFragment = new CartoonFaceFragment();
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown face id " + faceId);
         }
@@ -36,10 +42,11 @@ public class FaceFragmentFactory {
 
     public static List<FaceInfo> getFaceInfoList() {
         final ArrayList<FaceInfo> faceList = new ArrayList<>();
-        faceList.add(new FaceInfo(ID_FACE_EFIM, "Robot"));
-        faceList.add(new FaceInfo(ID_FACE_CONTROL, "Control"));
-        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE, "Telepresence"));
-        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE_EFIM, "Remote Robot"));
+        faceList.add(new FaceInfo(ID_FACE_EFIM, R.drawable.ic_launcher, R.drawable.efim_background_texture, "Robot", "Face tracking is active and AI is in total control.", false));
+        faceList.add(new FaceInfo(ID_FACE_ALIEN, R.drawable.ic_launcher, R.drawable.purple_fuzz, "Cartoon", "Face tracking is active and AI is in total control.", false));
+        faceList.add(new FaceInfo(ID_FACE_CONTROL, R.drawable.ic_control, R.drawable.efim_background_texture, "Control", "Used for direct control of remote or local robot.", false));
+        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE, R.drawable.ic_telepresence, R.drawable.efim_background_texture, "Telepresence", "Allow remote control and show remote video feed on screen.", true));
+        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE_EFIM, R.drawable.ic_robot_telepresence, R.drawable.efim_background_texture, "Remote Robot", "Telepresence while displaying robot face instead of video.", true));
         return faceList;
     }
 }

@@ -142,13 +142,17 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
 
         canvas.drawBitmap(mMouthBitmaps[mCurrentBitmap], null, DEST_RECT, null);
         //Draw teeth
-        canvas.drawPath(mTeethPath, mTeethPaint);
+        drawTeeth(canvas);
         //Draw microphone if listening
         if(mListening){
             canvas.drawBitmap(mMicrophoneBitmap, canvas.getWidth() / 2 - mMicrophoneBitmap.getWidth() / 2, canvas.getHeight() / 2 - mMicrophoneBitmap.getHeight() / 2, mMicrophonePaint);
         }
         //Draw text
         //super.onDraw(canvas);
+    }
+
+    protected void drawTeeth(Canvas canvas) {
+        canvas.drawPath(mTeethPath, mTeethPaint);
     }
 
 

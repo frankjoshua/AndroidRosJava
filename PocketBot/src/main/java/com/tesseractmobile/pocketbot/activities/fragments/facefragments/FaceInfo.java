@@ -5,11 +5,19 @@ package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
  */
 class FaceInfo {
     final public int id;
+    final public int icon;
+    final public int background;
     final public String name;
+    final public String info;
+    final public boolean locked;
 
-    FaceInfo(int id, String name) {
+    FaceInfo(final int id, int icon, int background, final String name, final String info, final boolean locked) {
         this.id = id;
+        this.icon = icon;
+        this.background = background;
         this.name = name;
+        this.info = info;
+        this.locked = locked;
     }
 
     @Override

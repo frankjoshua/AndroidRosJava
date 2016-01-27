@@ -17,5 +17,8 @@ abstract public class BaseFace implements RobotFace{
         sensorData.setControl(message);
         //Send data
         mRobotInterface.sendSensorData(false);
+
+        //Look based on joystick 2
+        look((float) message.joy2.X + 1, (float) message.joy2.Y + 1, 0);
     }
 }
