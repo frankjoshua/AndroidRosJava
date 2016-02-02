@@ -95,4 +95,8 @@ public interface RobotInterface {
     void deleteRobot(final String robotId);
 
     DataStore getDataStore();
+
+    void setIsNew(boolean isNew);
+
+    boolean isNew();
 }

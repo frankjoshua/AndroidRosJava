@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.robot;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.firebase.client.AuthData;
@@ -31,6 +32,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     public static final String SENSORS = "sensors";
     public static final String SENSOR_DATA = "sensor_data";
     static private DataStore instance;
+    private final Context mContext;
 
     /** Stores user and robot data */
     private Firebase mFirebase;
@@ -44,7 +46,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
 
     private DataStore(final Context context){
         mFirebasePreferenceSync = new FirebasePreferenceSync(context);
-        PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
+        mContext = context;
     }
 
     static public DataStore init(final Context context){
@@ -69,6 +71,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         mFirebase.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(final AuthData authData) {
+                //Save Auth data -- Must be done first
                 mAuthData = authData;
                 setupUser(authData, robotId);
                 setupRobot(robotId);
@@ -78,6 +81,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
                 for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
                     onAuthCompleteListener.onAuthComplete();
                 }
+                PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
             }
 
             @Override
@@ -114,13 +118,18 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         //Setup User
         userRef.child(AUTH_DATA).setValue(authData);
         //Save current robot to list of allowed robots
-        userRef.child(ROBOTS).child(robotId).setValue(true);
+        addRobot(robotId, true);
         //Mark user last connect status
         userRef.child(LAST_ONLINE).onDisconnect().setValue(ServerValue.TIMESTAMP);
 
         //Set user online status
         userRef.child(SETTINGS).child(IS_CONNECTED).setValue(true);
         userRef.child(IS_CONNECTED).onDisconnect().setValue(false);
+    }
+
+    public void addRobot(final String robotId, final boolean isOwned) {
+        final Firebase userRef = mFirebase.child(USERS).child(mAuthData.getUid());
+        userRef.child(ROBOTS).child(robotId).setValue(isOwned);
     }
 
     private Firebase getRobots() {
@@ -225,6 +234,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
             //Set inital preferences
             onSharedPreferenceChanged(PocketBotSettings.getSharedPrefs(mContext), PocketBotSettings.KEY_ROBOT_NAME);
             onSharedPreferenceChanged(PocketBotSettings.getSharedPrefs(mContext), PocketBotSettings.KEY_QB_ID);
+            onSharedPreferenceChanged(PocketBotSettings.getSharedPrefs(mContext), PocketBotSettings.KEY_PASSWORD);
             mFirebase.child(mRobotId).child(SETTINGS).child(PREFS).child(PocketBotSettings.KEY_ROBOT_ID).setValue(mRobotId);
             //Register for preference changes
             PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, this);

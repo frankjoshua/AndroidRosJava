@@ -75,6 +75,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
             }
         }
     };
+    private boolean mIsNew;
 
     public BaseRobot(final DataStore dataStore){
         mDataStore = dataStore;
@@ -358,5 +359,15 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public DataStore getDataStore() {
         return mDataStore;
+    }
+
+    @Override
+    public boolean isNew() {
+        return mIsNew;
+    }
+
+    @Override
+    public void setIsNew(boolean isNew) {
+        mIsNew = isNew;
     }
 }

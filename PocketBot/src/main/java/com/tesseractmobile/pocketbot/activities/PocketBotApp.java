@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 
 import com.firebase.client.Firebase;
 import com.quickblox.core.QBSettings;
@@ -27,6 +28,15 @@ public class PocketBotApp extends Application{
         super.onCreate();
         //Track errors
         Fabric.with(this, new Crashlytics());
+        //Check if robot is new
+        final String uuid = PreferenceManager.getDefaultSharedPreferences(this).getString(PocketBotSettings.KEY_ROBOT_ID, PocketBotSettings.ROBOT_ID_NOT_SET);
+        final boolean isNew;
+        if(uuid.equals(PocketBotSettings.ROBOT_ID_NOT_SET)){
+            //Mark robot as new
+            isNew = true;
+        } else {
+            isNew = false;
+        }
         //Get robot id first so Shared preference listeners don't trigger
         final String robotId = PocketBotSettings.getRobotId(this);
         //Init DataStore
@@ -35,6 +45,7 @@ public class PocketBotApp extends Application{
         RemoteControl.init(this, dataStore, robotId);
         //Init Robot
         Robot.init(dataStore);
+        Robot.get().setIsNew(true);
         //Setup Quickblox
         QBSettings.getInstance().fastConfigInit("30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
         //Bind to voice recognition service to hold constant connection

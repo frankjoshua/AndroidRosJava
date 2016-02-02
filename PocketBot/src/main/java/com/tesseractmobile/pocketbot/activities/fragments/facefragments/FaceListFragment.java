@@ -79,8 +79,8 @@ public class FaceListFragment extends Fragment implements AdapterView.OnItemClic
                 llLock.setVisibility(View.GONE);
             }
 
-            final ImageView imageView = (ImageView) view.findViewById(R.id.ivBackground);
-            imageView.setImageResource(faceInfo.background);
+//            final ImageView imageView = (ImageView) view.findViewById(R.id.ivBackground);
+//            imageView.setImageResource(faceInfo.background);
 
             return view;
         }

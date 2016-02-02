@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -65,10 +66,14 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
 
     @Override
     public void onAuthComplete() {
+        final Context context = getContext();
+        if(context == null){
+            return;
+        }
         //Hide sign in
         mSignInView.setVisibility(View.GONE);
         //Set adapter
-        final String currentRobotId = PocketBotSettings.getRobotId(getContext());
+        final String currentRobotId = PocketBotSettings.getRobotId(context);
         final Firebase userListRef = Robot.get().getDataStore().getUserListRef().child(DataStore.ROBOTS);
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef, mOnlyUserRobots) {
             @Override

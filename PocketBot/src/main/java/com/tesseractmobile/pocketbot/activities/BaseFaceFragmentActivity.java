@@ -18,10 +18,12 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
 import android.util.Log;
@@ -54,6 +56,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
@@ -122,6 +125,17 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         mRobotInterFace = Robot.get();
 
         setContentView(R.layout.main);
+
+        if(Robot.get().isNew()){
+            //After login show the robot selection dialog
+            Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+                @Override
+                public void onAuthComplete() {
+                    showRobotSelectionDialog();
+                }
+            });
+        }
+
         //Set on click listeners
         findViewById(R.id.btnApiAi).setOnClickListener(this);
         findViewById(R.id.btnFeedback).setOnClickListener(this);
@@ -147,7 +161,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         //Allow user to control the volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         updateUI();
-
 
         //Show drawer to user
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
@@ -514,16 +527,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         final int id = view.getId();
         switch (id){
             case R.id.llTop:
-                RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
-                robotSelectionDialog.setOnlyUserRobots(true);
-                robotSelectionDialog.setSignInOnClickListener(this);
-                robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
-                robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
-                    @Override
-                    public void onRobotSelected(RobotInfo.Settings model) {
-                        PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robot_id);
-                    }
-                });
+                showRobotSelectionDialog();
                 break;
             case R.id.sign_in_button:
                 startSignin();
@@ -546,8 +550,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 toggleViewVisibility(modesLayout);
                 break;
             case R.id.tvSettings:
-                final View settingsFragment = findViewById(R.id.llSettings);
-                toggleViewVisibility(settingsFragment);
+                toggleSettingsFragment();
                 break;
             case R.id.tvEmotions:
                 final View emotionsFragment = findViewById(R.id.emotionsFragment);
@@ -556,6 +559,33 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             default:
                 throw new UnsupportedOperationException("Not implemented");
         }
+    }
+
+    private void toggleSettingsFragment() {
+        final View settingsFragment = findViewById(R.id.llSettings);
+        toggleViewVisibility(settingsFragment);
+    }
+
+    private void showRobotSelectionDialog() {
+        RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
+        robotSelectionDialog.setOnlyUserRobots(true);
+        robotSelectionDialog.setSignInOnClickListener(this);
+        robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
+        robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
+            @Override
+            public void onRobotSelected(RobotInfo.Settings model) {
+                PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robot_id);
+                //Check if name should be set
+                if(model.prefs.robot_name.equals(PocketBotSettings.DEFAULT_ROBOT_NAME)){
+                    //Launch name change dialog
+                    //Open draw
+                    //Tell user to change the robot name
+                    Toast.makeText(BaseFaceFragmentActivity.this, "You should change your robot name.", Toast.LENGTH_LONG).show();
+                    toggleSettingsFragment();
+                    ((DrawerLayout) findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
+                }
+            }
+        });
     }
 
     private void toggleViewVisibility(final View view) {

@@ -6,10 +6,14 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
+import com.tesseractmobile.pocketbot.robot.DataStore;
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.BodyService;
 import com.tesseractmobile.pocketbot.service.UsbSerialService;
 
@@ -34,6 +38,21 @@ public class UsbSerialFragmentActivity extends AiFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Get the intent that started this activity
+        final Intent intent = getIntent();
+        final Uri data = intent.getData();
+        if(data != null){
+            final String robotId = data.getLastPathSegment();
+            Log.d("USB", robotId);
+            //Need to add this to list of allowed robots
+            Robot.get().getDataStore().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+                @Override
+                public void onAuthComplete() {
+                    Robot.get().getDataStore().addRobot(robotId, false);
+                }
+            });
+        }
+
         //Speed up sensor data
         setSensorDelay(20);
     }

@@ -41,6 +41,8 @@ public class PocketBotSettings {
     public static final String DEFAULT_API_AI_TOKEN = "443dddf4747d4408b0e9451d4d53f201  ";//"443dddf4747d4408b0e9451d4d53f201";
     private static final boolean DEFAULT_AUTO_SIGN_IN = false;
     public static final boolean DEFAULT_KEEP_ALIVE = true;
+    public static final String ROBOT_ID_NOT_SET = "NOT_SET";
+    public static final String DEFAULT_ROBOT_NAME = "Robot-1";
 
 
     /**
@@ -129,8 +131,8 @@ public class PocketBotSettings {
      * @return
      */
     public static String getPassword(final Context context) {
-        final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_PASSWORD, "NOT_SET");
-        if(uuid.equals("NOT_SET")){
+        final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_PASSWORD, ROBOT_ID_NOT_SET);
+        if(uuid.equals(ROBOT_ID_NOT_SET)){
             //Set UUID
             final String newUUID = UUID.randomUUID().toString();
             setPassword(context, newUUID);
@@ -177,8 +179,8 @@ public class PocketBotSettings {
     }
 
     public static String getRobotId(Context context) {
-        final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_ROBOT_ID, "NOT_SET");
-        if(uuid.equals("NOT_SET")){
+        final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_ROBOT_ID, ROBOT_ID_NOT_SET);
+        if(uuid.equals(ROBOT_ID_NOT_SET)){
             //Set UUID
             final String newUUID = UUID.randomUUID().toString();
             setRobotId(context, newUUID);
@@ -192,7 +194,7 @@ public class PocketBotSettings {
     }
 
     public static String getRobotName(Context context) {
-        final String name = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_ROBOT_NAME, "Robot-1");
+        final String name = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_ROBOT_NAME, DEFAULT_ROBOT_NAME);
         return name;
     }
 
