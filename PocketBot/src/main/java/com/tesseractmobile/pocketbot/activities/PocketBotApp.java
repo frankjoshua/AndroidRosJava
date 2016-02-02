@@ -38,14 +38,14 @@ public class PocketBotApp extends Application{
             isNew = false;
         }
         //Get robot id first so Shared preference listeners don't trigger
-        final String robotId = PocketBotSettings.getRobotId(this);
+        final String robotId = PreferenceManager.getDefaultSharedPreferences(this).getString(PocketBotSettings.KEY_ROBOT_ID, PocketBotSettings.ROBOT_ID_NOT_SET);
         //Init DataStore
         final DataStore dataStore = DataStore.init(this);
         //Start up remote control service
         RemoteControl.init(this, dataStore, robotId);
         //Init Robot
         Robot.init(dataStore);
-        Robot.get().setIsNew(true);
+        Robot.get().setIsNew(robotId.equals(PocketBotSettings.ROBOT_ID_NOT_SET));
         //Setup Quickblox
         QBSettings.getInstance().fastConfigInit("30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
         //Bind to voice recognition service to hold constant connection

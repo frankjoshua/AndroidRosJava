@@ -79,7 +79,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
                 mFirebasePreferenceSync.start(getRobots());
                 //Let everyone know we are logged in
                 for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
-                    onAuthCompleteListener.onAuthComplete();
+                    onAuthCompleteListener.onAuthComplete(authData);
                 }
                 PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
             }
@@ -161,7 +161,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     public void registerOnAuthCompleteListener(OnAuthCompleteListener onAuthCompleteListener) {
         mOnAuthCompleteListeners.add(onAuthCompleteListener);
         if(isLoggedIn()){
-            onAuthCompleteListener.onAuthComplete();
+            onAuthCompleteListener.onAuthComplete(mAuthData);
         }
     }
 
@@ -206,8 +206,12 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         return mAuthData != null && mRobotId != null;
     }
 
+    public AuthData getAuthData() {
+        return mAuthData;
+    }
+
     public interface OnAuthCompleteListener {
-        void onAuthComplete();
+        void onAuthComplete(final AuthData authData);
     }
 
     /**

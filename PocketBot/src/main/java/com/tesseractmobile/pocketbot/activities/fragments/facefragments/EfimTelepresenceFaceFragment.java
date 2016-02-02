@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.firebase.client.AuthData;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
@@ -57,7 +58,7 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
         });
         Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
             @Override
-            public void onAuthComplete() {
+            public void onAuthComplete(final AuthData authData) {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

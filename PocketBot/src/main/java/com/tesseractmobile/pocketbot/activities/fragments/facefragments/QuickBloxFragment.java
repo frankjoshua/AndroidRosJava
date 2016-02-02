@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.firebase.client.AuthData;
 import com.quickblox.auth.QBAuth;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.chat.QBChatService;
@@ -331,7 +332,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     @Override
-    public void onAuthComplete() {
+    public void onAuthComplete(final AuthData authData) {
         signIn(getContext());
     }
 }

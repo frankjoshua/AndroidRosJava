@@ -18,7 +18,6 @@ import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -35,6 +34,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.firebase.client.AuthData;
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -79,6 +80,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     public static final String FRAGMENT_FACE = "FACE";
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
     private static final int RC_GOOGLE_LOGIN = 1;
+    private static final int RC_REQUEST_INVITE = 2;
 
 
     //private RobotFace mRobotFace;
@@ -99,6 +101,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     private boolean mFaceTrackingActive;
 
     private RobotInterface mRobotInterFace;
+
+    private Handler handler = new Handler();
 
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
@@ -130,7 +134,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             //After login show the robot selection dialog
             Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
                 @Override
-                public void onAuthComplete() {
+                public void onAuthComplete(final AuthData authData) {
                     showRobotSelectionDialog();
                 }
             });
@@ -139,6 +143,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         //Set on click listeners
         findViewById(R.id.btnApiAi).setOnClickListener(this);
         findViewById(R.id.btnFeedback).setOnClickListener(this);
+        findViewById(R.id.btnSendInvite).setOnClickListener(this);
         findViewById(R.id.llTop).setOnClickListener(this);
         findViewById(R.id.tvModes).setOnClickListener(this);
         findViewById(R.id.tvSettings).setOnClickListener(this);
@@ -529,6 +534,28 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             case R.id.llTop:
                 showRobotSelectionDialog();
                 break;
+            case R.id.btnSendInvite:
+                Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+                    @Override
+                    public void onAuthComplete(final AuthData authData) {
+                        final String displayName = (String) authData.getProviderData().get("displayName");
+                        final String robotName = PocketBotSettings.getRobotName(BaseFaceFragmentActivity.this);
+                        final String message = displayName + " is giving you control of " + robotName;
+                        Intent intent = new AppInviteInvitation.IntentBuilder("PocketBot Control Invite")
+                                .setMessage(message)
+                                .setDeepLink(Uri.parse("http://pocketbot.tesseractmobile.com/usbserialfragment/" + PocketBotSettings.getRobotId(BaseFaceFragmentActivity.this)))
+                                //.setCustomImage(Uri.parse((String) authData.getProviderData().get("profileImageURL")))
+                                //.setCallToActionText("invitation_cta")
+                                .setEmailHtmlContent("<html><body>"
+                                        + "<a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\">" + "Click here to start controlling " + robotName + ".<br><br>"
+                                        + "<img src=\"" + (String) authData.getProviderData().get("profileImageURL") + "\" height=\"130\" width=\"130\"/></a>"
+                                        + "</body></html>")
+                                .setEmailSubject("PocketBot Control Invite from " + displayName)
+                                .build();
+                        startActivityForResult(intent, RC_REQUEST_INVITE);
+                    }
+                });
+                break;
             case R.id.sign_in_button:
                 startSignin();
                 break;
@@ -567,23 +594,28 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     }
 
     private void showRobotSelectionDialog() {
-        RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
-        robotSelectionDialog.setOnlyUserRobots(true);
-        robotSelectionDialog.setSignInOnClickListener(this);
-        robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
-        robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
+        handler.post(new Runnable() {
             @Override
-            public void onRobotSelected(RobotInfo.Settings model) {
-                PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robot_id);
-                //Check if name should be set
-                if(model.prefs.robot_name.equals(PocketBotSettings.DEFAULT_ROBOT_NAME)){
-                    //Launch name change dialog
-                    //Open draw
-                    //Tell user to change the robot name
-                    Toast.makeText(BaseFaceFragmentActivity.this, "You should change your robot name.", Toast.LENGTH_LONG).show();
-                    toggleSettingsFragment();
-                    ((DrawerLayout) findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
-                }
+            public void run() {
+                RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
+                robotSelectionDialog.setOnlyUserRobots(true);
+                robotSelectionDialog.setSignInOnClickListener(BaseFaceFragmentActivity.this);
+                robotSelectionDialog.show(getSupportFragmentManager(), "ROBOT_SELECTION_DIALOG");
+                robotSelectionDialog.setOnRobotSelectedListener(new RobotSelectionDialog.OnRobotSelectedListener() {
+                    @Override
+                    public void onRobotSelected(RobotInfo.Settings model) {
+                        PocketBotSettings.setRobotId(BaseFaceFragmentActivity.this, model.prefs.robot_id);
+                        //Check if name should be set
+                        if (model.prefs.robot_name.equals(PocketBotSettings.DEFAULT_ROBOT_NAME)) {
+                            //Launch name change dialog
+                            //Open draw
+                            //Tell user to change the robot name
+                            Toast.makeText(BaseFaceFragmentActivity.this, "You should change your robot name.", Toast.LENGTH_LONG).show();
+                            toggleSettingsFragment();
+                            ((DrawerLayout) findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
+                        }
+                    }
+                });
             }
         });
     }
@@ -636,15 +668,23 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == RC_GOOGLE_LOGIN && resultCode == Activity.RESULT_OK){
-            /* This was a request by the Google API */
-            if (resultCode != RESULT_OK) {
-                mGoogleLoginClicked = false;
-            }
-            mGoogleIntentInProgress = false;
-            if (!mGoogleApiClient.isConnecting()) {
-                mGoogleApiClient.connect();
-                Log.d(TAG, "Connecting Google Sign In");
+        if(resultCode == Activity.RESULT_OK) {
+            switch (requestCode){
+                case RC_GOOGLE_LOGIN:
+                    /* This was a request by the Google API */
+                    if (resultCode != RESULT_OK) {
+                        mGoogleLoginClicked = false;
+                    }
+                    mGoogleIntentInProgress = false;
+                    if (!mGoogleApiClient.isConnecting()) {
+                        mGoogleApiClient.connect();
+                        Log.d(TAG, "Connecting Google Sign In");
+                    }
+                    break;
+                case RC_REQUEST_INVITE:
+                    String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                    Log.d(TAG, "Sent " + ids.length + " Invitations");
+                    break;
             }
         }
     }

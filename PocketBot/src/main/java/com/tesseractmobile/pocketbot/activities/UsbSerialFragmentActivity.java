@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.firebase.client.AuthData;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.BodyService;
@@ -47,7 +48,7 @@ public class UsbSerialFragmentActivity extends AiFragmentActivity {
             //Need to add this to list of allowed robots
             Robot.get().getDataStore().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
                 @Override
-                public void onAuthComplete() {
+                public void onAuthComplete(final AuthData authData) {
                     Robot.get().getDataStore().addRobot(robotId, false);
                 }
             });

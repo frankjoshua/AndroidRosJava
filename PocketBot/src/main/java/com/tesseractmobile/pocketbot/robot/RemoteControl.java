@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -238,7 +239,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
 
 
     @Override
-    public void onAuthComplete() {
+    public void onAuthComplete(final AuthData authData) {
         //Listen for messages from firebase
         mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
         mFirebaseListen.child(CONTROL).addChildEventListener(this);

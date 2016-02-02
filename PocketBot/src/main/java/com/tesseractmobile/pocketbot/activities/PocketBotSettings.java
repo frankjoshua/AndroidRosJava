@@ -312,6 +312,8 @@ public class PocketBotSettings {
             return sharedPreferences.getBoolean(PocketBotSettings.KEY_AUTO_SIGN_IN, PocketBotSettings.DEFAULT_AUTO_SIGN_IN);
         } else if (key.equals(PocketBotSettings.KEY_KEEP_ALIVE)) {
             return sharedPreferences.getBoolean(PocketBotSettings.KEY_KEEP_ALIVE, PocketBotSettings.DEFAULT_KEEP_ALIVE);
+        } else if (key.equals("App Restrictions")) {
+            return sharedPreferences.getString(key, "");
         } else {
             throw new UnsupportedOperationException("Unknown key: " + key);
         }

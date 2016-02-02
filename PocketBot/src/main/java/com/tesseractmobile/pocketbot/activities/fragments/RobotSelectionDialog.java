@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -65,7 +66,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
     }
 
     @Override
-    public void onAuthComplete() {
+    public void onAuthComplete(final AuthData authData) {
         final Context context = getContext();
         if(context == null){
             return;

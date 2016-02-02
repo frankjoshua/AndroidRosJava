@@ -22,6 +22,10 @@
             "package_name": "com.tesseractmobile.pocketbot",
             "certificate_hash": "FB4641DF86484990E10577609E82703AEB10466E"
           }
+        },
+        {
+          "client_id": "547931764939-du412euoccilddpl427nc33u5lp0s0vd.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [],
@@ -34,8 +38,13 @@
           "apns_config": []
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547931764939-du412euoccilddpl427nc33u5lp0s0vd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "google_signin_service": {
           "status": 2
