@@ -87,7 +87,9 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
                 Log.e("DataStore", "Token: " + token);
-                throw new UnsupportedOperationException(firebaseError.toString());
+                if(Constants.LOGGING){
+                    throw new UnsupportedOperationException(firebaseError.toString());
+                }
             }
         });
     }
