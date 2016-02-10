@@ -45,8 +45,8 @@ public class FaceFragmentFactory {
         faceList.add(new FaceInfo(ID_FACE_EFIM, R.drawable.ic_launcher, R.drawable.efim_background_texture, "Robot", "Face tracking is active and AI is in total control.", false));
         faceList.add(new FaceInfo(ID_FACE_ALIEN, R.drawable.ic_launcher, R.drawable.purple_fuzz, "Cartoon", "Face tracking is active and AI is in total control.", false));
         faceList.add(new FaceInfo(ID_FACE_CONTROL, R.drawable.ic_control, R.drawable.efim_background_texture, "Control", "Used for direct control of remote or local robot.", false));
-        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE, R.drawable.ic_telepresence, R.drawable.efim_background_texture, "Telepresence", "Allow remote control and show remote video feed on screen.", true));
-        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE_EFIM, R.drawable.ic_robot_telepresence, R.drawable.efim_background_texture, "Remote Robot", "Telepresence while displaying robot face instead of video.", true));
+        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE, R.drawable.ic_telepresence, R.drawable.efim_background_texture, "Telepresence", "Allow remote control and show remote video feed on screen.", false));
+        faceList.add(new FaceInfo(ID_FACE_TELEPRESENCE_EFIM, R.drawable.ic_robot_telepresence, R.drawable.efim_background_texture, "Remote Robot", "Telepresence while displaying robot face instead of video.", false));
         return faceList;
     }
 }
