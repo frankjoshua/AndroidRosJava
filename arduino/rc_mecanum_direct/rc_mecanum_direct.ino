@@ -6,8 +6,8 @@
 
 #define MIN_SPEED -127
 #define MAX_SPEED 127
-#define MIN_INPUT 999
-#define MAX_INPUT 1980
+#define MIN_INPUT 1010
+#define MAX_INPUT 1955
 #define LEFT 1
 #define RIGHT 2
 
@@ -54,36 +54,32 @@ void setup() {
 
 
 void loop() {
-  //delay(1);
+  delay(1);
 
   readRc();
   
-  //driveMotors();
-}
-
-void driveMotors(){
- //Send data
-  if(channels[CH6] > 1200){
+  //Send data
+  //if(channels[CH5] > 1200){
     //Motors
-    int minSpeed =  constrain(map(channels[CH6], MIN_INPUT, MAX_INPUT, 0, MIN_SPEED), MIN_SPEED, MAX_SPEED);
-    int maxSpeed =  constrain(map(channels[CH6], MIN_INPUT, MAX_INPUT, 0, MAX_SPEED), MIN_SPEED, MAX_SPEED);
-    int mSpeed = map(channels[CH2], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
-    int strafe = map(channels[CH4], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
+    int minSpeed =  MIN_SPEED;//constrain(map(channels[CH5], MIN_INPUT, MAX_INPUT, 0, MIN_SPEED), MIN_SPEED, MAX_SPEED);
+    int maxSpeed =  MAX_SPEED;//constrain(map(channels[CH5], MIN_INPUT, MAX_INPUT, 0, MAX_SPEED), MIN_SPEED, MAX_SPEED);
+    int mSpeed = map(channels[CH3], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
+    int strafe = map(channels[CH5], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
     int dir = map(channels[CH1], MAX_INPUT, MIN_INPUT, minSpeed, maxSpeed);
     int powerR = constrain(mSpeed + dir - strafe, minSpeed, maxSpeed);
     int powerL = constrain(mSpeed - dir + strafe, minSpeed, maxSpeed);
     int powerRf = constrain(mSpeed + dir + strafe, minSpeed, maxSpeed);
     int powerLf = constrain(mSpeed - dir - strafe, minSpeed, maxSpeed);
     
-    Serial.print(strafe);
-    Serial.print(" Right Front: ");
-    Serial.print(powerRf);
-    Serial.print(" Rear: ");
-    Serial.println(powerR);
-    Serial.print("Left Front: ");
-    Serial.print(powerLf);
-    Serial.print(" Read: ");
-    Serial.println(powerL);
+//    Serial.print(strafe);
+//    Serial.print(" Right Front: ");
+//    Serial.print(powerRf);
+//    Serial.print(" Rear: ");
+//    Serial.println(powerR);
+//    Serial.print("Left Front: ");
+//    Serial.print(powerLf);
+//    Serial.print(" Read: ");
+//    Serial.println(powerL);
     
         //Set motors to FORWARD or BACKWARD
     if(powerL < 0){
@@ -116,36 +112,17 @@ void driveMotors(){
     rightMotor->setSpeed(rearRight);
     leftMotor->setSpeed(rearLeft);		
     frontRightMotor->setSpeed(frontRight);
-    frontLeftMotor->setSpeed(frontLeft); 
-  }
+    frontLeftMotor->setSpeed(frontLeft);
+
 }
 
 void readRc(){
-  
-  int reading = pulseIn(CH1_PIN, HIGH, 25000);
-  if(reading > 0){
-    filter[CH1].add(reading); // Read the pulse width of 
-  }
-  reading = pulseIn(CH2_PIN, HIGH, 25000);
-  if(reading > 0){
-    filter[CH2].add(reading); // Read the pulse width of 
-  }
-  reading = pulseIn(CH3_PIN, HIGH, 25000);
-  if(reading > 0){
-    filter[CH3].add(reading); // Read the pulse width of 
-  }
-  reading = pulseIn(CH4_PIN, HIGH, 25000);
-  if(reading > 0){
-    filter[CH4].add(reading); // Read the pulse width of 
-  }
-  reading = pulseIn(CH5_PIN, HIGH, 25000);
-  if(reading > 0){
-    filter[CH5].add(reading); // Read the pulse width of 
-  }
-  reading = pulseIn(CH6_PIN, HIGH, 25000);
-  if(reading > 0){
-    filter[CH6].add(reading); // Read the pulse width of 
-  }
+  filter[CH1].add(pulseIn(CH1_PIN, HIGH, 25000)); // Read the pulse width of 
+  filter[CH2].add(pulseIn(CH2_PIN, HIGH, 25000)); // each channel
+  filter[CH3].add(pulseIn(CH3_PIN, HIGH, 25000));
+  filter[CH4].add(pulseIn(CH4_PIN, HIGH, 25000));
+  filter[CH5].add(pulseIn(CH5_PIN, HIGH, 25000));
+  filter[CH6].add(pulseIn(CH6_PIN, HIGH, 25000));
   //Average out readings to remove spikes
   channels[CH1] = filter[CH1].getMedian();
   channels[CH2] = filter[CH2].getMedian();
@@ -154,20 +131,16 @@ void readRc(){
   channels[CH5] = filter[CH5].getMedian();
   channels[CH6] = filter[CH6].getMedian();
   
-  Serial.print(channels[CH1]);
-  Serial.print("    ");
-  Serial.print(channels[CH2]);
-  Serial.print("    ");
-  Serial.print(channels[CH3]);
-  Serial.print("    ");
-  Serial.print(channels[CH4]);
-  Serial.print("    ");
-  Serial.print(channels[CH5]);
-  Serial.print("    ");
-  Serial.println(channels[CH6]);
+//  Serial.println(channels[CH1]);
+//  Serial.println(channels[CH2]);
+//  Serial.println(channels[CH3]);
+//  Serial.println(channels[CH4]);
+//  Serial.println(channels[CH5]);
+//  Serial.println(channels[CH6]);
 }
 
 void initCom(){
+  //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
   Serial.begin(115200);
 }
 

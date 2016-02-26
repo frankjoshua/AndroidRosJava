@@ -40,7 +40,7 @@ public class PocketBotSettings {
     public static final String DEFAULT_API_AI_KEY = "1eca9ad4-74e8-4d3a-afea-7131df82d19b";//"1eca9ad4-74e8-4d3a-afea-7131df82d19b";
     public static final String DEFAULT_API_AI_TOKEN = "443dddf4747d4408b0e9451d4d53f201  ";//"443dddf4747d4408b0e9451d4d53f201";
     private static final boolean DEFAULT_AUTO_SIGN_IN = false;
-    public static final boolean DEFAULT_KEEP_ALIVE = true;
+    public static final boolean DEFAULT_KEEP_ALIVE = false;
     public static final String ROBOT_ID_NOT_SET = "NOT_SET";
     public static final String DEFAULT_ROBOT_NAME = "Robot-1";
 
