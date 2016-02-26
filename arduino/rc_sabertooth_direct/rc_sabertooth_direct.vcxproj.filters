@@ -14,4 +14,12 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="rc_sabertooth_direct.ino" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="__vm\.rc_sabertooth_direct.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

@@ -74,6 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\cores\arduino;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\variants\standard;C:\Users\josh\Development\workspace\efim\arduino\rc_sabertooth_direct;C:\Users\josh\Documents\Arduino\libraries\RunningMedian;C:\Users\josh\Documents\Arduino\libraries\RunningMedian\utility;C:\Users\josh\Documents\Arduino\libraries\SabertoothSimplified;C:\Users\josh\Documents\Arduino\libraries\SabertoothSimplified\utility;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries\SoftwareSerial;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries\SoftwareSerial\utility;C:\Program Files (x86)\Arduino\libraries;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\me3a43se.0wa\Micro Platforms\default\debuggers;C:\Users\josh\Documents\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -86,10 +87,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\cores\arduino;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\variants\standard;C:\Users\josh\Development\workspace\efim\arduino\rc_sabertooth_direct;C:\Users\josh\Documents\Arduino\libraries\RunningMedian;C:\Users\josh\Documents\Arduino\libraries\RunningMedian\utility;C:\Users\josh\Documents\Arduino\libraries\SabertoothSimplified;C:\Users\josh\Documents\Arduino\libraries\SabertoothSimplified\utility;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries\SoftwareSerial;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries\SoftwareSerial\utility;C:\Program Files (x86)\Arduino\libraries;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\me3a43se.0wa\Micro Platforms\default\debuggers;C:\Users\josh\Documents\Arduino\libraries;C:\Users\josh\Development\workspace\efim\arduino\rc_sabertooth_direct;C:\Users\josh\Documents\Arduino\libraries\RunningMedian;C:\Users\josh\Documents\Arduino\libraries\SabertoothSimplified;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries\SoftwareSerial;C:\Program Files (x86)\Arduino\libraries;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\me3a43se.0wa\Micro Platforms\default\debuggers;C:\Users\josh\Documents\Arduino\libraries;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\cores\arduino;C:\Users\josh\AppData\Roaming\arduino15\packages\arduino\hardware\avr\1.6.8\variants\standard;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>C:\Users\josh\Development\workspace\efim\arduino\rc_sabertooth_direct\__vm\.rc_sabertooth_direct.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=10604;ARDUINO_AVR_UNO;ARDUINO_ARCH_AVR;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -110,8 +115,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="rc_sabertooth_direct.ino">
+      <FileType>CppCode</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="__vm\.rc_sabertooth_direct.vsarduino.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties arduino.upload.port="COM5" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
