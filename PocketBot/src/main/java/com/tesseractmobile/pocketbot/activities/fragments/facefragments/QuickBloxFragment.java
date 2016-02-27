@@ -69,6 +69,11 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         final String password = PocketBotSettings.getPassword(context);
         //Create a user
         final QBUser user = new QBUser(login, password);
+        //If no password sign up the user
+        if(password.equals("")){
+            signUpUser(user, context);
+            return;
+        }
         //Create a session
         QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
             @Override
@@ -116,7 +121,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
                     @Override
                     public void onError(List<String> errors) {
                         //Unhandled Error
-                        error(errors.toString());
+                        error("SignUp: " + errors.toString());
                     }
                 });
             }
@@ -124,7 +129,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             @Override
             public void onError(List<String> errors) {
                 //Unhandled Error
-                error(errors.toString());
+                error("Session: " + errors.toString());
             }
 
         });
@@ -161,7 +166,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
                     postLogin(context, session, user);
                 } else {
                     //error
-                    error(errors.toString());
+                    error("Login: " + errors.toString());
                 }
             }
         });

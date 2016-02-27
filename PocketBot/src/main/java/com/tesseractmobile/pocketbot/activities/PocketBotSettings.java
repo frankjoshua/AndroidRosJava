@@ -132,7 +132,7 @@ public class PocketBotSettings {
      */
     public static String getPassword(final Context context) {
         final String uuid = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_PASSWORD, ROBOT_ID_NOT_SET);
-        if(uuid.equals(ROBOT_ID_NOT_SET)){
+        if(uuid.equals(ROBOT_ID_NOT_SET) || uuid.equals("")){
             //Set UUID
             final String newUUID = UUID.randomUUID().toString();
             setPassword(context, newUUID);

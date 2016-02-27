@@ -61,15 +61,15 @@ void loop() {
   //Send data
   if(channels[CH6] > 1200){
     //Motors
-    int minSpeed =  constrain(map(channels[CH6], MIN_INPUT, MAX_INPUT, 0, MIN_SPEED), MIN_SPEED, MAX_SPEED);
-    int maxSpeed =  constrain(map(channels[CH6], MIN_INPUT, MAX_INPUT, 0, MAX_SPEED), MIN_SPEED, MAX_SPEED);
+    int minSpeed =  constrain(map(channels[CH3], MIN_INPUT, MAX_INPUT, 0, MIN_SPEED), MIN_SPEED, MAX_SPEED);
+    int maxSpeed =  constrain(map(channels[CH3], MIN_INPUT, MAX_INPUT, 0, MAX_SPEED), MIN_SPEED, MAX_SPEED);
     int mSpeed = map(channels[CH2], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
     int strafe = map(channels[CH4], MIN_INPUT, MAX_INPUT, minSpeed, maxSpeed);
     int dir = map(channels[CH1], MAX_INPUT, MIN_INPUT, minSpeed, maxSpeed);
-    int powerR = constrain(mSpeed + dir - strafe, minSpeed, maxSpeed);
-    int powerL = constrain(mSpeed - dir + strafe, minSpeed, maxSpeed);
-    int powerRf = constrain(mSpeed + dir + strafe, minSpeed, maxSpeed);
-    int powerLf = constrain(mSpeed - dir - strafe, minSpeed, maxSpeed);
+    int powerR = constrain(mSpeed + dir + strafe, minSpeed, maxSpeed);
+    int powerL = constrain(mSpeed - dir - strafe, minSpeed, maxSpeed);
+    int powerRf = constrain(mSpeed + dir - strafe, minSpeed, maxSpeed);
+    int powerLf = constrain(mSpeed - dir + strafe, minSpeed, maxSpeed);
     
     Serial.print(strafe);
     Serial.print(" Right Front: ");
