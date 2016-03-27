@@ -10,7 +10,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
 
-import com.tesseractmobile.pocketbot.activities.BaseFaceFragmentActivity;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
 /**

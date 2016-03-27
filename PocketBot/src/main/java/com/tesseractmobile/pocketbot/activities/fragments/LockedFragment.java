@@ -6,11 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.tesseractmobile.pocketbot.R;
-import com.tesseractmobile.pocketbot.robot.faces.TelePresenceFace;
 
 /**
  * Created by josh on 12/2/2015.

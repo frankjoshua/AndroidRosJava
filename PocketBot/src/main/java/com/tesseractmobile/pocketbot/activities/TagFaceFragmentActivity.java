@@ -7,6 +7,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.tesseractmobile.pocketbot.robot.Robot;
+import com.tesseractmobile.tag.HeadingEstimate;
+import com.tesseractmobile.tag.TagGame;
+
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
@@ -18,10 +22,6 @@ import org.altbeacon.beacon.service.RunningAverageRssiFilter;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import com.tesseractmobile.pocketbot.robot.Robot;
-import com.tesseractmobile.tag.HeadingEstimate;
-import com.tesseractmobile.tag.TagGame;
 
 /**
  * Created by josh on 9/30/2015.

@@ -1,13 +1,5 @@
 package com.tesseractmobile.pocketbot.service;
 
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,13 +8,19 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbAccessory;
 import android.hardware.usb.UsbManager;
 import android.os.ParcelFileDescriptor;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.tesseractmobile.pocketbot.robot.BodyInterface;
-import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.RobotEvent;
 import com.tesseractmobile.pocketbot.robot.SensorData;
+
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UsbConnectionService extends BodyService implements Runnable, BodyInterface{
 

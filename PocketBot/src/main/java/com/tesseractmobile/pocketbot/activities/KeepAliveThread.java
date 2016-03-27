@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.tesseractmobile.pocketbot.robot.Constants;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
-import com.tesseractmobile.pocketbot.robot.SensorData;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;

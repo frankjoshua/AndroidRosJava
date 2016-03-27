@@ -56,7 +56,6 @@ import com.tesseractmobile.pocketbot.robot.RobotInfo;
 import com.tesseractmobile.pocketbot.robot.SensorControler;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
-import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
 import io.fabric.sdk.android.Fabric;
 

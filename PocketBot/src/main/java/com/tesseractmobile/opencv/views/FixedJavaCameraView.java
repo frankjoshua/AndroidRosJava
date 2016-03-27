@@ -2,9 +2,6 @@ package com.tesseractmobile.opencv.views;
 
 //import org.opencv.android.JavaCameraView;
 
-import android.content.Context;
-import android.util.AttributeSet;
-
 //public class FixedJavaCameraView extends JavaCameraView {
 public class FixedJavaCameraView {
 //    public FixedJavaCameraView(final Context context, final AttributeSet attrs) {

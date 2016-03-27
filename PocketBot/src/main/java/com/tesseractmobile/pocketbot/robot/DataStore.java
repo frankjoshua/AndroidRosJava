@@ -2,7 +2,6 @@ package com.tesseractmobile.pocketbot.robot;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.firebase.client.AuthData;

@@ -1,19 +1,15 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
-import com.tesseractmobile.pocketbot.R;
-import com.tesseractmobile.pocketbot.robot.Emotion;
-import com.tesseractmobile.pocketbot.robot.SensorData;
-import com.tesseractmobile.pocketbot.views.EyeView;
-import com.tesseractmobile.pocketbot.views.MouthView;
-import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
-
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.views.EyeView;
+import com.tesseractmobile.pocketbot.views.MouthView;
+import com.tesseractmobile.pocketbot.views.MouthView.SpeechCompleteListener;
 
 /**
  * Created by josh on 10/17/2015.

@@ -28,14 +28,11 @@
 
 package com.tesseractmobile.pocketbot.views;
 
-import android.provider.ContactsContract;
-
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Robot;
 
 import java.util.ArrayList;

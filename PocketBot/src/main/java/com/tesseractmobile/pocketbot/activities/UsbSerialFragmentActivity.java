@@ -1,15 +1,12 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import android.Manifest;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.firebase.client.AuthData;

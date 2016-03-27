@@ -2,8 +2,8 @@ package com.tesseractmobile.pocketbot.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.preference.PreferenceManager;
 
 import com.tesseractmobile.pocketbot.BuildConfig;
 import com.tesseractmobile.pocketbot.robot.CommandContract;

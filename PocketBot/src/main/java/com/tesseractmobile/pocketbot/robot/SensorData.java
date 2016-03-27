@@ -3,7 +3,6 @@ package com.tesseractmobile.pocketbot.robot;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
-import java.util.concurrent.Semaphore;
 
 /**
  * Data in this class is sent to the Arduino

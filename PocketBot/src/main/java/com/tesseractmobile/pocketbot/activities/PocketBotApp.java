@@ -9,13 +9,14 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
+import com.crashlytics.android.Crashlytics;
 import com.firebase.client.Firebase;
 import com.quickblox.core.QBSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
-import com.crashlytics.android.Crashlytics;
+
 import io.fabric.sdk.android.Fabric;
 
 /**

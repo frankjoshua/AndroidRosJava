@@ -1,7 +1,5 @@
 package com.tesseractmobile.pocketbot.views;
 
-import java.util.HashMap;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -29,6 +27,8 @@ import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.SpeechState;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.SpeechStateListener;
+
+import java.util.HashMap;
 
 public class MouthView extends TextView implements OnInitListener, OnDataCaptureListener, SpeechStateListener{
 

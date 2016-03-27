@@ -1,7 +1,5 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import java.util.UUID;
-
 import android.os.Bundle;
 
 import com.firebase.client.DataSnapshot;
@@ -9,6 +7,8 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tesseractmobile.pocketbot.robot.Robot;
+
+import java.util.UUID;
 
 public class FirebaseFaceFragmentActivity extends BaseFaceFragmentActivity {
 

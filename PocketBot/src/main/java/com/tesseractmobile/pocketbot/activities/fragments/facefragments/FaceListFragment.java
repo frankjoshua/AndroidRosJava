@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -9,9 +9,6 @@ import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.NumberFormat;
 
 /**

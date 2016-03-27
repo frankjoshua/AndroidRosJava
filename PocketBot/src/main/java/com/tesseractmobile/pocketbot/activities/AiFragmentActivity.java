@@ -12,14 +12,13 @@ import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.Robot;
 
-import io.fabric.sdk.android.Fabric;
-
 import ai.api.AIConfiguration;
 import ai.api.AIDataService;
 import ai.api.AIServiceException;
 import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.model.Result;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by josh on 8/19/2015.

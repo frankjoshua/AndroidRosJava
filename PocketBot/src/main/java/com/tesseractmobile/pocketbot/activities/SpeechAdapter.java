@@ -1,16 +1,13 @@
 package com.tesseractmobile.pocketbot.activities;
 
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.tesseractmobile.pocketbot.R;

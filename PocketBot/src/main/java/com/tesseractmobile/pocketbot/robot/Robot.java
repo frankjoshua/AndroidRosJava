@@ -1,11 +1,6 @@
 package com.tesseractmobile.pocketbot.robot;
 
-import android.provider.ContactsContract;
-
-import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 
 /**
  * Created by josh on 11/16/2015.
