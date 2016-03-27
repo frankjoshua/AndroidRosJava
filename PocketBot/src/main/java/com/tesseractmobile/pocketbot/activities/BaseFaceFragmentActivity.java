@@ -63,8 +63,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
-
-
     public static final String FRAGMENT_FACE_TRACKING = "FACE_TRACKING";
     public static final String FRAGMENT_FACE = "FACE";
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
@@ -72,16 +70,9 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
     private static final int RC_REQUEST_INVITE = 2;
     private static final int RC_SIGN_IN = 3;
 
-
-    //private RobotFace mRobotFace;
     private SpeechAdapter mSpeechAdapter;
 
     private boolean mFaceTrackingActive;
-
-    //private RobotInterface Robot.get();
-
-    private Handler handler = new Handler();
-
 
     private SignInButton mSignInButton;
 
@@ -476,7 +467,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
     }
 
     private void showRobotSelectionDialog() {
-        handler.post(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 RobotSelectionDialog robotSelectionDialog = new RobotSelectionDialog();
