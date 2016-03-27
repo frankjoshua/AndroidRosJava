@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.activities;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -40,7 +41,9 @@ import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -677,16 +680,18 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
 
         if(resultCode == Activity.RESULT_OK) {
             switch (requestCode){
-                case RC_GOOGLE_LOGIN:
-                    /* This was a request by the Google API */
-                    if (resultCode != RESULT_OK) {
-                        mGoogleLoginClicked = false;
-                    }
-                    mGoogleIntentInProgress = false;
-                    if (!mGoogleApiClient.isConnecting()) {
-                        mGoogleApiClient.connect();
-                        Log.d(TAG, "Connecting Google Sign In");
-                    }
+                case RC_SIGN_IN:
+                    GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                    handleSignInResult(result);
+//                    /* This was a request by the Google API */
+//                    if (resultCode != RESULT_OK) {
+//                        mGoogleLoginClicked = false;
+//                    }
+//                    mGoogleIntentInProgress = false;
+//                    if (!mGoogleApiClient.isConnecting()) {
+//                        mGoogleApiClient.connect();
+//                        Log.d(TAG, "Connecting Google Sign In");
+//                    }
                     break;
                 case RC_REQUEST_INVITE:
                     String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
@@ -696,19 +701,32 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         }
     }
 
-    private void getGoogleOAuthTokenAndLogin() {
+    private void handleSignInResult(final GoogleSignInResult result) {
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            getGoogleOAuthTokenAndLogin(acct.getEmail());
+        } else {
+            // Signed out, show unauthenticated UI.
+
+        }
+    }
+
+    private void getGoogleOAuthTokenAndLogin(final String account) {
         /* Get OAuth token in Background */
-        AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+        AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
             String errorMessage = null;
 
             @Override
-            protected String doInBackground(Void... params) {
+            protected String doInBackground(String... params) {
                 String token = null;
 
                 try {
-                    String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
+                    //String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
                     Log.d(TAG, "Trying to connect to Google API");
-                    token = GoogleAuthUtil.getToken(BaseFaceFragmentActivity.this, Plus.AccountApi.getAccountName(mGoogleApiClient), scope);
+                    final String scope = "oauth2:profile email";
+                    token = GoogleAuthUtil.getToken(getApplicationContext(), params[0], scope);
+                    //token = GoogleAuthUtil.getToken(BaseFaceFragmentActivity.this, Plus.AccountApi.getAccountName(mGoogleApiClient), scope);
                     Log.d(TAG, "Token read: " + token);
                 } catch (IOException transientEx) {
                     /* Network or server error */
@@ -742,7 +760,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 }
             }
         };
-        task.execute();
+        task.execute(account);
     }
 
 
@@ -764,12 +782,13 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 Log.e(TAG, result.toString());
             }
         }
+        //throw new UnsupportedOperationException();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
         /* Connected with Google API, use this to authenticate with Firebase */
-        getGoogleOAuthTokenAndLogin();
+        //getGoogleOAuthTokenAndLogin();
     }
 
     @Override

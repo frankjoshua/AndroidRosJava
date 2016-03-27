@@ -11,7 +11,8 @@
         "client_id": "android:com.tesseractmobile.pocketbot",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "com.tesseractmobile.pocketbot"
+          "package_name": "com.tesseractmobile.pocketbot",
+          "certificate_hash": []
         }
       },
       "oauth_client": [
