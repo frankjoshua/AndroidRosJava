@@ -8,6 +8,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.tesseractmobile.pocketbot.robot.Robot;
 
 public class FirebaseFaceFragmentActivity extends BaseFaceFragmentActivity {
 
@@ -40,7 +41,7 @@ public class FirebaseFaceFragmentActivity extends BaseFaceFragmentActivity {
                     if(!chat.user.equals(userId)){
                         //Ignore first response
                         if(firstResponce){
-                            getRobotInterface().say(chat.text);
+                            Robot.get().say(chat.text);
                         } else {
                             firstResponce = true;
                         }

@@ -19,6 +19,7 @@ import org.altbeacon.beacon.service.RunningAverageRssiFilter;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.tag.HeadingEstimate;
 import com.tesseractmobile.tag.TagGame;
 
@@ -45,7 +46,7 @@ public class TagFaceFragmentActivity extends BluetoothFragmentActivity implement
             //Update Tag game
             mTagGame.onMessageReceived(remoteState, remoteId, range);
             //Send new Data
-            getRobotInterface().sendSensorData(false);
+            Robot.get().sendSensorData(false);
         }
     };
 
@@ -135,7 +136,7 @@ public class TagFaceFragmentActivity extends BluetoothFragmentActivity implement
                         obtain.arg2 = Integer.parseInt(transimitedId);
                         hander.sendMessage(obtain);
                         //Update heading estimate
-                        mHeadingEstimate.newData(getRobotInterface().getSensorData().getSensor().heading, distanceChange);
+                        mHeadingEstimate.newData(Robot.get().getSensorData().getSensor().heading, distanceChange);
                         if(mTagGame.getState() == TagGame.IT) {
                             //Chase
                             //getRobotInterface().getSensorData().setDestHeading(mHeadingEstimate.getHeadingEstimate());
@@ -163,9 +164,9 @@ public class TagFaceFragmentActivity extends BluetoothFragmentActivity implement
     @Override
     public void onTagGameUpdate(int state, int id) {
         if(state == TagGame.SAFE){
-            getRobotInterface().say("Tag your it!");
+            Robot.get().say("Tag your it!");
         } else if (state == TagGame.IT){
-            getRobotInterface().say("You got me!");
+            Robot.get().say("You got me!");
         }
         createBeacon(state, id);
     }

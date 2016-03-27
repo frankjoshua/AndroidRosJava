@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.BodyService;
 import com.tesseractmobile.pocketbot.service.UsbConnectionService;
 
@@ -22,7 +23,7 @@ public class UsbAccessoryFragmentActivity extends AiFragmentActivity {
                                              @Override
                                              public void onServiceConnected(final ComponentName name, final IBinder service) {
                                                  final BodyService bodyService = ((BodyService.LocalBinder) service).getService();
-                                                 bodyService.registerBodyConnectionListener(getRobotInterface().getBodyConnectionListener());
+                                                 bodyService.registerBodyConnectionListener(Robot.get().getBodyConnectionListener());
                                                  //robotCommandInterface.reconnectRobot();
                                              }
                                          };

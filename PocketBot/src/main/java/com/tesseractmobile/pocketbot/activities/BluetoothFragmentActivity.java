@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.BluetoothService;
 import com.tesseractmobile.pocketbot.service.BodyService;
 
@@ -44,7 +45,7 @@ public class BluetoothFragmentActivity extends AiFragmentActivity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 final BodyService blueToothService = ((BodyService.LocalBinder) service).getService();
-                blueToothService.registerBodyConnectionListener(getRobotInterface().getBodyConnectionListener());
+                blueToothService.registerBodyConnectionListener(Robot.get().getBodyConnectionListener());
             }
 
             @Override

@@ -10,6 +10,7 @@ import com.tesseractmobile.pocketbot.robot.AI;
 import com.tesseractmobile.pocketbot.robot.AIListener;
 import com.tesseractmobile.pocketbot.robot.CommandContract;
 import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.robot.Robot;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -36,7 +37,7 @@ public class AiFragmentActivity extends BaseFaceFragmentActivity implements AI {
         final String key = PocketBotSettings.getApiAiKey(this);
         final AIConfiguration aiConfig = new AIConfiguration(token, key, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
-        getRobotInterface().setAI(this);
+        Robot.get().setAI(this);
         setSensorDelay(120);
     }
 
@@ -78,7 +79,7 @@ public class AiFragmentActivity extends BaseFaceFragmentActivity implements AI {
         if(speech.equals("")){
             super.doTextInput(result.getResolvedQuery());
         } else {
-            getRobotInterface().listen(speech);
+            Robot.get().listen(speech);
         }
     }
 
@@ -98,12 +99,12 @@ public class AiFragmentActivity extends BaseFaceFragmentActivity implements AI {
         } else if(emotion.equals(CommandContract.EMOTION_FEAR)){
             setEmotion(Emotion.FEAR);
         } else {
-            getRobotInterface().say("I had a new emotion... I don't understand, " + emotion);
+            Robot.get().say("I had a new emotion... I don't understand, " + emotion);
         }
     }
 
     protected void move(String direction, String measurement, int distance) {
-        getRobotInterface().say("I have no body. I can't move");
+        Robot.get().say("I have no body. I can't move");
     }
 
     @Override
@@ -125,7 +126,7 @@ public class AiFragmentActivity extends BaseFaceFragmentActivity implements AI {
 
 
                 } catch (final AIServiceException e) {
-                    getRobotInterface().say("I had an unhandled error.");
+                    Robot.get().say("I had an unhandled error.");
                 }
                 return null;
             }

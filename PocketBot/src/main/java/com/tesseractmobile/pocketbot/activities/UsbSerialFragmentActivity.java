@@ -32,7 +32,7 @@ public class UsbSerialFragmentActivity extends AiFragmentActivity {
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder service) {
             final BodyService bodyService = ((BodyService.LocalBinder) service).getService();
-            bodyService.registerBodyConnectionListener(getRobotInterface().getBodyConnectionListener());
+            bodyService.registerBodyConnectionListener(Robot.get().getBodyConnectionListener());
         }
     };
 

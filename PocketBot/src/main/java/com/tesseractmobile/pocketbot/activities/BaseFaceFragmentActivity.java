@@ -1,22 +1,15 @@
 package com.tesseractmobile.pocketbot.activities;
 
-import android.accounts.Account;
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.BatteryManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -37,18 +30,11 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.firebase.client.AuthData;
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
@@ -57,25 +43,24 @@ import com.google.code.chatterbotapi.ChatterBotType;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.fragments.ApiAiKeyDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
-import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.FaceTrackingFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
+import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.robot.GoogleSignInController;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
+import com.tesseractmobile.pocketbot.robot.SensorControler;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
-import com.google.android.gms.plus.Plus;
-
-import java.io.IOException;
 
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceFragmentActivity extends FragmentActivity implements SensorEventListener, SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
+public class BaseFaceFragmentActivity extends FragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
@@ -84,7 +69,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     public static final String FRAGMENT_FACE_TRACKING = "FACE_TRACKING";
     public static final String FRAGMENT_FACE = "FACE";
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
-    private static final int RC_GOOGLE_LOGIN = 1;
+
     private static final int RC_REQUEST_INVITE = 2;
     private static final int RC_SIGN_IN = 3;
 
@@ -92,47 +77,26 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     //private RobotFace mRobotFace;
     private SpeechAdapter mSpeechAdapter;
 
-
-    //Device sensor manager
-    private SensorManager mSensorManager;
-
-    //Storage for sensors
-    static private float ROTATION[] = new float[9];
-    static private float INCLINATION[] = new float[9];
-    static private float ORIENTATION[] = new float[3];
-
-    private float[] mGravity;
-    private float[] mGeomagnetic;
-
     private boolean mFaceTrackingActive;
 
-    private RobotInterface mRobotInterFace;
+    //private RobotInterface Robot.get();
 
     private Handler handler = new Handler();
 
-    /* Client used to interact with Google APIs. */
-    private GoogleApiClient mGoogleApiClient;
 
-    /* A flag indicating that a PendingIntent is in progress and prevents us from starting further intents. */
-    private boolean mGoogleIntentInProgress;
-
-    /* Track whether the sign-in button has been clicked so that we know to resolve all issues preventing sign-in
-     * without waiting. */
-    private boolean mGoogleLoginClicked;
-
-    /* Store the connection result from onConnectionFailed callbacks so that we can resolve them when the user clicks
-     * sign-in. */
-    private ConnectionResult mGoogleConnectionResult;
     private SignInButton mSignInButton;
-    private BroadcastReceiver mBatteryReceiver;
+
     private KeepAliveThread mKeepAliveThread;
+
+    /** Receives sensor data and forwards it to the robot */
+    private SensorControler mSensorControler;
+    /** Handles Google Authentication */
+    private GoogleSignInController mGoogleSignInController;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
-
-        mRobotInterFace = Robot.get();
 
         setContentView(R.layout.main);
 
@@ -163,8 +127,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
 
-        //Start senors
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensorControler = new SensorControler(this);
 
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -177,34 +140,43 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
 
         //Setup Google Sign in
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        mGoogleSignInController = new GoogleSignInController(this);
 
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignInButton.setSize(SignInButton.SIZE_STANDARD);
-        mSignInButton.setScopes(gso.getScopeArray());
+        mSignInButton.setScopes(mGoogleSignInController.getScopeArray());
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         if (PocketBotSettings.isAutoSignIn(this)) {
-            //startSignin();
+            mGoogleSignInController.startSignin(this, RC_SIGN_IN);
         }
 
+        checkForPermissions();
+    }
+
+    private void checkForPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final String[] permissionList = new String[]{
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.RECORD_AUDIO
+            };
+            for(final String permission : permissionList){
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(permissionList, 0);
+                }
+            }
+        }
     }
 
     @Override
     public void onHeartBeat() {
         //Keep Arduino awake
-        mRobotInterFace.sendSensorData(false);
+        Robot.get().sendSensorData(false);
     }
 
     @Override
     public void onInternetTimeout() {
-        mRobotInterFace.getSensorData().setControl(new SensorData.Control());
-        mRobotInterFace.sendSensorData(true);
+        Robot.get().getSensorData().setControl(new SensorData.Control());
+        Robot.get().sendSensorData(true);
     }
 
     private void updateUI() {
@@ -217,20 +189,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         tvRobotName.setText(PocketBotSettings.getRobotName(this));
     }
 
-    private void onTokenReceived(final String token){
 
-        Log.d(TAG, "Received token: " + token);
-        mGoogleIntentInProgress = false;
-
-        if (!mGoogleApiClient.isConnecting()) {
-            mGoogleApiClient.connect();
-            Robot.get().setAuthToken(PocketBotSettings.getRobotId(this), token);
-            Toast.makeText(this, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
-            mSignInButton.setEnabled(true);
-            //Auto sign in next time
-            PocketBotSettings.setAutoSignIn(this, true);
-        }
-    }
 
     protected void peekDrawer(final DrawerLayout drawerLayout) {
         drawerLayout.openDrawer(Gravity.LEFT);
@@ -292,7 +251,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         //Listen for preference changes
         PocketBotSettings.registerOnSharedPreferenceChangeListener(this, this);
         //Listen for speech to update preview
-        mRobotInterFace.registerSpeechListener(this);
+        Robot.get().registerSpeechListener(this);
         //Keep alive thread
         if(PocketBotSettings.isKeepAlive(this)) {
             mKeepAliveThread = new KeepAliveThread(this, this);
@@ -306,7 +265,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         //Listen for preference changes
         PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);
         //Stop listening for speech to update preview
-        mRobotInterFace.unregisterSpeechListener(this);
+        Robot.get().unregisterSpeechListener(this);
         //Keep alive thread
         if(PocketBotSettings.isKeepAlive(this)) {
             mKeepAliveThread.stopThread();
@@ -316,35 +275,13 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     @Override
     protected void onResume() {
         super.onResume();
-        //Start listening for orientation
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
-        //Listen to proximity sensor
-        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_UI);
-        //Listen for battery status
-        final IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        mBatteryReceiver = new BroadcastReceiver(){
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                //information about battery status
-                int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-                float batteryPct = level / (float)scale;
-                SensorData sensorData = mRobotInterFace.getSensorData();
-                sensorData.getSensor().battery = (int) (batteryPct * 100);
-            }
-        };
-        registerReceiver(mBatteryReceiver, filter);
+        mSensorControler.onResume(this, Robot.get());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //Stop listening for orientation
-        mSensorManager.unregisterListener(this);
-        //Stop listening for battery status
-        unregisterReceiver(mBatteryReceiver);
+        mSensorControler.onPause(this);
     }
 
     /**
@@ -353,7 +290,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
      * @param emotion
      */
     final public void setEmotion(final Emotion emotion) {
-        mRobotInterFace.setEmotion(emotion);
+        Robot.get().setEmotion(emotion);
     }
 
 
@@ -381,68 +318,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     }
 
 
-
-//    @Override
-//    public boolean onProccessInput(final String input) {
-//        if (input.contains("game")) {
-//            say("My favorite game is solitaire");
-//            final Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.tesseractmobile.solitairemulti");
-//            startActivity(launchIntent);
-//            return true;
-//        }
-//        return false;
-//    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            //mGravity = lowPass(event.values.clone(), mGravity);
-            mGravity = lowPass(event.values, mGravity);
-        }
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-            //mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
-            mGeomagnetic = lowPass(event.values, mGeomagnetic);
-        }
-        SensorData sensorData = mRobotInterFace.getSensorData();
-        if (mGravity != null && mGeomagnetic != null) {
-            boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
-            if (success) {
-                SensorManager.getOrientation(ROTATION, ORIENTATION);
-                //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
-                final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
-                if (Math.abs(heading - sensorData.getSensor().heading) > 1) {
-                    sensorData.setHeading(heading);
-                    mRobotInterFace.sendSensorData(false);
-                    //Log.d(TAG, " New Heading " + heading);
-                }
-            }
-        }
-
-        if(event.sensor.getType() == Sensor.TYPE_PROXIMITY){
-            final float distance = event.values[0];
-            //Distance is either touching or not
-            sensorData.setProximity(distance < 1.0f);
-            mRobotInterFace.sendSensorData(true);
-            //Log.d(TAG, "Proximity " + Float.toString(distance));
-        }
-    }
-
-    private float[] lowPass(float[] input, float[] output) {
-        if (output == null) return input;
-        for (int i = 0; i < input.length; i++) {
-            output[i] = output[i] + 0.25f * (input[i] - output[i]);
-        }
-        return output;
-    }
-
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-
     private void switchFace(int faceId){
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = supportFragmentManager.beginTransaction();
@@ -459,7 +334,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         faceFragment.setOnCompleteListener(new CallbackFragment.OnCompleteListener() {
             @Override
             public void onComplete() {
-                mRobotInterFace.setRobotFace(faceFragment.getRobotFace(mRobotInterFace));
+                Robot.get().setRobotFace(faceFragment.getRobotFace(Robot.get()));
             }
         });
         if(isUseFaceTracking){
@@ -482,7 +357,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                     });
                 }
                 if (faceTrackingFragment != null) {
-                    faceTrackingFragment.setRobotInterface(mRobotInterFace);
+                    faceTrackingFragment.setRobotInterface(Robot.get());
                 }
             }
         } else {
@@ -532,7 +407,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
      * @param i in millis
      */
     protected void setSensorDelay(int i) {
-        mRobotInterFace.setSensorDelay(i);
+        Robot.get().setSensorDelay(i);
     }
 
     @Override
@@ -565,7 +440,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 });
                 break;
             case R.id.sign_in_button:
-                startSignin();
+                mGoogleSignInController.startSignin(this, RC_SIGN_IN);
                 break;
             case R.id.btnApiAi:
                 FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
@@ -636,44 +511,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         }
     }
 
-    private void startSignin() {
-        //mSignInButton.setEnabled(false);
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-//        mGoogleLoginClicked = true;
-//        if (!mGoogleApiClient.isConnecting()) {
-//            if (mGoogleConnectionResult != null) {
-//                resolveSignInError();
-//            } else if (mGoogleApiClient.isConnected()) {
-//                getGoogleOAuthTokenAndLogin();
-//            } else {
-//                /* connect API now */
-//                Log.d(TAG, "Trying to connect to Google API");
-//                mGoogleApiClient.connect();
-//            }
-//        }
-    }
-
-    /* A helper method to resolve the current ConnectionResult error. */
-    private void resolveSignInError() {
-        Log.e(TAG, "Resolving sign in Error");
-        if (mGoogleConnectionResult.hasResolution()) {
-            try {
-                mGoogleIntentInProgress = true;
-                mGoogleConnectionResult.startResolutionForResult(this, RC_GOOGLE_LOGIN);
-                Log.d(TAG, "Launching google login");
-            } catch (IntentSender.SendIntentException e) {
-                Log.e(TAG, "IntentSender.SendIntentException " + e.toString());
-                // The intent was canceled before it was sent.  Return to the default
-                // state and attempt to connect to get an updated ConnectionResult.
-                mGoogleIntentInProgress = false;
-                mGoogleApiClient.connect();
-            }
-        } else {
-            Log.e(TAG, "No sign error resolution");
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -682,16 +519,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             switch (requestCode){
                 case RC_SIGN_IN:
                     GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                    handleSignInResult(result);
-//                    /* This was a request by the Google API */
-//                    if (resultCode != RESULT_OK) {
-//                        mGoogleLoginClicked = false;
-//                    }
-//                    mGoogleIntentInProgress = false;
-//                    if (!mGoogleApiClient.isConnecting()) {
-//                        mGoogleApiClient.connect();
-//                        Log.d(TAG, "Connecting Google Sign In");
-//                    }
+                    mGoogleSignInController.handleSignInResult(this, result);
                     break;
                 case RC_REQUEST_INVITE:
                     String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
@@ -700,102 +528,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
             }
         }
     }
-
-    private void handleSignInResult(final GoogleSignInResult result) {
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            getGoogleOAuthTokenAndLogin(acct.getEmail());
-        } else {
-            // Signed out, show unauthenticated UI.
-
-        }
-    }
-
-    private void getGoogleOAuthTokenAndLogin(final String account) {
-        /* Get OAuth token in Background */
-        AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
-            String errorMessage = null;
-
-            @Override
-            protected String doInBackground(String... params) {
-                String token = null;
-
-                try {
-                    //String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
-                    Log.d(TAG, "Trying to connect to Google API");
-                    final String scope = "oauth2:profile email";
-                    token = GoogleAuthUtil.getToken(getApplicationContext(), params[0], scope);
-                    //token = GoogleAuthUtil.getToken(BaseFaceFragmentActivity.this, Plus.AccountApi.getAccountName(mGoogleApiClient), scope);
-                    Log.d(TAG, "Token read: " + token);
-                } catch (IOException transientEx) {
-                    /* Network or server error */
-                    Log.e(TAG, "Error authenticating with Google: " + transientEx);
-                    errorMessage = "Network error: " + transientEx.getMessage();
-                } catch (UserRecoverableAuthException e) {
-                    Log.w(TAG, "Recoverable Google OAuth error: " + e.toString());
-                    /* We probably need to ask for permissions, so start the intent if there is none pending */
-                    if (!mGoogleIntentInProgress) {
-                        mGoogleIntentInProgress = true;
-                        Intent recover = e.getIntent();
-                        startActivityForResult(recover, RC_GOOGLE_LOGIN);
-                    }
-                } catch (GoogleAuthException authEx) {
-                    /* The call is not ever expected to succeed assuming you have already verified that
-                     * Google Play services is installed. */
-                    Log.e(TAG, "Error authenticating with Google: " + authEx.getMessage(), authEx);
-                    errorMessage = "Error authenticating with Google: " + authEx.getMessage();
-                }
-
-                return token;
-            }
-
-            @Override
-            protected void onPostExecute(String token) {
-                mGoogleLoginClicked = false;
-                if (token != null) {
-                    onTokenReceived(token);
-                } else if (errorMessage != null) {
-                    Toast.makeText(BaseFaceFragmentActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-        task.execute(account);
-    }
-
-
-    protected RobotInterface getRobotInterface() {
-        return mRobotInterFace;
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        if (!mGoogleIntentInProgress) {
-            /* Store the ConnectionResult so that we can use it later when the user clicks on the Google+ login button */
-            mGoogleConnectionResult = result;
-
-            if (mGoogleLoginClicked) {
-                /* The user has already clicked login so we attempt to resolve all errors until the user is signed in,
-                 * or they cancel. */
-                resolveSignInError();
-            } else {
-                Log.e(TAG, result.toString());
-            }
-        }
-        //throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        /* Connected with Google API, use this to authenticate with Firebase */
-        //getGoogleOAuthTokenAndLogin();
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        // ignore
-    }
-
 
     private class BotTask extends AsyncTask<String, Void, Void> {
 
@@ -811,7 +543,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 // bot1 = factory.create(ChatterBotType.CLEVERBOT);
                 // bot1 = factory.create(ChatterBotType.JABBERWACKY);
             } catch (final Exception e) {
-                mRobotInterFace.say("There was an error loading ChatterBotFactory()");
+                Robot.get().say("There was an error loading ChatterBotFactory()");
                 return null;
             }
             final ChatterBotSession bot1session = bot1.createSession();
@@ -837,15 +569,15 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
                 }
             } catch (final Exception e) {
                 // Tell user what went wrong
-                mRobotInterFace.say("Error in BotTask.doInBackground");
+                Robot.get().say("Error in BotTask.doInBackground");
                 Log.e("BotTask", e.toString());
                 return null;
             }
             if (response.length() != 0) {
                 //Speak the text and listen for a response
-                mRobotInterFace.listen(response);
+                Robot.get().listen(response);
             } else {
-                mRobotInterFace.say("I can't think of anything to say.");
+                Robot.get().say("I can't think of anything to say.");
             }
 
             return null;

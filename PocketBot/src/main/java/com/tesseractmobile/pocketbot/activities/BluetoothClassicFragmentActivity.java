@@ -12,6 +12,7 @@ import android.view.View;
 
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.fragments.BluetoothDialog;
+import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.BluetoothClassicService;
 import com.tesseractmobile.pocketbot.service.BodyService;
 
@@ -77,7 +78,7 @@ public class BluetoothClassicFragmentActivity extends AiFragmentActivity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 blueToothService = (BluetoothClassicService) ((BodyService.LocalBinder) service).getService();
-                blueToothService.registerBodyConnectionListener(getRobotInterface().getBodyConnectionListener());
+                blueToothService.registerBodyConnectionListener(Robot.get().getBodyConnectionListener());
             }
 
             @Override
