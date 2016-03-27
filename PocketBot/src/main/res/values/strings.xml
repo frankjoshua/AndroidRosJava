@@ -12,4 +12,5 @@
 	<string name="better_not_die">
 	     I think it would be better not to die, don\'t you?
 	</string>
+    <string name="service_id">com.tesseractmobile.pocketbot.service</string>
 </resources>

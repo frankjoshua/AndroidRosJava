@@ -50,6 +50,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFrag
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
+import com.tesseractmobile.pocketbot.robot.GoogleNearbyConnectionController;
 import com.tesseractmobile.pocketbot.robot.GoogleSignInController;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
@@ -83,12 +84,18 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
     /** Handles Google Authentication */
     private GoogleSignInController mGoogleSignInController;
 
+    /** For finding local network devices */
+    private GoogleNearbyConnectionController mGoogleNearbyConnectionController;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.main);
+
+        //Check for needed Android permissions
+        checkForPermissions();
 
         if(Robot.get().isNew()){
             //After login show the robot selection dialog
@@ -117,7 +124,11 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
         //Setup face
         switchFace(PocketBotSettings.getSelectedFace(this));
 
+        //Listen for sensor events
         mSensorControler = new SensorControler(this);
+
+        //Look for nearby Pocketbots
+        mGoogleNearbyConnectionController = new GoogleNearbyConnectionController(this);
 
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -131,7 +142,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
 
         //Setup Google Sign in
         mGoogleSignInController = new GoogleSignInController(this);
-
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignInButton.setSize(SignInButton.SIZE_STANDARD);
         mSignInButton.setScopes(mGoogleSignInController.getScopeArray());
@@ -140,9 +150,11 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
             mGoogleSignInController.startSignin(this, RC_SIGN_IN);
         }
 
-        checkForPermissions();
     }
 
+    /**
+     * Check for Android M permissions
+     */
     private void checkForPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             final String[] permissionList = new String[]{
@@ -247,6 +259,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
             mKeepAliveThread = new KeepAliveThread(this, this);
             mKeepAliveThread.startThread();
         }
+        //Look for nearby devices
+        mGoogleNearbyConnectionController.onStart();
+        mGoogleNearbyConnectionController.startAdvertising(this);
+        mGoogleNearbyConnectionController.startDiscovery(this);
     }
 
     @Override
@@ -260,6 +276,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
         if(PocketBotSettings.isKeepAlive(this)) {
             mKeepAliveThread.stopThread();
         }
+        //Stop looking for nearby devices
+        mGoogleNearbyConnectionController.onStop();
     }
 
     @Override
@@ -308,6 +326,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
     }
 
 
+    /**
+     * Change active face
+     * @param faceId
+     */
     private void switchFace(int faceId){
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         final FragmentTransaction ft = supportFragmentManager.beginTransaction();

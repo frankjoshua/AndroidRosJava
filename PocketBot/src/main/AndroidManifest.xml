@@ -27,6 +27,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- Required for Nearby Connections API -->
+    <meta-data android:name="com.google.android.gms.nearby.connection.SERVICE_ID"
+        android:value="@string/service_id" />
+
     <application
         android:name=".activities.PocketBotApp"
         android:allowBackup="true"
