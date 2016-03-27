@@ -2,7 +2,9 @@ package com.tesseractmobile.pocketbot.views;
 
 import java.util.HashMap;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,6 +20,7 @@ import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.UtteranceProgressListener;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.TextView;
@@ -159,9 +162,15 @@ public class MouthView extends TextView implements OnInitListener, OnDataCapture
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        final Visualizer mVisualizer = new Visualizer(0);
-        mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
-        mVisualizer.setEnabled(true);
+        //Check for audio permission
+        int permissionCheck = ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.RECORD_AUDIO);
+        if(permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            //Start the visualizer to animated the mouth
+            final Visualizer mVisualizer = new Visualizer(0);
+            mVisualizer.setDataCaptureListener(MouthView.this, Visualizer.getMaxCaptureRate() / 2, true, false);
+            mVisualizer.setEnabled(true);
+        }
 
         //Create path for teeth
         mTeethPath = new Path();

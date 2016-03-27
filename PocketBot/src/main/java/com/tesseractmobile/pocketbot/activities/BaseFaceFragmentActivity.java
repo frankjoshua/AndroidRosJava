@@ -39,6 +39,8 @@ import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
@@ -81,6 +83,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     public static final String FRAGMENT_PREVIEW = "PREVIEW";
     private static final int RC_GOOGLE_LOGIN = 1;
     private static final int RC_REQUEST_INVITE = 2;
+    private static final int RC_SIGN_IN = 3;
 
 
     //private RobotFace mRobotFace;
@@ -171,18 +174,20 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
         peekDrawer((DrawerLayout) findViewById(R.id.drawer_layout));
 
         //Setup Google Sign in
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API)
-                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignInButton.setSize(SignInButton.SIZE_STANDARD);
+        mSignInButton.setScopes(gso.getScopeArray());
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         if (PocketBotSettings.isAutoSignIn(this)) {
-            startSignin();
+            //startSignin();
         }
 
     }
@@ -629,19 +634,21 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Sensor
     }
 
     private void startSignin() {
-        mSignInButton.setEnabled(false);
-        mGoogleLoginClicked = true;
-        if (!mGoogleApiClient.isConnecting()) {
-            if (mGoogleConnectionResult != null) {
-                resolveSignInError();
-            } else if (mGoogleApiClient.isConnected()) {
-                getGoogleOAuthTokenAndLogin();
-            } else {
-                /* connect API now */
-                Log.d(TAG, "Trying to connect to Google API");
-                mGoogleApiClient.connect();
-            }
-        }
+        //mSignInButton.setEnabled(false);
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+//        mGoogleLoginClicked = true;
+//        if (!mGoogleApiClient.isConnecting()) {
+//            if (mGoogleConnectionResult != null) {
+//                resolveSignInError();
+//            } else if (mGoogleApiClient.isConnected()) {
+//                getGoogleOAuthTokenAndLogin();
+//            } else {
+//                /* connect API now */
+//                Log.d(TAG, "Trying to connect to Google API");
+//                mGoogleApiClient.connect();
+//            }
+//        }
     }
 
     /* A helper method to resolve the current ConnectionResult error. */
