@@ -18,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.nearby.Nearby;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
 import java.io.IOException;
@@ -38,8 +39,11 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
                 .requestEmail()
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(fragmentActivity)
-                .enableAutoManage(fragmentActivity, this)
+                //.enableAutoManage(fragmentActivity, this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addApi(Nearby.CONNECTIONS_API)
                 .build();
     }
 
@@ -55,7 +59,7 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
             getGoogleOAuthTokenAndLogin(context, acct.getEmail());
         } else {
             // Signed out, show unauthenticated UI.
-
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -104,35 +108,41 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
         task.execute(account);
     }
 
+    private Context mContext;
+    private String mToken;
     private void onTokenReceived(final Context context, final String token){
-
+        mContext = context;
+        mToken = token;
         Log.d(TAG, "Received token: " + token);
 
         if (!mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
-            Robot.get().setAuthToken(PocketBotSettings.getRobotId(context), token);
-            Toast.makeText(context, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
-            //mSignInButton.setEnabled(true);
-            //Auto sign in next time
-            PocketBotSettings.setAutoSignIn(context, true);
         }
     }
     @Override
     public void onConnected(Bundle result) {
-
+        Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mToken);
+        Toast.makeText(mContext, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
+        //mSignInButton.setEnabled(true);
+        //Auto sign in next time
+        PocketBotSettings.setAutoSignIn(mContext, true);
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void onConnectionFailed(final ConnectionResult result) {
-
+        throw new UnsupportedOperationException();
     }
 
     public Scope[] getScopeArray() {
         return gso.getScopeArray();
+    }
+
+    public GoogleApiClient getGoogleApiClient() {
+        return mGoogleApiClient;
     }
 }

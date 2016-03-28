@@ -27,33 +27,18 @@ public class GoogleNearbyConnectionController implements
         Connections.MessageListener,
         Connections.EndpointDiscoveryListener {
 
-    private final GoogleApiClient mGoogleApiClient;
     // Identify if the device is the host
     private boolean mIsHost = false;
 
     public GoogleNearbyConnectionController(final Context context) {
-        mGoogleApiClient = new GoogleApiClient.Builder(context)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Nearby.CONNECTIONS_API)
-                .build();
-    }
 
-    public void onStart() {
-        mGoogleApiClient.connect();
-    }
-
-    public void onStop() {
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
     }
 
     /**
      * Start as a network Host
      * @param context
      */
-    public void startAdvertising(final Context context) {
+    public void startAdvertising(final Context context, final GoogleApiClient googleApiClient) {
         // Identify that this device is the host
         mIsHost = true;
 
@@ -69,7 +54,7 @@ public class GoogleNearbyConnectionController implements
         long NO_TIMEOUT = 0L;
 
         String name = null;
-        Nearby.Connections.startAdvertising(mGoogleApiClient, name, appMetadata, NO_TIMEOUT,
+        Nearby.Connections.startAdvertising(googleApiClient, name, appMetadata, NO_TIMEOUT,
                 this).setResultCallback(new ResultCallback<Connections.StartAdvertisingResult>() {
             @Override
             public void onResult(Connections.StartAdvertisingResult result) {
@@ -87,7 +72,7 @@ public class GoogleNearbyConnectionController implements
      * Look for host on the newtork
      * @param context
      */
-    public void startDiscovery(final Context context) {
+    public void startDiscovery(final Context context, final GoogleApiClient googleApiClient) {
 
         String serviceId = context.getString(R.string.service_id);
 
@@ -95,8 +80,7 @@ public class GoogleNearbyConnectionController implements
         long DISCOVER_TIMEOUT = 1000L;
 
         // Discover nearby apps that are advertising with the required service ID.
-        // Discover nearby apps that are advertising with the required service ID.
-        Nearby.Connections.startDiscovery(mGoogleApiClient, serviceId, DISCOVER_TIMEOUT, this)
+        Nearby.Connections.startDiscovery(googleApiClient, serviceId, DISCOVER_TIMEOUT, this)
                 .setResultCallback(new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
@@ -137,25 +121,25 @@ public class GoogleNearbyConnectionController implements
 
     }
 
-    private void connectTo(String endpointId, final String endpointName) {
-        // Send a connection request to a remote endpoint. By passing 'null' for
-        // the name, the Nearby Connections API will construct a default name
-        // based on device model such as 'LGE Nexus 5'.
-        String myName = null;
-        byte[] myPayload = null;
-        Nearby.Connections.sendConnectionRequest(mGoogleApiClient, myName,
-                endpointId, myPayload, new Connections.ConnectionResponseCallback() {
-                    @Override
-                    public void onConnectionResponse(String remoteEndpointId, Status status,
-                                                     byte[] bytes) {
-                        if (status.isSuccess()) {
-                            // Successful connection
-                        } else {
-                            // Failed connection
-                        }
-                    }
-                }, this);
-    }
+//    private void connectTo(String endpointId, final String endpointName) {
+//        // Send a connection request to a remote endpoint. By passing 'null' for
+//        // the name, the Nearby Connections API will construct a default name
+//        // based on device model such as 'LGE Nexus 5'.
+//        String myName = null;
+//        byte[] myPayload = null;
+//        Nearby.Connections.sendConnectionRequest(mGoogleApiClient, myName,
+//                endpointId, myPayload, new Connections.ConnectionResponseCallback() {
+//                    @Override
+//                    public void onConnectionResponse(String remoteEndpointId, Status status,
+//                                                     byte[] bytes) {
+//                        if (status.isSuccess()) {
+//                            // Successful connection
+//                        } else {
+//                            // Failed connection
+//                        }
+//                    }
+//                }, this);
+//    }
 
     @Override
     public void onEndpointLost(String s) {

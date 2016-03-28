@@ -35,6 +35,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
@@ -103,7 +104,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                 @Override
                 public void onAuthComplete(final AuthData authData) {
                     showRobotSelectionDialog();
-                    startGoogleNearbyDevicesService();
                 }
             });
         }
@@ -151,6 +151,14 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
             mGoogleSignInController.startSignin(this, RC_SIGN_IN);
         }
 
+        //Start Nearby devices controller when authenticated
+        Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+            @Override
+            public void onAuthComplete(AuthData authData) {
+                startGoogleNearbyDevicesService(mGoogleSignInController.getGoogleApiClient());
+            }
+        });
+
     }
 
     /**
@@ -173,11 +181,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
     /**
      * Start searching for devices on the local network
      */
-    private void startGoogleNearbyDevicesService(){
+    private void startGoogleNearbyDevicesService(final GoogleApiClient googleApiClient){
         //Look for nearby devices
-        mGoogleNearbyConnectionController.onStart();
-        mGoogleNearbyConnectionController.startAdvertising(this);
-        mGoogleNearbyConnectionController.startDiscovery(this);
+        mGoogleNearbyConnectionController.startAdvertising(this, googleApiClient);
+        mGoogleNearbyConnectionController.startDiscovery(this, googleApiClient);
     }
 
     @Override
@@ -284,8 +291,6 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
         if(PocketBotSettings.isKeepAlive(this)) {
             mKeepAliveThread.stopThread();
         }
-        //Stop looking for nearby devices
-        mGoogleNearbyConnectionController.onStop();
     }
 
     @Override
