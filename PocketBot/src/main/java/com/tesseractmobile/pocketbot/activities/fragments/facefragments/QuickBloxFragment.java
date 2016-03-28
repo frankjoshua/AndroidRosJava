@@ -14,7 +14,9 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.QBEntityCallbackImpl;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
@@ -75,7 +77,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             return;
         }
         //Create a session
-        QBAuth.createSession(user, new QBEntityCallbackImpl<QBSession>() {
+        QBAuth.createSession(user, new QBEntityCallback<QBSession>() {
             @Override
             public void onSuccess(QBSession session, Bundle bundle) {
                 //Save the id so other robots can use it to call
@@ -86,16 +88,17 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             }
 
             @Override
-            public void onError(List<String> errors) {
+            public void onError(QBResponseException e) {
                 //error
-                if (errors.get(0).equals("Unauthorized")) {
+                if (e.getErrors().get(0).equals("Unauthorized")) {
                     //User has no account, so sign them up
                     signUpUser(user, context);
                 } else {
                     //Unhandled Error
-                    error(errors.toString());
+                    error(e.getErrors().toString());
                 }
             }
+
         });
     }
 
@@ -110,7 +113,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
             @Override
             public void onSuccess(final QBSession session, Bundle params) {
                 //User the Auth connection to sign up the user
-                QBUsers.signUp(user, new QBEntityCallbackImpl<QBUser>() {
+                QBUsers.signUp(user, new QBEntityCallback<QBUser>() {
                     @Override
                     public void onSuccess(QBUser result, Bundle params) {
                         //After signin continue to set up call
@@ -119,17 +122,11 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
                     }
 
                     @Override
-                    public void onError(List<String> errors) {
+                    public void onError(QBResponseException e) {
                         //Unhandled Error
-                        error("SignUp: " + errors.toString());
+                        error("SignUp: " + e.getErrors().toString());
                     }
                 });
-            }
-
-            @Override
-            public void onError(List<String> errors) {
-                //Unhandled Error
-                error("Session: " + errors.toString());
             }
 
         });
@@ -153,20 +150,20 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         }
 
         //Chat service is used to start WebRTC signaling
-        QBChatService.getInstance().login(user, new QBEntityCallbackImpl<QBUser>() {
+        QBChatService.getInstance().login(user, new QBEntityCallback<QBUser>() {
 
             @Override
-            public void onSuccess() {
+            public void onSuccess(QBUser qbUser, Bundle bundle) {
                 postLogin(context, session, user);
             }
 
             @Override
-            public void onError(List errors) {
-                if (errors.get(0).equals("You have already logged in chat")) {
+            public void onError(QBResponseException e) {
+                if (e.getErrors().get(0).equals("You have already logged in chat")) {
                     postLogin(context, session, user);
                 } else {
                     //error
-                    error("Login: " + errors.toString());
+                    error("Login: " + e.getErrors().toString());
                 }
             }
         });

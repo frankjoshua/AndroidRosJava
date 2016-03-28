@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
 import com.firebase.client.Firebase;
@@ -48,7 +49,8 @@ public class PocketBotApp extends Application{
         Robot.init(dataStore);
         Robot.get().setIsNew(robotId.equals(PocketBotSettings.ROBOT_ID_NOT_SET));
         //Setup Quickblox
-        QBSettings.getInstance().fastConfigInit("30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
+        QBSettings.getInstance().init(this, "30377", "XOF58dzCGkyg8a9", "NZa9WcFAmhmrKr8");
+        QBSettings.getInstance().setAccountKey("dRPuNzPqTxT3o4pi6syS");
         //Bind to voice recognition service to hold constant connection
         final ServiceConnection voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override
@@ -80,7 +82,7 @@ public class PocketBotApp extends Application{
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         //Enable MultiDex support
-        //MultiDex.install(this);
+        MultiDex.install(this);
     }
 
 }

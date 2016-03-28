@@ -103,6 +103,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                 @Override
                 public void onAuthComplete(final AuthData authData) {
                     showRobotSelectionDialog();
+                    startGoogleNearbyDevicesService();
                 }
             });
         }
@@ -167,6 +168,16 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                 }
             }
         }
+    }
+
+    /**
+     * Start searching for devices on the local network
+     */
+    private void startGoogleNearbyDevicesService(){
+        //Look for nearby devices
+        mGoogleNearbyConnectionController.onStart();
+        mGoogleNearbyConnectionController.startAdvertising(this);
+        mGoogleNearbyConnectionController.startDiscovery(this);
     }
 
     @Override
@@ -259,10 +270,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
             mKeepAliveThread = new KeepAliveThread(this, this);
             mKeepAliveThread.startThread();
         }
-        //Look for nearby devices
-        mGoogleNearbyConnectionController.onStart();
-        mGoogleNearbyConnectionController.startAdvertising(this);
-        mGoogleNearbyConnectionController.startDiscovery(this);
+
     }
 
     @Override
