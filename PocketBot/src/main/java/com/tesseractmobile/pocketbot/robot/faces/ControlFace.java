@@ -190,6 +190,6 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     public void onRemoteSensorUpdate(final SensorData sensorData) {
         //Received sensor data from remote robot
         say("Heading: " + Integer.toString(sensorData.getSensor().heading) + " Battery " + Integer.toString(sensorData.getSensor().battery) + "%\n"
-        + "JoyX: " + sensorData.getControl().joy1.X + " JoyY: " + sensorData.getControl().joy1.Y);
+        + "JoyX: " + numberFormat.format(sensorData.getControl().joy1.X) + " JoyY: " + numberFormat.format(sensorData.getControl().joy1.Y));
     }
 }

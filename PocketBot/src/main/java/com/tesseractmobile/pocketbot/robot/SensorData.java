@@ -207,9 +207,9 @@ public class SensorData {
 
     private static void copyFace(final PocketBotProtocol.Face fromFace, final Face toFace) {
         toFace.id = fromFace.getId();
-        toFace.X = fromFace.getX();
-        toFace.Y = fromFace.getY();
-        toFace.Z = fromFace.getZ();
+        toFace.X = (float) round(fromFace.getX(), 2);
+        toFace.Y = (float) round(fromFace.getY(), 2);
+        toFace.Z = (float) round(fromFace.getZ(), 2);
     }
 
     private static void copySensor(final PocketBotProtocol.Sensor fromSensor, final Sensor toSensor) {
@@ -229,9 +229,9 @@ public class SensorData {
     }
 
     private static void copyJoyStick(final PocketBotProtocol.Joystick fromJoy, final Joystick toJoy) {
-        toJoy.X = fromJoy.getX();
-        toJoy.Y = fromJoy.getY();
-        toJoy.Z = fromJoy.getZ();
+        toJoy.X = round(fromJoy.getX(), 2);
+        toJoy.Y = round(fromJoy.getY(), 2);
+        toJoy.Z = round(fromJoy.getZ(), 2);
         toJoy.A = fromJoy.getA();
         toJoy.B = fromJoy.getB();
         toJoy.heading = fromJoy.getHeading();

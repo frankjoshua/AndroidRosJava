@@ -178,7 +178,6 @@ public class GoogleNearbyConnectionController implements
         } catch (InvalidProtocolBufferException e) {
 
         }
-        throw new UnsupportedOperationException("WIP");
     }
 
     @Override
