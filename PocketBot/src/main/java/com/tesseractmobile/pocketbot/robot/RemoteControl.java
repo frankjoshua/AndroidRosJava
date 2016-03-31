@@ -338,4 +338,8 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             }
         }
     }
+
+    public void setRemoteTransmitter(final RemoteTransmiter remoteTransmiter) {
+        mRemoteTransmiter = remoteTransmiter;
+    }
 }

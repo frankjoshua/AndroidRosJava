@@ -3,6 +3,7 @@ package com.tesseractmobile.pocketbot.robot;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
+import java.security.PermissionCollection;
 
 /**
  * Data in this class is sent to the Arduino
@@ -189,6 +190,51 @@ public class SensorData {
 
     public void setSensor(final Sensor sensor) {
         this.sensor = sensor;
+    }
+
+    /**
+     * Create a new SensorData object from a PocketBotProtocol.PocketBotMessage
+     * @param data
+     * @return
+     */
+    public static SensorData fromPocketBotMessage(final PocketBotProtocol.PocketBotMessage data) {
+        final SensorData sensorData = new SensorData();
+        copyControl(data.getControl(), sensorData.getControl());
+        copySensor(data.getSensor(), sensorData.getSensor());
+        copyFace(data.getFace(), sensorData.getFace());
+        return sensorData;
+    }
+
+    private static void copyFace(final PocketBotProtocol.Face fromFace, final Face toFace) {
+        toFace.id = fromFace.getId();
+        toFace.X = fromFace.getX();
+        toFace.Y = fromFace.getY();
+        toFace.Z = fromFace.getZ();
+    }
+
+    private static void copySensor(final PocketBotProtocol.Sensor fromSensor, final Sensor toSensor) {
+        toSensor.heading = fromSensor.getHeading();
+        toSensor.proximity = fromSensor.getProximity();
+        copyGps(fromSensor.getGps(), toSensor.gps);
+    }
+
+    private static void copyGps(final PocketBotProtocol.Gps fromGps, final Gps toGps) {
+        toGps.lat = fromGps.getLat();
+        toGps.lon = fromGps.getLon();
+    }
+
+    private static void copyControl(final PocketBotProtocol.Control fromControl, final Control toControl) {
+        copyJoyStick(fromControl.getJoy1(), toControl.joy1);
+        copyJoyStick(fromControl.getJoy2(), toControl.joy2);
+    }
+
+    private static void copyJoyStick(final PocketBotProtocol.Joystick fromJoy, final Joystick toJoy) {
+        toJoy.X = fromJoy.getX();
+        toJoy.Y = fromJoy.getY();
+        toJoy.Z = fromJoy.getZ();
+        toJoy.A = fromJoy.getA();
+        toJoy.B = fromJoy.getB();
+        toJoy.heading = fromJoy.getHeading();
     }
 
     static public class Gps {

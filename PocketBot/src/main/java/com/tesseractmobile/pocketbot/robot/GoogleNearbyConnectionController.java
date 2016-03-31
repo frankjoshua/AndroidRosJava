@@ -12,7 +12,6 @@ import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AppIdentifier;
 import com.google.android.gms.nearby.connection.AppMetadata;
 import com.google.android.gms.nearby.connection.Connections;
-import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.tesseractmobile.pocketbot.R;
 
@@ -106,7 +105,7 @@ public class GoogleNearbyConnectionController implements
 
     @Override
     public void onConnected(Bundle bundle) {
-
+        Log.d(TAG, "onConnected");
     }
 
     @Override
@@ -116,19 +115,21 @@ public class GoogleNearbyConnectionController implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Log.d(TAG, "onConnectionFailed " + connectionResult.getErrorMessage());
     }
 
     @Override
-    public void onConnectionRequest(String s, String s1, String s2, byte[] bytes) {
-
+    public void onConnectionRequest(final String endpointId, String deviceId,
+                                    String endpointName, byte[] payload) {
+        Log.d(TAG, "ConnectionRequest from " + endpointId);
+        Nearby.Connections.acceptConnectionRequest(mGoogleApiClient, endpointId, payload, this);
     }
 
     @Override
     public void onEndpointFound(final String endpointId, String deviceId,
                                 String serviceId, final String endpointName) {
-        connectTo(endpointId, endpointName);
         Log.d(TAG, "Endpoint found " + endpointId);
+        connectTo(endpointId, endpointName);
     }
 
     private void connectTo(String endpointId, final String endpointName) {
@@ -143,10 +144,13 @@ public class GoogleNearbyConnectionController implements
                     public void onConnectionResponse(String remoteEndpointId, Status status,
                                                      byte[] bytes) {
                         if (status.isSuccess()) {
+                            Log.d(TAG, "Connected to endpoint " + remoteEndpointId);
                             // Successful connection
                             mRemoteEndpointId = remoteEndpointId;
+                            RemoteControl.get().setRemoteTransmitter(GoogleNearbyConnectionController.this);
                         } else {
                             // Failed connection
+                            Log.d(TAG, "Failed to connected to endpoint: " + status.getStatusMessage());
                         }
                     }
                 }, this);
@@ -154,11 +158,12 @@ public class GoogleNearbyConnectionController implements
 
     @Override
     public void onEndpointLost(String s) {
-
+        Log.w(TAG, "Endpoint lost " + s);
     }
 
     public void sendMessage(final byte[] bytes){
         Nearby.Connections.sendReliableMessage(mGoogleApiClient, mRemoteEndpointId, bytes);
+        Log.d(TAG, "sendMessage " + bytes.length);
     }
 
     @Override
@@ -167,7 +172,9 @@ public class GoogleNearbyConnectionController implements
         //Convert from bytes to PocketBotMessage
         try {
             final PocketBotProtocol.PocketBotMessage data = PocketBotProtocol.PocketBotMessage.parseFrom(bytes);
-
+            final SensorData sensorData = SensorData.fromPocketBotMessage(data);
+            Robot.get().getSensorData().setControl(sensorData.getControl());
+            Robot.get().sendSensorData(false);
         } catch (InvalidProtocolBufferException e) {
 
         }
@@ -176,11 +183,12 @@ public class GoogleNearbyConnectionController implements
 
     @Override
     public void onDisconnected(String s) {
-
+        Log.w(TAG, "Disconnected " + s);
     }
 
     @Override
     public void send(String uuid, Object object) {
+        Log.d(TAG, "sending message: " + object.toString());
         //Put control object into a SensorData object to be sent
         final SensorData sensorData = new SensorData();
         final SensorData.Control control = (SensorData.Control) object;
