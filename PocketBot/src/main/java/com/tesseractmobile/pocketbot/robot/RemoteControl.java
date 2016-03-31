@@ -45,6 +45,8 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     private ChildEventListener mChildEventListener;
     private Firebase mFirebaseStatus;
     final private SensorData mSensorData = new SensorData();
+    /** Sends data to the remote robot */
+    private RemoteTransmiter mRemoteTransmiter;
 
     private RemoteControl(final Context context, final DataStore dataStore, final String id){
         setId(dataStore, id);
@@ -54,6 +56,17 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             mKeepAliveThread.startThread();
         }
         PocketBotSettings.registerOnSharedPreferenceChangeListener(context, this);
+        //Set firebase as default remote transmiter
+        mRemoteTransmiter = new RemoteTransmiter() {
+            @Override
+            public void send(String uuid, Object object) {
+                if(uuid != null) {
+                    //Send to firebase
+                    mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object);
+                    timeStamp(uuid);
+                }
+            }
+        };
     }
 
     /**
@@ -181,17 +194,9 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
      * Pass data to remote robot
      * @param object
      */
-    public void send(final Object object, final boolean asString) {
+    public void send(final Object object) {
         final String uuid = mTransmitUUID;
-        if(uuid != null) {
-            //Send to firebase
-            if (asString) {
-                mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object.toString());
-            } else {
-                mFirebaseTransmit.child(uuid).child(CONTROL).child(DATA).setValue(object);
-            }
-            timeStamp(uuid);
-        }
+        mRemoteTransmiter.send(uuid, object);
     }
 
     /**

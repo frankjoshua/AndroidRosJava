@@ -128,8 +128,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
         //Listen for sensor events
         mSensorControler = new SensorControler(this);
 
-        //Look for nearby Pocketbots
-        mGoogleNearbyConnectionController = new GoogleNearbyConnectionController(this);
+
 
         // Keep the screen on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -182,6 +181,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
      * Start searching for devices on the local network
      */
     private void startGoogleNearbyDevicesService(final GoogleApiClient googleApiClient){
+        //Look for nearby Pocketbots
+        mGoogleNearbyConnectionController = new GoogleNearbyConnectionController(googleApiClient);
         //Look for nearby devices
         mGoogleNearbyConnectionController.startAdvertising(this, googleApiClient);
         mGoogleNearbyConnectionController.startDiscovery(this, googleApiClient);

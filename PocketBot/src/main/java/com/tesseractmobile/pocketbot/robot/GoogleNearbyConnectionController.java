@@ -2,6 +2,7 @@ package com.tesseractmobile.pocketbot.robot;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -12,6 +13,7 @@ import com.google.android.gms.nearby.connection.AppIdentifier;
 import com.google.android.gms.nearby.connection.AppMetadata;
 import com.google.android.gms.nearby.connection.Connections;
 import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.tesseractmobile.pocketbot.R;
 
 import java.util.ArrayList;
@@ -25,13 +27,18 @@ public class GoogleNearbyConnectionController implements
         GoogleApiClient.OnConnectionFailedListener,
         Connections.ConnectionRequestListener,
         Connections.MessageListener,
-        Connections.EndpointDiscoveryListener {
+        Connections.EndpointDiscoveryListener,
+        RemoteTransmiter{
 
+    private static final String TAG = GoogleNearbyConnectionController.class.getSimpleName();
     // Identify if the device is the host
     private boolean mIsHost = false;
 
-    public GoogleNearbyConnectionController(final Context context) {
+    final GoogleApiClient mGoogleApiClient;
+    private String mRemoteEndpointId;
 
+    public GoogleNearbyConnectionController(final GoogleApiClient googleApiClient) {
+        mGoogleApiClient = googleApiClient;
     }
 
     /**
@@ -60,6 +67,7 @@ public class GoogleNearbyConnectionController implements
             public void onResult(Connections.StartAdvertisingResult result) {
                 if (result.getStatus().isSuccess()) {
                     // Device is advertising
+                    Log.d(TAG, "startAdvertising:onResult: SUCCESS");
                 } else {
                     int statusCode = result.getStatus().getStatusCode();
                     // Advertising failed - see statusCode for more details
@@ -86,6 +94,7 @@ public class GoogleNearbyConnectionController implements
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
                             // Device is discovering
+                            Log.d(TAG, "startDiscovery:onResult: SUCCESS");
                         } else {
                             int statusCode = status.getStatus().getStatusCode();
                             // Advertising failed - see statusCode for more details
@@ -118,41 +127,67 @@ public class GoogleNearbyConnectionController implements
     @Override
     public void onEndpointFound(final String endpointId, String deviceId,
                                 String serviceId, final String endpointName) {
-
+        connectTo(endpointId, endpointName);
+        Log.d(TAG, "Endpoint found " + endpointId);
     }
 
-//    private void connectTo(String endpointId, final String endpointName) {
-//        // Send a connection request to a remote endpoint. By passing 'null' for
-//        // the name, the Nearby Connections API will construct a default name
-//        // based on device model such as 'LGE Nexus 5'.
-//        String myName = null;
-//        byte[] myPayload = null;
-//        Nearby.Connections.sendConnectionRequest(mGoogleApiClient, myName,
-//                endpointId, myPayload, new Connections.ConnectionResponseCallback() {
-//                    @Override
-//                    public void onConnectionResponse(String remoteEndpointId, Status status,
-//                                                     byte[] bytes) {
-//                        if (status.isSuccess()) {
-//                            // Successful connection
-//                        } else {
-//                            // Failed connection
-//                        }
-//                    }
-//                }, this);
-//    }
+    private void connectTo(String endpointId, final String endpointName) {
+        // Send a connection request to a remote endpoint. By passing 'null' for
+        // the name, the Nearby Connections API will construct a default name
+        // based on device model such as 'LGE Nexus 5'.
+        String myName = null;
+        byte[] myPayload = null;
+        Nearby.Connections.sendConnectionRequest(mGoogleApiClient, myName,
+                endpointId, myPayload, new Connections.ConnectionResponseCallback() {
+                    @Override
+                    public void onConnectionResponse(String remoteEndpointId, Status status,
+                                                     byte[] bytes) {
+                        if (status.isSuccess()) {
+                            // Successful connection
+                            mRemoteEndpointId = remoteEndpointId;
+                        } else {
+                            // Failed connection
+                        }
+                    }
+                }, this);
+    }
 
     @Override
     public void onEndpointLost(String s) {
 
     }
 
+    public void sendMessage(final byte[] bytes){
+        Nearby.Connections.sendReliableMessage(mGoogleApiClient, mRemoteEndpointId, bytes);
+    }
+
     @Override
     public void onMessageReceived(String s, byte[] bytes, boolean b) {
+        Log.d(TAG, "onMessageReceived: " + s);
+        //Convert from bytes to PocketBotMessage
+        try {
+            final PocketBotProtocol.PocketBotMessage data = PocketBotProtocol.PocketBotMessage.parseFrom(bytes);
 
+        } catch (InvalidProtocolBufferException e) {
+
+        }
+        throw new UnsupportedOperationException("WIP");
     }
 
     @Override
     public void onDisconnected(String s) {
 
+    }
+
+    @Override
+    public void send(String uuid, Object object) {
+        //Put control object into a SensorData object to be sent
+        final SensorData sensorData = new SensorData();
+        final SensorData.Control control = (SensorData.Control) object;
+        sensorData.setControl(control);
+        //Convert to protobuf
+        final PocketBotProtocol.PocketBotMessage data = SensorData.toPocketBotMessage(sensorData);
+        //Send the data
+        sendMessage(data.toByteArray());
     }
 }

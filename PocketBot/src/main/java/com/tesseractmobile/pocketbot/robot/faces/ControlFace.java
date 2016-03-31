@@ -140,7 +140,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
                 mLastUpdate = SystemClock.uptimeMillis();
                 //Send to the remote robot
                 final SensorData sensorData = mRobotInterface.getSensorData();
-                RemoteControl.get().send(sensorData.getControl(), false);
+                RemoteControl.get().send(sensorData.getControl());
             }
         }
     }
