@@ -162,7 +162,7 @@ public class GoogleNearbyConnectionController implements
     }
 
     public void sendMessage(final byte[] bytes){
-        Nearby.Connections.sendReliableMessage(mGoogleApiClient, mRemoteEndpointId, bytes);
+        Nearby.Connections.sendUnreliableMessage(mGoogleApiClient, mRemoteEndpointId, bytes) ;
         Log.d(TAG, "sendMessage " + bytes.length);
     }
 
