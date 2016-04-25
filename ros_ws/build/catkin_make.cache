@@ -1,1 +1,2 @@
 
+-DCATKIN_DEVEL_PREFIX=/home/josh/efim/ros_ws/devel -DCMAKE_INSTALL_PREFIX=/home/josh/efim/ros_ws/install -G Unix Makefiles
