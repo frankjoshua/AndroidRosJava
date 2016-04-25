@@ -1,0 +1,140 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'io.fabric.tools:gradle:1.21.2'
+        //classpath 'com.google.gms:google-services:1.5.0'
+        classpath 'com.google.gms:google-services:2.0.0-alpha5'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
+    }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        applicationId "com.tesseractmobile.pocketbot"
+        //Min sdk 14 required by Quickblox
+        minSdkVersion 14
+        targetSdkVersion 23
+        //17 - 1.9.4 released 2/10/16
+        versionCode 18
+        versionName "1.9.5"
+
+        // Enabling multidex support.
+        multiDexEnabled true
+
+        //Enable Testing
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'LICENSE.txt'
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+}
+
+ext {
+    playServicesVersion = '8.4.0'
+    supportLibVersion = '23.2.1'
+    qbSdkVersion = '2.5.1'
+}
+
+dependencies {
+
+    //compile project(':openCVLibrary300')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:multidex:1.0.1'
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    //compile 'com.google.android.gms:play-services:7.8.0'
+
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'ai.api:sdk:1.7.1@aar'
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile 'commons-io:commons-io:2.4'
+    //Firebase
+    compile 'com.firebase:firebase-client-android:2.5.0+'
+    //Protobuf
+    compile files('libs/protobuf-java-2.6.1.jar')
+    //Crashlytics
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+        transitive = true;
+    }
+    compile 'org.altbeacon:android-beacon-library:2+'
+    compile 'com.pubnub:pubnub-android:3.7.5'
+    compile project(':usbSerialForAndroid')
+    //Face Tracking
+    compile "com.google.android.gms:play-services-vision:${playServicesVersion}"
+    //User authentication
+    compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
+    compile "com.google.android.gms:play-services-plus:${playServicesVersion}"
+    //App Invites
+    compile "com.google.android.gms:play-services-appinvite:${playServicesVersion}"
+    //Nearby Connections - Local networking
+    compile "com.google.android.gms:play-services-nearby:${playServicesVersion}"
+    //RecyclerView
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    //Testing
+    testCompile 'junit:junit:4.12'
+    androidTestCompile "com.android.support:support-annotations:${supportLibVersion}"
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    //Video calling
+    compile "com.quickblox:quickblox-android-sdk-core:2.5.1@aar"
+    compile("com.quickblox:quickblox-android-sdk-chat:2.5.1@aar") {
+        transitive=true
+    }
+
+    compile "com.quickblox:quickblox-android-sdk-core:${qbSdkVersion}@aar"
+    compile ("com.quickblox:quickblox-android-sdk-chat:${qbSdkVersion}@aar") {
+        transitive=true
+    }
+    compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${qbSdkVersion}@aar"
+}
+
+apply plugin: 'com.google.gms.google-services'

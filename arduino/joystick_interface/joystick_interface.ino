@@ -1,4 +1,5 @@
-#include <EasyTransfer.h>
+#include <Wire.h>
+#include <EasyTransferI2C.h>
 
 #define DOWN true;
 #define UP false;
@@ -6,7 +7,7 @@
 #define MIN_SPEED -127
 #define MAX_SPEED 127
 #define MIN_INPUT 0
-#define MAX_OUTPUT 1024
+#define MAX_OUTPUT 1023
 
 // Store the Arduino pin associated with each input
 const byte PIN_BUTTON_SELECT = 2; // Select button is triggered when joystick is pressed
@@ -20,7 +21,8 @@ const byte PIN_ANALOG_X = 0;
 const byte PIN_ANALOG_Y = 1;
 
 //START Easy Transfer
-EasyTransfer etData;
+#define I2C_SLAVE_ADDRESS 9
+EasyTransferI2C etData;
 struct COM_DATA_STRUCTURE{
   //put your variable definitions here for the data you want to receive
   //THIS MUST BE EXACTLY THE SAME ON THE OTHER ARDUINO
@@ -35,7 +37,8 @@ COM_DATA_STRUCTURE dataStruct;
 //END Easy Transfer
 
 void setup() {
-  
+  Serial.begin(115200);
+  Serial.println("Starting");
   initCom();
   initBoard();
   
@@ -50,12 +53,16 @@ boolean select;
 int x;
 int y;
 
+boolean laserOn = false;
+
 void loop() {
   delay(10);
   
   readValues();
 
   if(right == false){
+    
+    //Motors
     int mSpeed = map(y, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
     int dir = map(x, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
     int powerR = mSpeed + dir;
@@ -64,21 +71,70 @@ void loop() {
     //Send data
     dataStruct.tar = 20;
     dataStruct.val = powerR;
-    etData.sendData();
+    Serial.println("Sending");
+    etData.sendData(I2C_SLAVE_ADDRESS);
     dataStruct.tar = 21;
     dataStruct.val = powerL;
-    etData.sendData();
-  } else if (up == false){
+    etData.sendData(I2C_SLAVE_ADDRESS);
+  } 
+  
+  if (up == false){
+    //Servos
     int hPos = map(y, MIN_INPUT, MAX_OUTPUT, 0, 180);
     int vPos = map(x, MIN_INPUT, MAX_OUTPUT, 0, 180);
     
     //Send data
     dataStruct.tar = 10;
+    dataStruct.cmd = 1;
     dataStruct.val = hPos;
-    etData.sendData();
+    etData.sendData(I2C_SLAVE_ADDRESS);
     dataStruct.tar = 11;
+    dataStruct.cmd = 1;
     dataStruct.val = vPos;
-    etData.sendData();
+    etData.sendData(I2C_SLAVE_ADDRESS);
+  }
+  
+  if (down == false){
+    //Servos
+    int hPos = map(y, MIN_INPUT, MAX_OUTPUT, -10, 10);
+    int vPos = map(x, MIN_INPUT, MAX_OUTPUT, -10, 10);
+    
+    //Send data
+    dataStruct.tar = 10;
+    dataStruct.cmd = 2;
+    dataStruct.val = hPos;
+    etData.sendData(I2C_SLAVE_ADDRESS);
+    dataStruct.tar = 11;
+    dataStruct.cmd = 2;
+    dataStruct.val = vPos;
+    etData.sendData(I2C_SLAVE_ADDRESS);
+  }
+  
+  if(left == false){
+    //Motors
+    int mSpeed = map(y, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
+    int dir = map(x, MIN_INPUT, MAX_OUTPUT, MIN_SPEED, MAX_SPEED);
+    int powerR = mSpeed + dir;
+    int powerL = mSpeed - dir;
+    
+    //Send data
+    dataStruct.tar = 20;
+    dataStruct.val = powerR / 4;
+    etData.sendData(I2C_SLAVE_ADDRESS);
+    dataStruct.tar = 21;
+    dataStruct.val = powerL / 4;
+    etData.sendData(I2C_SLAVE_ADDRESS);
+    //Laser
+    //Send data
+//    dataStruct.tar = 90;
+//    if(laserOn){
+//      dataStruct.cmd = 1;
+//    } else {
+//      dataStruct.cmd = 2;
+//    }
+//    laserOn = !laserOn;
+//    etData.sendData();
+//    delay(100);
   }
 
 }
@@ -116,6 +172,10 @@ void initBoard(){
 
 void initCom(){
   //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  Serial.begin(9600);
-  etData.begin(details(dataStruct), &Serial); 
+//  Serial.begin(115200);
+//  etData.begin(details(dataStruct), &Serial); 
+ //Set I2C
+  Wire.begin();
+  etData.begin(details(dataStruct), &Wire);
 }
+

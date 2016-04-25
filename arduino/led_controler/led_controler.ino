@@ -5,7 +5,8 @@
 
 #define PIN            0
 
-Adafruit_NeoPixel ring = Adafruit_NeoPixel(40, PIN, NEO_GRB + NEO_KHZ800);
+#define PIXELS 32
+Adafruit_NeoPixel ring = Adafruit_NeoPixel(PIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 int power = 0;
 
@@ -16,10 +17,10 @@ void setup(){
 }
 
 int pixel = 0;
-const int startDelay = 2000;
+const int startDelay = 1000;
 int baseDelay = startDelay;
 void loop(){
-  delay(baseDelay / 16);
+  delay(baseDelay / PIXELS);
   for(int i = 0; i < 40; i++){
     ring.setPixelColor(i, 0);
     int red = 0;
@@ -58,9 +59,9 @@ void loop(){
   ring.show();
   //power++;
   pixel++;
-  if(pixel > 48){
+  if(pixel > PIXELS){
     pixel = 0;  
-      baseDelay -= 100;
+      //baseDelay -= 100;
     if(baseDelay <= 0){
       baseDelay = startDelay;
     }

@@ -1,41 +1,30 @@
-#include <Servo.h>
-#include <EasyTransfer.h>
-#include <Usb.h>
-#include <AndroidAccessory.h>
-#include <Adafruit_NeoPixel.h>
+#include <Wire.h>
+#include <EasyTransferI2C.h>
+#include <adk.h> //https://github.com/felis/USB_Host_Shield_2.0
+#include <usbhub.h> //https://github.com/felis/USB_Host_Shield_2.0
+#include <SPI.h>
+#include <PocketBot.h> //https://github.com/frankjoshua/PocketBot
 
-#define REGISTER 1
-#define UNREGISTER 2
-#define REGISTRATION 1
-#define PIXEL_PIN            13
 
-Adafruit_NeoPixel pixel = Adafruit_NeoPixel(60, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+//Init USB connection for android device
+USB Usb;
+//These two lines give support for using a powered USB hub
+USBHub hub0(&Usb);
+USBHub hub1(&Usb);
 
-class Listener {
-  public:
-    int targets[32];
-    int pointer;
-    void registerTarget(int target);
-    void unregisterTarget(int target);
-    boolean isTarget(int target);
-};
-
-AndroidAccessory acc("Google, Inc.",
-		     "DemoKit",
-		     "DemoKit Arduino Board",
+/*
+* These parameters must match what the app expects
+*/
+ADK adk(&Usb, "Tesseract Mobile LLC",
+		     "PocketBot",
+		     "",
 		     "1.0",
-		     "http://www.android.com",
-		     "0000000012345678");
+		     "http://pocketbot.io",
+		     "1");
 
-const int DATA_CHANNELS = 4;
-EasyTransfer etData[DATA_CHANNELS];
-
-//Listeners 
-//0-3 = Serial Ports
-//4 USB
-const int DATA_LISTENERS = 5;
-Listener listeners[DATA_LISTENERS];
-
+//START Easy Transfer
+#define I2C_SLAVE_ADDRESS 9
+EasyTransferI2C etData;
 struct COM_DATA_STRUCTURE{
   //put your variable definitions here for the data you want to receive
   //THIS MUST BE EXACTLY THE SAME ON THE OTHER ARDUINO
@@ -48,128 +37,70 @@ struct COM_DATA_STRUCTURE{
 //give a name to the group of data
 COM_DATA_STRUCTURE dataStruct;
 
+/** This will be used to decode messages from the Android device */
+PocketBot pocketBot;
+/* Allocate space for the decoded message. */
+PocketBotMessage message = PocketBotMessage_init_zero;
+
 void setup()
 {
-  initPixel();
   initCom();
-  acc.powerOn();
-  pinMode(13, OUTPUT);
+  
+  //Connect to Android device
+  if(Usb.Init() == -1) {
+    Serial.println(F("OSCOKIRQ failed to assert"));
+    while(1); //halt
+  }
+  Serial.println(F("Waiting for Android device..."));
+  while(adk.isReady() == false){
+     Usb.Task();
+     delay(5);
+  }
+  Serial.println("");
+  Serial.println(F("Connected"));
+
 }
 
-void loop()
-{
-  delay(10);
-  
-  //Loop through each input
-  for(int dataLine = 0; dataLine < DATA_CHANNELS; dataLine++){
-    if(etData[dataLine].receiveData()){
-      int tar = dataStruct.tar;
-      int val = dataStruct.val;
-      int cmd = dataStruct.cmd;
-      //Check for registration request
-      if(tar == REGISTRATION){
-        if(val == REGISTER){
-          //Register Listener
-          listeners[dataLine].registerTarget(cmd);
-          //Respond that registration was successful
-          delay(20);
-          etData[dataLine].sendData();
-          //Mark line as connected
-          setPixelColor(dataLine, 75,0,255);
-        } else if(val == UNREGISTER){
-          //Register Listener
-          listeners[dataLine].unregisterTarget(cmd);
-        }
-      } else {
-        //Route to correct output
-        routeData();
+void loop(){
+  uint8_t rcode;
+  byte msg[1] = { 0x00 };
+  uint16_t len = sizeof(msg);
+  Usb.Task();
+  if(adk.isReady()){ 
+    len = sizeof(msg);
+    rcode = adk.RcvData(&len, msg);
+    while(!rcode && len > 0){
+      Usb.Task();
+      if(pocketBot.read(msg[0], message)){
+        Serial.println(millis());
+        Serial.print(F("FaceID = ")); Serial.println(message.face.faceId);
+        Serial.print(F("FaceX = ")); Serial.println(message.face.faceX);
+        Serial.print(F("FaceY = ")); Serial.println(message.face.faceY);
+        Serial.print(F("FaceZ = ")); Serial.println(message.face.faceZ);
+        Serial.print(F("JoyX = ")); Serial.println(message.control.joyX);
+        Serial.print(F("JoyY = ")); Serial.println(message.control.joyY);
+        Serial.print(F("JoyZ = ")); Serial.println(message.control.joyZ);
+        Serial.print(F("Proximity = ")); Serial.println(message.sensor.proximity);
+        Serial.print(F("Heading = ")); Serial.println(message.sensor.heading);
       }
+      rcode = adk.RcvData(&len, msg);
     }
   }
-
-  //Read from connected Android device
-  if (acc.isConnected()) {
-    byte msg[3];
-    int len = acc.read(msg, sizeof(msg), 1);
-
-    if (len > 0) {
-      dataStruct.tar = msg[0];
-      dataStruct.cmd = msg[1];
-      dataStruct.val = msg[2];
-      dataStruct.dur = 0;
-      routeData();
-    }
-  } 
-
   
 }
 
-void routeData(){
-  int target = dataStruct.tar;
-  for(int listener = 0; listener < DATA_LISTENERS; listener++){
-     setPixelColor(12 - listener, 0,255,50);
-     if(listeners[listener].isTarget(target)){
-       etData[listener].sendData();
-     } else {
-      setPixelColor(12 - listener, 0,0,0);
-     } 
-  }
+void sendData(int tar, int cmd, int val){
+  dataStruct.tar = tar;
+  dataStruct.cmd = cmd;
+  dataStruct.val = val;
+  dataStruct.dur = 0;
+  etData.sendData(I2C_SLAVE_ADDRESS);
 }
 
 void initCom(){
-  //start the easy transfer library, pass in the data details and the name of the serial port. Can be Serial, Serial1, Serial2, etc.
-  Serial.begin(9600);
-  etData[0].begin(details(dataStruct), &Serial); 
-  Serial1.begin(9600);
-  etData[1].begin(details(dataStruct), &Serial1);
-  Serial2.begin(9600);
-  etData[2].begin(details(dataStruct), &Serial2); 
-  Serial3.begin(9600);
-  etData[3].begin(details(dataStruct), &Serial3);
-  //Set initial pixel colors for data lines
-  setPixelColor(0,255,0,100);
-  setPixelColor(1,255,0,100);
-  setPixelColor(2,255,0,100);
-  setPixelColor(3,255,0,100);
-}
-
-void initPixel(){
-  pixel.begin();
-  pixel.setBrightness(50);
-  pixel.show();
-}
-
-void setPixelColor(int pixelNum, int red, int green, int blue){
-  pixel.setPixelColor(pixelNum, red, green, blue);
-  pixel.show();
-}
-
-void Listener::registerTarget(int target){
-  //First unregister target if registered
-  unregisterTarget(target);
-  //Add to list of registered targets
-  targets[pointer] = target;
-  pointer++;
-  //Reset pointer if too large
-  if(pointer > 31){
-     pointer = 0; 
-  }
-}
-
-void Listener::unregisterTarget(int target){
-  for(int i = 0; i < 32; i++){
-     if(targets[i] == target){
-        targets[i] = 0;
-     } 
-  }
-}
-
-boolean Listener::isTarget(int target){
-  for(int i = 0; i < 32; i++){
-     if(targets[i] == target){
-        return true;
-     } 
-  }
-  return false;
+  Serial.begin(115200);
+//  etData.begin(details(dataStruct), &Serial);
+  Wire.begin();
+  etData.begin(details(dataStruct), &Wire);
 }
 
