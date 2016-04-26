@@ -88,7 +88,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.1524" radius="0.01"/>
+        <cylinder length="0.0508" radius="0.0762"/>
       </geometry>
     </collision>
     <inertial>
@@ -98,7 +98,7 @@
     </inertial>
   </link>
 
-  <joint name="axiz_front_left" type="continuous">
+  <joint name="axis_front_left" type="continuous">
     <axis xyz="0 0 1"/>
     <parent link="base_lower_link"/>
     <child link="wheel_front_left"/>
@@ -114,7 +114,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.1524" radius="0.01"/>
+        <cylinder length="0.0508" radius="0.0762"/>
       </geometry>
     </collision>
     <inertial>
@@ -124,7 +124,7 @@
     </inertial>
   </link>
 
-  <joint name="axiz_front_right" type="continuous">
+  <joint name="axis_front_right" type="continuous">
     <axis xyz="0 0 1"/>
     <parent link="base_lower_link"/>
     <child link="wheel_front_right"/>
@@ -140,7 +140,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.1524" radius="0.01"/>
+        <cylinder length="0.0508" radius="0.0762"/>
       </geometry>
     </collision>
     <inertial>
@@ -150,7 +150,7 @@
     </inertial>
   </link>
 
-  <joint name="axiz_rear_right" type="continuous">
+  <joint name="axis_rear_right" type="continuous">
     <axis xyz="0 0 1"/>
     <parent link="base_lower_link"/>
     <child link="wheel_rear_right"/>
@@ -166,7 +166,7 @@
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.1524" radius="0.01"/>
+        <cylinder length="0.0508" radius="0.0762"/>
       </geometry>
     </collision>
     <inertial>
@@ -174,14 +174,34 @@
       <inertia ixx="1.0" iyy="1.0" izz="1.0"
                ixy="0" ixz="0" iyz="0"/>
     </inertial>
+    <gazebo reference="wheel_rear_left">
+      <material>Gazebo/Black</material>
+    </gazebo>
   </link>
 
-  <joint name="axiz_rear_left" type="continuous">
+  <joint name="axis_rear_left" type="continuous">
     <axis xyz="0 0 1"/>
     <parent link="base_lower_link"/>
     <child link="wheel_rear_left"/>
     <origin rpy="-1.5708 0 0" xyz="-0.165862 0.18034 0"/>
   </joint>
+
+<gazebo>
+  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+    <updateRate>100.0</updateRate>
+    <robotNamespace>/</robotNamespace>
+    <leftFrontJoint>axis_front_left</leftFrontJoint>
+    <rightFrontJoint>axis_front_right</rightFrontJoint>
+    <leftRearJoint>axis_rear_left</leftRearJoint>
+    <rightRearJoint>axis_rear_right</rightRearJoint>
+    <wheelSeparation>0.4</wheelSeparation>
+    <wheelDiameter>0.215</wheelDiameter>
+    <robotBaseFrame>base_link</robotBaseFrame>
+    <torque>20</torque>
+    <commandTopic>cmd_vel_mux/input/teleop</commandTopic>
+    <broadcastTF>false</broadcastTF>
+  </plugin>
+</gazebo>
 </robot>
 
 
