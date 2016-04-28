@@ -258,7 +258,7 @@
     <wheelSeparation>0.4</wheelSeparation>
     <wheelDiameter>0.215</wheelDiameter>
     <robotBaseFrame>base_link</robotBaseFrame>
-    <torque>20</torque>
+    <torque>5</torque>
     <commandTopic>cmd_vel</commandTopic>
     <broadcastTF>1</broadcastTF>
   </plugin>
