@@ -1,9 +1,17 @@
 <launch>
   <param name="robot_description" textfile="/home/josh/efim/ros_ws/src/efim/efim.urdf" />
-<!--<param name="robot_description" textfile="/home/josh/Downloads/urdf_tutorial/urdf/07-physics.urdf" />-->
   <include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
-        args="-param robot_description -urdf -model efim"/>
+        args="-param robot_description -urdf -model efim -x 8 -y -8"/>
  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
- <!--<node name="map_server" pkg="map_server" type="map_server" args="$(find mapping)/maps/willow.yaml"/>-->
+ <node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>
+ <include file="$(find amcl)/examples/amcl_diff.launch"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="/home/josh/efim/ros_ws/src/efim/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="/home/josh/efim/ros_ws/src/efim/costmap_common_params.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="/home/josh/efim/ros_ws/src/efim/global_costmap_params.yaml" command="load"/>
+    <rosparam file="/home/josh/efim/ros_ws/src/efim/local_costmap_params.yaml" command="load"/>
+    <rosparam file="/home/josh/efim/ros_ws/src/efim/base_local_planner_params.yaml" command="load"/>
+  </node>
 </launch>

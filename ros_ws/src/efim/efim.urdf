@@ -259,7 +259,7 @@
     <wheelDiameter>0.215</wheelDiameter>
     <robotBaseFrame>base_link</robotBaseFrame>
     <torque>20</torque>
-    <commandTopic>cmd_vel_mux/input/teleop</commandTopic>
+    <commandTopic>cmd_vel</commandTopic>
     <broadcastTF>1</broadcastTF>
   </plugin>
   <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
