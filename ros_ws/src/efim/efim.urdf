@@ -65,7 +65,7 @@
     </visual>
     <collision>
       <geometry>
-        <box size="0.2794 0.0762 0.0762"/> 
+        <box size="0.0762 0.2794 0.0762"/> 
       </geometry>
     </collision>
    <inertial>
@@ -107,7 +107,7 @@
     <axis xyz="0 0 1"/>
     <parent link="body_link"/>
     <child link="laser_link"/>
-    <origin rpy="0 0 0" xyz="0.2032 0 0"/>
+    <origin rpy="0 0 0" xyz="0.2032 0 -0.3"/>
   </joint>  
 
   <link name="hitch_front_link">
@@ -255,10 +255,10 @@
     <rightFrontJoint>axis_front_right</rightFrontJoint>
     <leftRearJoint>axis_rear_left</leftRearJoint>
     <rightRearJoint>axis_rear_right</rightRearJoint>
-    <wheelSeparation>0.4</wheelSeparation>
-    <wheelDiameter>0.215</wheelDiameter>
+    <wheelSeparation>0.254</wheelSeparation>
+    <wheelDiameter>0.1524</wheelDiameter>
     <robotBaseFrame>base_link</robotBaseFrame>
-    <torque>5</torque>
+    <torque>10</torque>
     <commandTopic>cmd_vel</commandTopic>
     <broadcastTF>1</broadcastTF>
   </plugin>
