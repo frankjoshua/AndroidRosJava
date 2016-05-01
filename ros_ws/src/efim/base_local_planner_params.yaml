@@ -1,2 +1,9 @@
 TrajectoryPlannerROS:
   holonomic_robot: false
+  path_distance_bias: 32
+  goal_distance_bias: 24
+  occdist_scale: 0.02
+  max_vel_theta: 25.5
+  min_vel_theta: -25.5
+  min_in_place_vel_theta: 0.5
+  meter_scoring: true

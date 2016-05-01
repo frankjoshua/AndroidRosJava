@@ -1,11 +1,11 @@
 <launch>
   <param name="robot_description" textfile="/home/josh/efim/ros_ws/src/efim/efim.urdf" />
   <include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>
-  <include file="$(find frontier_exploration)/launch/global_map.launch"/>
+  <!--<include file="$(find frontier_exploration)/launch/global_map.launch"/>-->
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
-        args="-param robot_description -urdf -model efim -x 8 -y -8"/>
+        args="-param robot_description -urdf -model efim -x 0 -y 0"/>
  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
- <node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>
+ <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
  <node name="gmapping" pkg="gmapping" type="slam_gmapping"/>
 
  <include file="$(find amcl)/examples/amcl_diff.launch"/>
