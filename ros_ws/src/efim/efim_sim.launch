@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>
+  <!--<include file="$(find frontier_exploration)/launch/global_map.launch"/>-->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description -urdf -model efim -x 0 -y 0"/>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <include file="./efim.launch"/>
+</launch>
