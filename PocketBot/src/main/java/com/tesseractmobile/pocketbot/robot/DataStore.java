@@ -117,7 +117,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     private void setupUser(final AuthData authData, final String robotId) {
         final Firebase userRef = mFirebase.child(USERS).child(authData.getUid());
         //Setup User
-        userRef.child(AUTH_DATA).setValue(authData);
+        userRef.child(AUTH_DATA).setValue(true);
         //Save current robot to list of allowed robots
         addRobot(robotId, true);
         //Mark user last connect status
