@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.firebase.client.AuthData;
 import com.quickblox.auth.model.QBSession;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
@@ -66,19 +65,20 @@ public class TelepresenceFaceFragment extends QuickBloxFragment implements Remot
                 ((View.OnClickListener) activity).onClick(view);
             }
         });
-        Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
-            @Override
-            public void onAuthComplete(final AuthData authData) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btnSignIn.setVisibility(View.INVISIBLE);
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
-            }
-        });
-        return view;
+        throw new UnsupportedOperationException("Not implemented!");
+//        Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+//            @Override
+//            public void onAuthComplete(final AuthData authData) {
+//                activity.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        btnSignIn.setVisibility(View.INVISIBLE);
+//                        progressBar.setVisibility(View.INVISIBLE);
+//                    }
+//                });
+//            }
+//        });
+//        return view;
     }
 
     @Override

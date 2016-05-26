@@ -337,8 +337,8 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     }
 
     @Override
-    public void setAuthToken(String robotId, String token) {
-        mDataStore.setAuthToken(robotId, token);
+    public void setAuthToken(String robotId, AuthData authData) {
+        mDataStore.setAuthToken(robotId, authData);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.tesseractmobile.pocketbot.robot;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,6 +21,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
 import java.io.IOException;
@@ -31,11 +39,13 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
 
     private final GoogleSignInOptions gso;
     /* Client used to interact with Google APIs. */
-    private GoogleApiClient mGoogleApiClient;
+    private final GoogleApiClient mGoogleApiClient;
+    private final FirebaseAuth mAuth;
 
 
     public GoogleSignInController(final FragmentActivity fragmentActivity) {
        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("547931764939-du412euoccilddpl427nc33u5lp0s0vd.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(fragmentActivity)
@@ -45,6 +55,7 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addApi(Nearby.CONNECTIONS_API)
                 .build();
+        mAuth = FirebaseAuth.getInstance();
     }
 
     public void startSignin(final FragmentActivity fragmentActivity, final int requestCode) {
@@ -56,72 +67,52 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            getGoogleOAuthTokenAndLogin(context, acct.getEmail());
+            firebaseAuthWithGoogle(context, acct);
+            //getGoogleOAuthTokenAndLogin(context, acct.getEmail());
         } else {
             // Signed out, show unauthenticated UI.
             throw new UnsupportedOperationException();
         }
     }
 
-    private void getGoogleOAuthTokenAndLogin(final Context context, final String account) {
-        /* Get OAuth token in Background */
-        AsyncTask<String, Void, String> task = new AsyncTask<String, Void, String>() {
-            String errorMessage = null;
+    private void firebaseAuthWithGoogle(final Context context, final GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGooogle:" + acct.getId());
+        // ...
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
 
-            @Override
-            protected String doInBackground(String... params) {
-                String token = null;
-
-                try {
-                    //String scope = String.format("oauth2:%s", Scopes.PLUS_LOGIN);
-                    Log.d(TAG, "Trying to connect to Google API");
-                    final String scope = "oauth2:profile email";
-                    token = GoogleAuthUtil.getToken(context, params[0], scope);
-                    //token = GoogleAuthUtil.getToken(BaseFaceFragmentActivity.this, Plus.AccountApi.getAccountName(mGoogleApiClient), scope);
-                    Log.d(TAG, "Token read: " + token);
-                } catch (IOException transientEx) {
-                    /* Network or server error */
-                    Log.e(TAG, "Error authenticating with Google: " + transientEx);
-                    errorMessage = "Network error: " + transientEx.getMessage();
-                } catch (UserRecoverableAuthException e) {
-                    Log.w(TAG, "Recoverable Google OAuth error: " + e.toString());
-                    /* We probably need to ask for permissions, so start the intent if there is none pending */
-                } catch (GoogleAuthException authEx) {
-                    /* The call is not ever expected to succeed assuming you have already verified that
-                     * Google Play services is installed. */
-                    Log.e(TAG, "Error authenticating with Google: " + authEx.getMessage(), authEx);
-                    errorMessage = "Error authenticating with Google: " + authEx.getMessage();
-                }
-
-                return token;
-            }
-
-            @Override
-            protected void onPostExecute(String token) {
-                if (token != null) {
-                    onTokenReceived(context, token);
-                } else if (errorMessage != null) {
-                    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show();
-                }
-            }
-        };
-        task.execute(account);
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredential", task.getException());
+                            throw new UnsupportedOperationException("Not implemented!");
+                        }
+                        final AuthData authData = new AuthData(acct);
+                        onTokenReceived(context, authData);
+                    }
+                });
     }
 
+
     private Context mContext;
-    private String mToken;
-    private void onTokenReceived(final Context context, final String token){
+    private AuthData mAuthData;
+    private void onTokenReceived(final Context context, final AuthData authData){
+        mAuthData = authData;
         mContext = context;
-        mToken = token;
-        Log.d(TAG, "Received token: " + token);
 
         if (!mGoogleApiClient.isConnecting()) {
             mGoogleApiClient.connect();
         }
     }
+
     @Override
     public void onConnected(Bundle result) {
-        Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mToken);
+        Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mAuthData);
         Toast.makeText(mContext, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
         //mSignInButton.setEnabled(true);
         //Auto sign in next time

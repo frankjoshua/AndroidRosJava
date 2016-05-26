@@ -33,8 +33,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.Query;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -132,7 +132,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
      * @param ref        The Firebase location to watch for data changes. Can also be a slice of a location, using some
      *                   combination of <code>limit()</code>, <code>startAt()</code>, and <code>endAt()</code>
      */
-    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, Firebase ref, final boolean onlyUserRobots) {
+    public FirebaseRecyclerAdapter(Class<T> modelClass, int modelLayout, Class<VH> viewHolderClass, DatabaseReference ref, final boolean onlyUserRobots) {
         this(modelClass, modelLayout, viewHolderClass, (Query) ref, onlyUserRobots);
     }
 
@@ -150,7 +150,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
         return mSnapshots.getItem(position).getValue(mModelClass);
     }
 
-    public Firebase getRef(int position) { return mSnapshots.getItem(position).getRef(); }
+    public DatabaseReference getRef(int position) { return mSnapshots.getItem(position).getRef(); }
 
     @Override
     public long getItemId(int position) {

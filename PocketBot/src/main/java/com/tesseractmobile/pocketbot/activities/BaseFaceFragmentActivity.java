@@ -28,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.firebase.client.AuthData;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -49,6 +48,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.RobotSelectionDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
+import com.tesseractmobile.pocketbot.robot.AuthData;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.GoogleNearbyConnectionController;
@@ -447,7 +447,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                 Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
                     @Override
                     public void onAuthComplete(final AuthData authData) {
-                        final String displayName = (String) authData.getProviderData().get("displayName");
+                        final String displayName = authData.getDisplayName();
                         final String robotName = PocketBotSettings.getRobotName(BaseFaceFragmentActivity.this);
                         final String message = displayName + " is giving you control of " + robotName;
                         Intent intent = new AppInviteInvitation.IntentBuilder("PocketBot Control Invite")
@@ -457,7 +457,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                                 //.setCallToActionText("invitation_cta")
                                 .setEmailHtmlContent("<html><body>"
                                         + "<a href=\"%%APPINVITE_LINK_PLACEHOLDER%%\">" + "Click here to start controlling " + robotName + ".<br><br>"
-                                        + "<img src=\"" + (String) authData.getProviderData().get("profileImageURL") + "\" height=\"130\" width=\"130\"/></a>"
+                                        + "<img src=\"" + authData.getProfileImageURL() + "\" height=\"130\" width=\"130\"/></a>"
                                         + "</body></html>")
                                 .setEmailSubject("PocketBot Control Invite from " + displayName)
                                 .build();

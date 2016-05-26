@@ -11,10 +11,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
+import com.google.firebase.database.DatabaseReference;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
+import com.tesseractmobile.pocketbot.robot.AuthData;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.robot.RobotInfo;
@@ -69,7 +69,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         mSignInView.setVisibility(View.GONE);
         //Set adapter
         final String currentRobotId = PocketBotSettings.getRobotId(context);
-        final Firebase userListRef = Robot.get().getDataStore().getUserListRef().child(DataStore.ROBOTS);
+        final DatabaseReference userListRef = Robot.get().getDataStore().getUserListRef().child(DataStore.ROBOTS);
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef, mOnlyUserRobots) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {

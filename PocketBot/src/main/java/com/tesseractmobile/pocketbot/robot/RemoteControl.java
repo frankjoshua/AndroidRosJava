@@ -5,13 +5,13 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ServerValue;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.tesseractmobile.pocketbot.activities.KeepAliveThread;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
@@ -28,8 +28,8 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     private static final String TIMESTAMP = "time_stamp";
     private KeepAliveThread mKeepAliveThread;
     //private Pubnub pubnub = new Pubnub("pub-c-2bd62a71-0bf0-4d53-bf23-298fd6b34c3e", "sub-c-75cdf46e-83e9-11e5-8495-02ee2ddab7fe");
-    private Firebase mFirebaseListen;
-    private Firebase mFirebaseTransmit;
+    private DatabaseReference mFirebaseListen;
+    private DatabaseReference mFirebaseTransmit;
 
     /** the pubnub channel to listen to */
     private String id;
@@ -43,7 +43,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     private long mTimeStamp;
     private String mTransmitUUID;
     private ChildEventListener mChildEventListener;
-    private Firebase mFirebaseStatus;
+    private DatabaseReference mFirebaseStatus;
     final private SensorData mSensorData = new SensorData();
     /** Sends data to the remote robot */
     private RemoteTransmiter mRemoteTransmiter;
@@ -183,7 +183,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError DatabaseError) {
 
             }
         };
@@ -238,7 +238,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     }
 
     @Override
-    public void onCancelled(final FirebaseError firebaseError) {
+    public void onCancelled(final DatabaseError DatabaseError) {
         //Firebase Cancelled
     }
 
@@ -246,14 +246,14 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
     @Override
     public void onAuthComplete(final AuthData authData) {
         //Listen for messages from firebase
-        mFirebaseListen = new Firebase(DataStore.FIREBASE_URL).child(CONTROL).child(id);
+        mFirebaseListen = FirebaseDatabase.getInstance().getReferenceFromUrl(DataStore.FIREBASE_URL).child(CONTROL).child(id);
         mFirebaseListen.child(CONTROL).addChildEventListener(this);
         //Setup transmitter
-        mFirebaseTransmit = new Firebase(DataStore.FIREBASE_URL).child(CONTROL);
+        mFirebaseTransmit = FirebaseDatabase.getInstance().getReferenceFromUrl(DataStore.FIREBASE_URL).child(CONTROL);
         //Listen for status updates
-        mFirebaseStatus = new Firebase(DataStore.FIREBASE_URL).child(STATUS);
+        mFirebaseStatus = FirebaseDatabase.getInstance().getReferenceFromUrl(DataStore.FIREBASE_URL).child(STATUS);
         //Listen for controler disconnect
-        Firebase connectedRef = new Firebase(DataStore.BASE_FIREBASE_URL + ".info/connected");
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference().child(".info/connected");
         connectedRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -264,7 +264,7 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
 
             }
         });
@@ -302,13 +302,13 @@ public class RemoteControl implements ChildEventListener, DataStore.OnAuthComple
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError DatabaseError) {
 
             }
         });
     }
 
-    public Firebase getControlRef() {
+    public DatabaseReference getControlRef() {
         return mFirebaseTransmit;
     }
 

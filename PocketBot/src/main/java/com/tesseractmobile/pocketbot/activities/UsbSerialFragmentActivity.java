@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.firebase.client.AuthData;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Robot;
 import com.tesseractmobile.pocketbot.service.BodyService;
@@ -43,12 +42,13 @@ public class UsbSerialFragmentActivity extends AiFragmentActivity {
             final String robotId = data.getLastPathSegment();
             Log.d("USB", robotId);
             //Need to add this to list of allowed robots
-            Robot.get().getDataStore().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
-                @Override
-                public void onAuthComplete(final AuthData authData) {
-                    Robot.get().getDataStore().addRobot(robotId, false);
-                }
-            });
+            throw new UnsupportedOperationException("Not implemented!");
+//            Robot.get().getDataStore().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+//                @Override
+//                public void onAuthComplete(final AuthData authData) {
+//                    Robot.get().getDataStore().addRobot(robotId, false);
+//                }
+//            });
         }
 
         //Speed up sensor data

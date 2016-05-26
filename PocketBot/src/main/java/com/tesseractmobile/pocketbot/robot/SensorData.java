@@ -1,6 +1,6 @@
 package com.tesseractmobile.pocketbot.robot;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 import java.math.BigDecimal;
 import java.security.PermissionCollection;
@@ -265,7 +265,7 @@ public class SensorData {
         public int battery;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
+
     static public class Control {
         public SensorData.Joystick joy1 = new SensorData.Joystick();
         public SensorData.Joystick joy2 = new SensorData.Joystick();
