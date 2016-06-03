@@ -1,61 +1,42 @@
 {
   "project_info": {
-    "project_id": "pocketbot-1161",
-    "project_number": "547931764939",
-    "name": "PocketBot"
+    "project_number": "1040276762585",
+    "firebase_url": "https://boiling-torch-4457.firebaseio.com",
+    "project_id": "boiling-torch-4457",
+    "storage_bucket": "boiling-torch-4457.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:547931764939:android:c04a20f13303a9f4",
-        "client_id": "android:com.tesseractmobile.pocketbot",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:1040276762585:android:c04a20f13303a9f4",
         "android_client_info": {
-          "package_name": "com.tesseractmobile.pocketbot",
-          "certificate_hash": []
+          "package_name": "com.tesseractmobile.pocketbot"
         }
       },
       "oauth_client": [
         {
-          "client_id": "547931764939-ga0f7ceadg6l6e79iqur1rd78crmdboq.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.tesseractmobile.pocketbot",
-            "certificate_hash": "FB4641DF86484990E10577609E82703AEB10466E"
-          }
-        },
-        {
-          "client_id": "547931764939-du412euoccilddpl427nc33u5lp0s0vd.apps.googleusercontent.com",
+          "client_id": "1040276762585-bh5oen6s1sklo8lr6i0h4vqdg1lrbdsn.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9lhAs3W74ca95MivvCPBLEmvu2Anb9XA"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
         },
-        "cloud_messaging_service": {
-          "status": 1,
-          "apns_config": []
-        },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "547931764939-du412euoccilddpl427nc33u5lp0s0vd.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "google_signin_service": {
-          "status": 2
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

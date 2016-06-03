@@ -2,10 +2,12 @@ package com.tesseractmobile.pocketbot.activities;
 
 import android.os.Bundle;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Robot;
 
 import java.util.UUID;
@@ -13,7 +15,7 @@ import java.util.UUID;
 public class FirebaseFaceFragmentActivity extends BaseFaceFragmentActivity {
 
     private static final String CHILD_PATH = "chat";
-    private Firebase mFirebaseRef;
+    private DatabaseReference mFirebaseRef;
     private String userId;
     boolean firstResponce;
     
@@ -25,9 +27,8 @@ public class FirebaseFaceFragmentActivity extends BaseFaceFragmentActivity {
         userId = getPreferences(MODE_PRIVATE).getString("uuid", UUID.randomUUID().toString());
         //Save User Id
         getPreferences(MODE_PRIVATE).edit().putString("uuid", userId).commit();
-        
-        Firebase.setAndroidContext(this);
-        mFirebaseRef = new Firebase("https://boiling-torch-4457.firebaseio.com/").child(CHILD_PATH);
+
+        mFirebaseRef = FirebaseDatabase.getInstance().getReferenceFromUrl(DataStore.FIREBASE_URL).child(CHILD_PATH);
 
         mFirebaseRef.addValueEventListener(new ValueEventListener() {
 
@@ -50,7 +51,7 @@ public class FirebaseFaceFragmentActivity extends BaseFaceFragmentActivity {
             }
 
             @Override
-            public void onCancelled(final FirebaseError error) {
+            public void onCancelled(final DatabaseError error) {
             }
 
         });

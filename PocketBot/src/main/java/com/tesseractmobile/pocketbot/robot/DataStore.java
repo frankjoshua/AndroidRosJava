@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ServerValue;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
 public class DataStore implements SharedPreferences.OnSharedPreferenceChangeListener {
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
-    public static final String API_VERSION = "betaV3";
+    public static final String API_VERSION = "betaV4";
     public static final String BASE_FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/";
     public static final String FIREBASE_URL = BASE_FIREBASE_URL + API_VERSION + "/";
     public static final String AUTH_DATA = "auth_data";
@@ -34,7 +36,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     private final Context mContext;
 
     /** Stores user and robot data */
-    private Firebase mFirebase;
+    private DatabaseReference mFirebase;
 
     private AuthData mAuthData;
 
@@ -63,48 +65,60 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
      * Signs in to Firebase using Google Auth
      * Also adds robot to list of allowed robots
      * @param robotId
-     * @param token
+     * @param authData
      */
-    public void setAuthToken(final String robotId, final String token) {
-        mFirebase = new Firebase(FIREBASE_URL);
-        mFirebase.authWithOAuthToken("google", token, new Firebase.AuthResultHandler() {
-            @Override
-            public void onAuthenticated(final AuthData authData) {
-                //Save Auth data -- Must be done first
-                mAuthData = authData;
-                setupUser(authData, robotId);
-                setupRobot(robotId);
-                //Start syncing preferences
-                mFirebasePreferenceSync.start(getRobots());
-                //Let everyone know we are logged in
-                for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
-                    onAuthCompleteListener.onAuthComplete(authData);
-                }
-                PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
-            }
-
-            @Override
-            public void onAuthenticationError(FirebaseError firebaseError) {
-                Log.e("DataStore", "Token: " + token);
-                if(Constants.LOGGING){
-                    throw new UnsupportedOperationException(firebaseError.toString());
-                }
-            }
-        });
+    public void setAuthToken(final String robotId, final AuthData authData) {
+        mFirebase = FirebaseDatabase.getInstance().getReferenceFromUrl(FIREBASE_URL);
+        //Save Auth data -- Must be done first
+        mAuthData = authData;
+        setupUser(authData, robotId);
+        setupRobot(robotId);
+        //Start syncing preferences
+        mFirebasePreferenceSync.start(getRobots());
+        //Let everyone know we are logged in
+        for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
+            onAuthCompleteListener.onAuthComplete(authData);
+        }
+            PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
+//        throw new UnsupportedOperationException("Not implemented!");
+//        mFirebase.authWithOAuthToken("google", token, new DatabaseReference.AuthResultHandler() {
+//            @Override
+//            public void onAuthenticated(final AuthData authData) {
+//                //Save Auth data -- Must be done first
+//                mAuthData = authData;
+//                setupUser(authData, robotId);
+//                setupRobot(robotId);
+//                //Start syncing preferences
+//                mFirebasePreferenceSync.start(getRobots());
+//                //Let everyone know we are logged in
+//                for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
+//                    onAuthCompleteListener.onAuthComplete(authData);
+//                }
+//                PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
+//            }
+//
+//            @Override
+//            public void onAuthenticationError(DatabaseError DatabaseError) {
+//                Log.e("DataStore", "Token: " + token);
+//                if(Constants.LOGGING){
+//                    throw new UnsupportedOperationException(DatabaseError.toString());
+//                }
+//            }
+//        });
     }
 
     private void setupRobot(final String robotId) {
 
         if(mRobotId != null){
             //Disconnect last robot
-            final Firebase lastRobotRef = getRobots().child(mRobotId);
+            final DatabaseReference lastRobotRef = getRobots().child(mRobotId);
             //Mark robot last connect status
             lastRobotRef.child(SETTINGS).child(LAST_ONLINE).setValue(ServerValue.TIMESTAMP);
             //Set robot online status
             lastRobotRef.child(SETTINGS).child(IS_CONNECTED).setValue(false);
             lastRobotRef.child(SETTINGS).child(IS_CONNECTED).setValue(false);
         }
-        final Firebase robotRef = getRobots().child(robotId);
+        final DatabaseReference robotRef = getRobots().child(robotId);
         //Save ID
         mRobotId = robotId;
         //Mark robot last connect status
@@ -115,9 +129,9 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     }
 
     private void setupUser(final AuthData authData, final String robotId) {
-        final Firebase userRef = mFirebase.child(USERS).child(authData.getUid());
+        final DatabaseReference userRef = mFirebase.child(USERS).child(authData.getUid());
         //Setup User
-        userRef.child(AUTH_DATA).setValue(authData);
+        userRef.child(AUTH_DATA).setValue(true);
         //Save current robot to list of allowed robots
         addRobot(robotId, true);
         //Mark user last connect status
@@ -129,11 +143,11 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     }
 
     public void addRobot(final String robotId, final boolean isOwned) {
-        final Firebase userRef = mFirebase.child(USERS).child(mAuthData.getUid());
+        final DatabaseReference userRef = mFirebase.child(USERS).child(mAuthData.getUid());
         userRef.child(ROBOTS).child(robotId).setValue(isOwned);
     }
 
-    private Firebase getRobots() {
+    private DatabaseReference getRobots() {
         return mFirebase.child(ROBOTS);
     }
 
@@ -141,14 +155,14 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
      * Returns a reference to the users robots
      * @return
      */
-    public Firebase getRobotListRef() {
+    public DatabaseReference getRobotListRef() {
         if(isLoggedIn()){
             return getRobots();
         }
         throw new UnsupportedOperationException();
     }
 
-    public Firebase getUserListRef() {
+    public DatabaseReference getUserListRef() {
         if (isLoggedIn()){
             return mFirebase.child(USERS).child(mAuthData.getUid());
         }
@@ -183,7 +197,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
 
     public void deleteRobot(final String robot_id) {
         //Delete robot from user
-        final Firebase userRef = mFirebase.child(USERS).child(mAuthData.getUid());
+        final DatabaseReference userRef = mFirebase.child(USERS).child(mAuthData.getUid());
         userRef.child(ROBOTS).child(robot_id).removeValue();
         //Delete robot
         getRobots().child(robot_id).removeValue();
@@ -220,7 +234,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
      */
     private static class FirebasePreferenceSync implements SharedPreferences.OnSharedPreferenceChangeListener, ChildEventListener {
         private String mRobotId;
-        private Firebase mFirebase;
+        private DatabaseReference mFirebase;
         private Context mContext;
 
         public FirebasePreferenceSync(final Context context) {
@@ -231,7 +245,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
          * Start syncing data
          * @param firebase
          */
-        public void start(final Firebase firebase){
+        public void start(final DatabaseReference firebase){
             this.mFirebase = firebase;
             //Listen for data changes on selected robot
             mRobotId = PocketBotSettings.getRobotId(mContext);
@@ -300,7 +314,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         }
 
         @Override
-        public void onCancelled(FirebaseError firebaseError) {
+        public void onCancelled(DatabaseError DatabaseError) {
 
         }
 

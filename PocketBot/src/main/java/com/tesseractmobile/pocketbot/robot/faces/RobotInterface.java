@@ -1,6 +1,7 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
 import com.tesseractmobile.pocketbot.robot.AI;
+import com.tesseractmobile.pocketbot.robot.AuthData;
 import com.tesseractmobile.pocketbot.robot.BodyConnectionListener;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
@@ -86,7 +87,7 @@ public interface RobotInterface {
 
     void unregisterSpeechListener(final SpeechListener speechListener);
 
-    void setAuthToken(String robotId, String token);
+    void setAuthToken(String robotId, AuthData authData);
 
     void registerOnAuthCompleteListener(final DataStore.OnAuthCompleteListener onAuthCompleteListener);
 

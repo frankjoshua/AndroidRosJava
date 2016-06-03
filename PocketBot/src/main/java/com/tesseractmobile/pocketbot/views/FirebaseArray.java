@@ -28,11 +28,11 @@
 
 package com.tesseractmobile.pocketbot.views;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.tesseractmobile.pocketbot.robot.Robot;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ class FirebaseArray implements ChildEventListener {
             mQuery = ref;
         }
         mSnapshots = new ArrayList<DataSnapshot>();
-        final Firebase robots = Robot.get().getDataStore().getRobotListRef();
+        final DatabaseReference robots = Robot.get().getDataStore().getRobotListRef();
         //mQuery.addChildEventListener(this);
         mQuery.addChildEventListener(new ChildEventListener() {
             @Override
@@ -82,7 +82,7 @@ class FirebaseArray implements ChildEventListener {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError DatabaseError) {
 
             }
         });
@@ -141,7 +141,7 @@ class FirebaseArray implements ChildEventListener {
         notifyChangedListeners(OnChangedListener.EventType.Moved, newIndex, oldIndex);
     }
 
-    public void onCancelled(FirebaseError firebaseError) {
+    public void onCancelled(DatabaseError DatabaseError) {
         // TODO: what do we do with this?
     }
     // End of ChildEventListener methods

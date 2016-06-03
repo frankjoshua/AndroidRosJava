@@ -11,7 +11,6 @@ import android.preference.PreferenceManager;
 import android.support.multidex.MultiDex;
 
 import com.crashlytics.android.Crashlytics;
-import com.firebase.client.Firebase;
 import com.quickblox.core.QBSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
@@ -70,10 +69,6 @@ public class PocketBotApp extends Application{
         if (bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false) {
             throw new UnsupportedOperationException("Error binding to service");
         }
-
-        //Start Firebase - before DataStore
-        Firebase.setAndroidContext(this);
-
 
 
     }

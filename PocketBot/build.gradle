@@ -4,10 +4,9 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.1.0'
         classpath 'io.fabric.tools:gradle:1.21.2'
-        //classpath 'com.google.gms:google-services:1.5.0'
-        classpath 'com.google.gms:google-services:2.0.0-alpha5'
+        classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 
@@ -31,7 +30,7 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.tesseractmobile.pocketbot"
@@ -39,8 +38,8 @@ android {
         minSdkVersion 14
         targetSdkVersion 23
         //17 - 1.9.4 released 2/10/16
-        versionCode 18
-        versionName "1.9.5"
+        versionCode 19
+        versionName "1.9.6"
 
         // Enabling multidex support.
         multiDexEnabled true
@@ -79,8 +78,8 @@ android {
 }
 
 ext {
-    playServicesVersion = '8.4.0'
-    supportLibVersion = '23.2.1'
+    playServicesVersion = '9.0.0'
+    supportLibVersion = '23.4.0'
     qbSdkVersion = '2.5.1'
 }
 
@@ -88,24 +87,17 @@ dependencies {
 
     //compile project(':openCVLibrary300')
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:multidex:1.0.1'
     compile "com.android.support:support-v4:${supportLibVersion}"
     //compile 'com.google.android.gms:play-services:7.8.0'
 
-    compile 'com.google.code.gson:gson:2.3.1'
-    compile 'ai.api:sdk:1.7.1@aar'
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
-    compile 'commons-io:commons-io:2.4'
     //Firebase
-    compile 'com.firebase:firebase-client-android:2.5.0+'
     //Protobuf
     compile files('libs/protobuf-java-2.6.1.jar')
     //Crashlytics
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-    compile 'org.altbeacon:android-beacon-library:2+'
-    compile 'com.pubnub:pubnub-android:3.7.5'
     compile project(':usbSerialForAndroid')
     //Face Tracking
     compile "com.google.android.gms:play-services-vision:${playServicesVersion}"
@@ -125,16 +117,26 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     //Video calling
-    compile "com.quickblox:quickblox-android-sdk-core:2.5.1@aar"
     compile("com.quickblox:quickblox-android-sdk-chat:2.5.1@aar") {
-        transitive=true
+        transitive = true
     }
 
     compile "com.quickblox:quickblox-android-sdk-core:${qbSdkVersion}@aar"
-    compile ("com.quickblox:quickblox-android-sdk-chat:${qbSdkVersion}@aar") {
-        transitive=true
+    compile("com.quickblox:quickblox-android-sdk-chat:${qbSdkVersion}@aar") {
+        transitive = true
     }
     compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${qbSdkVersion}@aar"
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'ai.api:sdk:1.7.1@aar'
+    compile 'commons-io:commons-io:2.4'
+    compile "com.google.firebase:firebase-core:${playServicesVersion}"
+    compile "com.google.firebase:firebase-database:${playServicesVersion}"
+    compile "com.google.firebase:firebase-auth:${playServicesVersion}"
+    compile 'org.altbeacon:android-beacon-library:2.+'
+    compile 'com.pubnub:pubnub-android:3.7.5'
+    compile 'com.quickblox:quickblox-android-sdk-core:2.5.1@aar'
+    compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
 }
 
 apply plugin: 'com.google.gms.google-services'
