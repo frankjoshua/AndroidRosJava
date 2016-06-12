@@ -11,6 +11,7 @@ import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.robot.AuthData;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.RemoteListener;
@@ -55,20 +56,19 @@ public class EfimTelepresenceFaceFragment extends QuickBloxFragment implements R
                 ((View.OnClickListener) activity).onClick(view);
             }
         });
-        throw new UnsupportedOperationException("Not implemented!");
-//        Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
-//            @Override
-//            public void onAuthComplete(final AuthData authData) {
-//                activity.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        btnSignIn.setVisibility(View.INVISIBLE);
-//                        progressBar.setVisibility(View.INVISIBLE);
-//                    }
-//                });
-//            }
-//        });
-//        return view;
+        Robot.get().registerOnAuthCompleteListener(new DataStore.OnAuthCompleteListener() {
+            @Override
+            public void onAuthComplete(final AuthData authData) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnSignIn.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        });
+        return view;
     }
 
     @Override

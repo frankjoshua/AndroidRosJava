@@ -23,7 +23,7 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
     public static final String ROBOTS = "robots";
     public static final String USERS = "users";
     public static final String API_VERSION = "betaV4";
-    public static final String BASE_FIREBASE_URL = "https://boiling-torch-4457.firebaseio.com/";
+    public static final String BASE_FIREBASE_URL = "https://pocketbot-1161.firebaseio.com/";
     public static final String FIREBASE_URL = BASE_FIREBASE_URL + API_VERSION + "/";
     public static final String AUTH_DATA = "auth_data";
     public static final String SETTINGS = "settings";
@@ -79,32 +79,15 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
             onAuthCompleteListener.onAuthComplete(authData);
         }
-            PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
-//        throw new UnsupportedOperationException("Not implemented!");
-//        mFirebase.authWithOAuthToken("google", token, new DatabaseReference.AuthResultHandler() {
-//            @Override
-//            public void onAuthenticated(final AuthData authData) {
-//                //Save Auth data -- Must be done first
-//                mAuthData = authData;
-//                setupUser(authData, robotId);
-//                setupRobot(robotId);
-//                //Start syncing preferences
-//                mFirebasePreferenceSync.start(getRobots());
-//                //Let everyone know we are logged in
-//                for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
-//                    onAuthCompleteListener.onAuthComplete(authData);
-//                }
-//                PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
-//            }
-//
-//            @Override
-//            public void onAuthenticationError(DatabaseError DatabaseError) {
-//                Log.e("DataStore", "Token: " + token);
-//                if(Constants.LOGGING){
-//                    throw new UnsupportedOperationException(DatabaseError.toString());
-//                }
-//            }
-//        });
+
+        setupUser(authData, robotId);
+        setupRobot(robotId);
+        mFirebasePreferenceSync.start(getRobots());
+        //Let everyone know we are logged in
+        for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
+            onAuthCompleteListener.onAuthComplete(authData);
+        }
+        PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
     }
 
     private void setupRobot(final String robotId) {

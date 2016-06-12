@@ -58,7 +58,7 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
         Robot.get().unregisterOnAuthCompleteListener(this);
         if(mCurrentRTCSession != null){
             mCurrentRTCSession.hangUp(mCurrentRTCSession.getUserInfo());
-            mCurrentRTCSession.removeSessionnCallbacksListener(this);
+            mCurrentRTCSession.removeSessionCallbacksListener(this);
             mCurrentRTCSession.removeVideoTrackCallbacksListener(this);
             mCurrentRTCSession.removeSignalingCallback(this);
         }
@@ -268,11 +268,6 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     }
 
     @Override
-    public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer) {
-        //showDialog("The remote robot disconnected");
-    }
-
-    @Override
     public void onSessionClosed(QBRTCSession qbrtcSession) {
         //showDialog("Session Closed");
     }
@@ -290,6 +285,11 @@ abstract public class QuickBloxFragment extends FaceFragment implements QBRTCCli
     @Override
     public void onCallAcceptByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
         //showDialog("Call Accepted");
+    }
+
+    @Override
+    public void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map) {
+        //showDialog("The remote robot disconnected");
     }
 
     @Override
