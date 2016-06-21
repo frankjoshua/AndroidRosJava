@@ -2,4 +2,4 @@
 source_root_dir = "/home/josh/efim/ros_ws/src"
 whitelisted_packages = "".split(';') if "" != "" else []
 blacklisted_packages = "".split(';') if "" != "" else []
-underlay_workspaces = "/home/josh/efim/ros_ws/devel;/opt/ros/indigo".split(';') if "/home/josh/efim/ros_ws/devel;/opt/ros/indigo" != "" else []
+underlay_workspaces = "/opt/ros/kinetic".split(';') if "/opt/ros/kinetic" != "" else []
