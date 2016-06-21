@@ -31,7 +31,7 @@
   
   <!-- Odometry from laser scans -->
   <!-- We use Hector mapping to generate odometry for us -->
-<!--  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen"> -->
+<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
     
     <!-- Frame names -->
     <param name="map" value="hector_map" />
@@ -52,8 +52,8 @@
     <param name="map_update_angle_thresh" value="0.06" />
     
     <!-- Advertising config --> 
-    <param name="scan_topic" value="/jn0/base_scan"/>
-  <!-- </node> -->
+    <param name="scan_topic" value="/scan"/>
+</node>
 
 
  <!-- Start Mapping Server -->
