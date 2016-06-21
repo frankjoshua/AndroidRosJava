@@ -1,0 +1,8 @@
+prefix=/home/josh/efim/ros_ws/devel
+
+Name: xv_11_laser_driver
+Description: Description of xv_11_laser_driver
+Version: 0.2.2
+Cflags: -I/home/josh/efim/ros_ws/src/xv_11_laser_driver/include
+Libs: -L/home/josh/efim/ros_ws/devel/lib 
+Requires: 
