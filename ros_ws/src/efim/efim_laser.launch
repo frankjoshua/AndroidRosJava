@@ -26,15 +26,16 @@
     <rosparam file="$(arg base_path)/base_local_planner_params.yaml" command="load"/>
   </node>
 
-<!-- Start Laser LIDAR -->
-<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node"/>
+  <!-- Start Laser LIDAR -->
+  <node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node"/>
+  
   <!-- Odometry from laser scans -->
   <!-- We use Hector mapping to generate odometry for us -->
-  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
+<!--  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen"> -->
     
     <!-- Frame names -->
     <param name="map" value="hector_map" />
-    <param name="base_link" value="base_footprint" />
+    <param name="base_link" value="base_link" />
     <param name="odom" value="odom" />
     
     <!-- Tf use -->
@@ -52,12 +53,12 @@
     
     <!-- Advertising config --> 
     <param name="scan_topic" value="/jn0/base_scan"/>
-  </node>
+  <!-- </node> -->
 
 
- <!-- Start Mapping Server -->
- <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
- <!--<node name="gmapping" pkg="gmapping" type="slam_gmapping"/>-->
-  <include file="$(arg base_path)/rtabmap_laser.launch"/>
+  <!-- Start Mapping Server -->
+  <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
+  <node name="gmapping" pkg="gmapping" type="slam_gmapping"/>
+  <!--<include file="$(arg base_path)/rtabmap_laser.launch"/>-->
 
 </launch>
