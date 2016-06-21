@@ -56,9 +56,9 @@
   <!-- </node> -->
 
 
-  <!-- Start Mapping Server -->
-  <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
-  <node name="gmapping" pkg="gmapping" type="slam_gmapping"/>
+ <!-- Start Mapping Server -->
+ <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
+ <node name="gmapping" pkg="gmapping" type="slam_gmapping"/>
   <!--<include file="$(arg base_path)/rtabmap_laser.launch"/>-->
 
 </launch>
