@@ -4,18 +4,18 @@
   
   <!-- Load URDF file -->
   <param name="robot_description" textfile="$(arg base_path)/efim.urdf.xacro" />
-<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
   <!-- ACML handles localiztion -->
   <include file="$(find amcl)/examples/amcl_diff.launch"/>
   <!--<node pkg="amcl" type="amcl" name="amcl"/>-->
 
-<!--<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
-  <param name="scan_height" value="10"/>
-  <param name="range_min" value="0.45"/>
-  <remap from="image" to="/camera/depth/image_raw"/>
-</node>-->
+  <!--<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
+    <param name="scan_height" value="10"/>
+    <param name="range_min" value="0.45"/>
+    <remap from="image" to="/camera/depth/image_raw"/>
+  </node>-->
 
   <!-- Move base handles navigation -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
@@ -31,7 +31,7 @@
   
   <!-- Odometry from laser scans -->
   <!-- We use Hector mapping to generate odometry for us -->
-<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
+  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
     
     <!-- Frame names -->
     <param name="map" value="hector_map" />
@@ -53,12 +53,12 @@
     
     <!-- Advertising config --> 
     <param name="scan_topic" value="/scan"/>
-</node>
+  </node>
 
 
- <!-- Start Mapping Server -->
- <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
- <node name="gmapping" pkg="gmapping" type="slam_gmapping"/>
-  <!--<include file="$(arg base_path)/rtabmap_laser.launch"/>-->
+  <!-- Start Mapping Server -->
+  <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
+  <!--<node name="gmapping" pkg="gmapping" type="slam_gmapping"/>-->
+  <include file="$(arg base_path)/rtabmap_laser.launch"/>
 
 </launch>
