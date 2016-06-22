@@ -2,6 +2,11 @@
   
   <arg name="base_path" value="/home/josh/efim/ros_ws/src/efim" />
   
+  <!-- Start Kinect -->
+  <include file="$(find freenect_launch)/launch/freenect.launch">
+    <arg name="depth_registration" value="true"/>
+  </include>
+
   <!-- Load URDF file -->
   <param name="robot_description" textfile="$(arg base_path)/efim.urdf.xacro" />
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
@@ -31,5 +36,8 @@
  <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
  <!--<node name="gmapping" pkg="gmapping" type="slam_gmapping"/>-->
  <include file="$(arg base_path)/rtabmap.launch"/>
+
+  <!-- Start RVIZ for visualization -->
+  <node name="rviz" pkg="rviz" type="rviz"/>
 
 </launch>

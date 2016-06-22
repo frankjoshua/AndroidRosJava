@@ -7,6 +7,12 @@
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
+  <!-- Start Kinect -->
+  <include file="$(find freenect_launch)/launch/freenect.launch">"
+    <arg name="camera" value="camera"/>
+    <arg name="depth_registration" value="true"/>
+  </include>
+
   <!-- ACML handles localiztion -->
   <include file="$(find amcl)/examples/amcl_diff.launch"/>
   <!--<node pkg="amcl" type="amcl" name="amcl"/>-->
@@ -34,7 +40,7 @@
   <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
     
     <!-- Frame names -->
-    <param name="map" value="hector_map" />
+    <param name="map_frame" value="hector_map" />
     <param name="base_link" value="base_link" />
     <param name="odom" value="odom" />
     
@@ -55,10 +61,15 @@
     <param name="scan_topic" value="/scan"/>
   </node>
 
+  <node pkg="tf" type="static_transform_publisher" name="scanmatcher_to_base"
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatcher_frame /base_link 100"/>
 
   <!-- Start Mapping Server -->
   <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
   <!--<node name="gmapping" pkg="gmapping" type="slam_gmapping"/>-->
   <include file="$(arg base_path)/rtabmap_laser.launch"/>
+
+  <!-- Start RVIZ for visualization -->
+  <node name="rviz" pkg="rviz" type="rviz"/>
 
 </launch>
