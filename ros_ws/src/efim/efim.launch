@@ -2,9 +2,14 @@
   
   <arg name="base_path" value="/home/josh/efim/ros_ws/src/efim" />
   
+  <!-- Start Kinect -->
+  <include file="$(find freenect_launch)/launch/freenect.launch">
+    <arg name="depth_registration" value="true"/>
+  </include>
+
   <!-- Load URDF file -->
   <param name="robot_description" textfile="$(arg base_path)/efim.urdf.xacro" />
-<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
   <!-- ACML handles localiztion -->
@@ -18,46 +23,21 @@
 </node>-->
 
   <!-- Move base handles navigation -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  <!--<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <rosparam file="$(arg base_path)/costmap_common_params.yaml" command="load" ns="global_costmap"/>
     <rosparam file="$(arg base_path)/costmap_common_params.yaml" command="load" ns="local_costmap"/>
     <rosparam file="$(arg base_path)/global_costmap_params.yaml" command="load"/>
     <rosparam file="$(arg base_path)/local_costmap_params.yaml" command="load"/>
     <rosparam file="$(arg base_path)/base_local_planner_params.yaml" command="load"/>
-  </node>
-
-<!-- Start Laser LIDAR -->
-<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node"/>
-  <!-- Odometry from laser scans -->
-  <!-- We use Hector mapping to generate odometry for us -->
-  <node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
-    
-    <!-- Frame names -->
-    <param name="map" value="hector_map" />
-    <param name="base_link" value="base_footprint" />
-    <param name="odom" value="odom" />
-    
-    <!-- Tf use -->
-    <param name="pub_map_odom_transform" value="false"/>
-    <param name="pub_map_scanmatch_transform" value="true"/>
-    <param name="pub_odometry" value="true"/>
-    
-    <!-- Map size / start point -->
-    <param name="map_resolution" value="0.050"/>
-    <param name="map_size" value="2048"/>
-    <param name="map_multi_res_levels" value="2" />
-    
-    <!-- Map update parameters -->
-    <param name="map_update_angle_thresh" value="0.06" />
-    
-    <!-- Advertising config --> 
-    <param name="scan_topic" value="/jn0/base_scan"/>
-  </node>
+  </node>-->
 
 
  <!-- Start Mapping Server -->
  <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
  <!--<node name="gmapping" pkg="gmapping" type="slam_gmapping"/>-->
-  <include file="$(arg base_path)/rtabmap_laser.launch"/>
+ <include file="$(arg base_path)/rtabmap.launch"/>
+
+  <!-- Start RVIZ for visualization -->
+  <node name="rviz" pkg="rviz" type="rviz"/>
 
 </launch>

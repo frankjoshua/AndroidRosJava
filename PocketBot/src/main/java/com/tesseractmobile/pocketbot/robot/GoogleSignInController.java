@@ -19,7 +19,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -58,9 +60,25 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
         mAuth = FirebaseAuth.getInstance();
     }
 
+    /**
+     * Starts the sign in or signs out if already signed in
+     * @param fragmentActivity
+     * @param requestCode
+     */
     public void startSignin(final FragmentActivity fragmentActivity, final int requestCode) {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        fragmentActivity.startActivityForResult(signInIntent, requestCode);
+        if(mGoogleApiClient.isConnected()){
+            FirebaseAuth.getInstance().signOut();
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(@NonNull Status status) {
+                    mGoogleApiClient.disconnect();
+                    Toast.makeText(fragmentActivity, "Signed Out!", Toast.LENGTH_LONG);
+                }
+            });
+        } else {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            fragmentActivity.startActivityForResult(signInIntent, requestCode);
+        }
     }
 
     public void handleSignInResult(final Context context, final GoogleSignInResult result) {
