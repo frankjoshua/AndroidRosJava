@@ -61,8 +61,11 @@
     <param name="scan_topic" value="/scan"/>
   </node>
 
+  <node pkg="tf" type="static_transform_publisher" name="odom_to_base"
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /base_link /scanmatch_odom 100"/>
   <node pkg="tf" type="static_transform_publisher" name="scanmatcher_to_base"
     args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatcher_frame /base_link 100"/>
+ 
 
   <!-- Start Mapping Server -->
   <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->

@@ -1,5 +1,5 @@
 local_costmap:
-  global_frame: odom
+  global_frame: scanmatch_odom
   robot_base_frame: base_link
   rolling_window: true
   static_map: false
