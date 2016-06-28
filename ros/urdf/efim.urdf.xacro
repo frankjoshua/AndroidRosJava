@@ -101,26 +101,25 @@
         <plugin name="camera_controller" filename="libgazebo_ros_openni_kinect.so">
             <cameraName>camera</cameraName>
             <alwaysOn>true</alwaysOn>
-                <updateRate>10.0</updateRate>
-                <cameraName>camera</cameraName>
-                <frameName>camera</frameName>                   
-            <imageTopicName>rgb/image_raw</imageTopicName>
+            <updateRate>10.0</updateRate>
+            <frameName>camera_link</frameName>                   
+            <imageTopicName>rgb/image_rect_color</imageTopicName>
             <depthImageTopicName>depth_registered/image_raw</depthImageTopicName>
             <pointCloudTopicName>depth/points</pointCloudTopicName>
             <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>              
             <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
             <pointCloudCutoff>0.4</pointCloudCutoff>                
-                <hackBaseline>0.07</hackBaseline>
-                <distortionK1>0.0</distortionK1>
-                <distortionK2>0.0</distortionK2>
-                <distortionK3>0.0</distortionK3>
-                <distortionT1>0.0</distortionT1>
-                <distortionT2>0.0</distortionT2>
+            <hackBaseline>0.07</hackBaseline>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
             <CxPrime>0.0</CxPrime>
             <Cx>0.0</Cx>
             <Cy>0.0</Cy>
             <focalLength>0.0</focalLength>
-            </plugin>
+        </plugin>
     </sensor>
 </gazebo>
 
@@ -299,7 +298,7 @@
 <gazebo>
   <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
     <updateRate>100.0</updateRate>
-    <robotNamespace>/</robotNamespace>
+    <robotNamespace></robotNamespace>
     <leftFrontJoint>axis_front_left</leftFrontJoint>
     <rightFrontJoint>axis_front_right</rightFrontJoint>
     <leftRearJoint>axis_rear_left</leftRearJoint>
@@ -310,11 +309,42 @@
     <torque>10</torque>
     <commandTopic>cmd_vel</commandTopic>
     <broadcastTF>1</broadcastTF>
+    <odometryFrame>/odom_frame_gazebo</odometryFrame>
+    <odometryTopic>/odom_gazebo</odometryTopic>
   </plugin>
   <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
     <jointName>axis_front_left, axis_front_right, axis_rear_left, axis_rear_right</jointName>
+    <updateRate>100</updateRate>
   </plugin>
 </gazebo>
+
+<gazebo reference="laser">
+    <material>Gazebo/Blue</material>
+    <sensor type="ray" name="head_hokuyo_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>40</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570795</min_angle>
+            <max_angle>1.570795</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>30.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>/scan</topicName>
+        <frameName>laser</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
 </robot>
 
 
