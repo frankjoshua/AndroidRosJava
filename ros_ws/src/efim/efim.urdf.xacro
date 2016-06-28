@@ -154,9 +154,9 @@
 
   <joint name="laser_joint" type="continuous">
     <axis xyz="0 0 1"/>
-    <parent link="base_link"/>
+    <parent link="body_link"/>
     <child link="laser"/>
-    <origin rpy="0 0 0" xyz="0.2 0 0.5"/>
+    <origin rpy="0 0 0" xyz="0.0 0 0.55"/>
   </joint> 
 
   <link name="hitch_front_link">

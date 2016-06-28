@@ -14,11 +14,11 @@
   </include>
 
   <!-- ACML handles localiztion for static maps -->
-  <node pkg="amcl" type="amcl" name="amcl" output="screen">
+  <!--<node pkg="amcl" type="amcl" name="amcl" output="screen">
   <param name="odom_model_type" value="diff"/>
   <param name="odom_frame_id" value="odom"/>
   <param name="use_map_topic" value="true"/>
-</node>
+</node>-->
   <!--<node pkg="amcl" type="amcl" name="amcl"/>-->
 
   <!--<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
