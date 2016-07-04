@@ -107,7 +107,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public void sendSensorData(final boolean required) {
         if(Constants.LOGGING){
-            Log.d(TAG,  "sendSensorData Required: " + required);
+            //Log.d(TAG,  "sendSensorData Required: " + required);
         }
         final long uptime = SystemClock.uptimeMillis();
         if(required || uptime >= mLastSensorTransmision + mSensorDelay) {
@@ -127,7 +127,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
             }
         } else {
             if(Constants.LOGGING){
-                Log.d(TAG, mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
+                Log.e(TAG, mSensorDelay + " Data dropped - too fast: " + (uptime - mLastSensorTransmision));
             }
             System.gc();
         }
