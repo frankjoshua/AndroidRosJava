@@ -19,7 +19,7 @@ allprojects {
 
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-
+apply from: 'auto-version.gradle'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -37,31 +37,40 @@ android {
         //Min sdk 14 required by Quickblox
         minSdkVersion 14
         targetSdkVersion 23
-        //17 - 1.9.4 released 2/10/16
-        versionCode 21
-        versionName "1.9.8"
+        versionCode calculateVersionCode()
+        versionName calculateVersionName()
 
         // Enabling multidex support.
         multiDexEnabled true
 
         //Enable Testing
+        testApplicationId "com.tesseractmobile.pocketbot.test"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
     }
 
     signingConfigs {
         debug {
             storeFile file("debug.keystore")
+        }
+        release {
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
+            testCoverageEnabled true
+            testProguardFile 'proguard-test-rules.pro'
+            versionNameSuffix "-beta"
+            //ext.betaDistributionGroupAliases="pocketbotbeta"
+            ext.betaDistributionGroupAliases="josh"
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -74,6 +83,13 @@ android {
 
     dexOptions {
         javaMaxHeapSize "4g"
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        //Stops false positives with the % symbol
+        disable "StringFormatInvalid","StringFormatMatches"
     }
 }
 
@@ -132,6 +148,21 @@ dependencies {
     compile 'org.altbeacon:android-beacon-library:2.+'
     compile 'com.pubnub:pubnub-android:3.7.5'
     compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
+    //Testing
+    androidTestCompile 'com.android.support:support-annotations:+'
+    compile 'com.android.support:support-annotations:+'
+    androidTestCompile 'com.android.support.test:runner:+'
+    androidTestCompile 'com.android.support.test:rules:+'
+    // Optional -- UI testing with Espresso
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    // Required -- JUnit 4 framework
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'junit:junit:+'
+}
+
+task pushRelease(type: Exec){
+    description "Calls push_release.bat with version name"
+    commandLine 'cmd', '/c', 'push_release', "${calculateVersionName()}"
 }
 
 apply plugin: 'com.google.gms.google-services'
