@@ -14,6 +14,8 @@ node ('ci1') {
 
     stage 'Stage Connected Test'
     sh "cd PocketBot && ./gradlew uninstallAll"
+    sh "cd PocketBot && ./gradlew installDebug"
+    sh "cd PocketBot && ./gradlew grantPermissions"
     sh "cd PocketBot && ./gradlew connectedDebugAndroidTest"
 
     stage 'Stage Beta Release'

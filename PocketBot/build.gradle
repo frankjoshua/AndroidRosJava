@@ -61,7 +61,7 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false //usb serial for android does not currently work with proguard
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
             testCoverageEnabled true
             testProguardFile 'proguard-test-rules.pro'
@@ -70,8 +70,8 @@ android {
             ext.betaDistributionGroupAliases="josh"
         }
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -166,6 +166,14 @@ dependencies {
 task pushRelease(type: Exec){
     description "Calls push_release.bat with version name"
     commandLine 'cmd', '/c', 'push_release', "${calculateVersionName()}"
+}
+
+task grantPermissions(){
+    description "Allows permissions to work with Marshmallow"
+    def adb = android.getAdbExe().toString()
+    def applicationId = "com.tesseractmobile.pocketbot"
+    "${adb} shell pm grant ${applicationId} android.permission.RECORD_AUDIO".execute()
+    "${adb} shell pm grant ${applicationId} android.permission.CAMERA".execute()
 }
 
 apply plugin: 'com.google.gms.google-services'

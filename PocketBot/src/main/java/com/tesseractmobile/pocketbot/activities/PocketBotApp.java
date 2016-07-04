@@ -29,15 +29,6 @@ public class PocketBotApp extends Application{
         super.onCreate();
         //Track errors
         Fabric.with(this, new Crashlytics());
-        //Check if robot is new
-        final String uuid = PreferenceManager.getDefaultSharedPreferences(this).getString(PocketBotSettings.KEY_ROBOT_ID, PocketBotSettings.ROBOT_ID_NOT_SET);
-        final boolean isNew;
-        if(uuid.equals(PocketBotSettings.ROBOT_ID_NOT_SET)){
-            //Mark robot as new
-            isNew = true;
-        } else {
-            isNew = false;
-        }
         //Get robot id first so Shared preference listeners don't trigger
         final String robotId = PreferenceManager.getDefaultSharedPreferences(this).getString(PocketBotSettings.KEY_ROBOT_ID, PocketBotSettings.ROBOT_ID_NOT_SET);
         //Init DataStore
