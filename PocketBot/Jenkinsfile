@@ -6,19 +6,19 @@ node ('ci1') {
     git credentialsId: '9a65d10b-144b-4b63-9f93-91f9ef1ce543', url: 'ssh://git@stash.tesseractmobile.net:7999/arduino/efim.git'
 
     stage 'Stage Build'
-    sh "chmod +x ./gradlew"
-    sh "./gradlew clean assembleDebug"
+    sh "chmod +x ./PocketBot/gradlew"
+    sh "./PocketBot/gradlew clean assembleDebug"
 
     stage 'Stage Unit Test'
-    sh "./gradlew test"
+    sh "./PocketBot/gradlew test"
 
     stage 'Stage Connected Test'
-    sh "./gradlew uninstallAll"
-    sh "./gradlew connectedDebugAndroidTest"
+    sh "./PocketBot/gradlew uninstallAll"
+    sh "./PocketBot/gradlew connectedDebugAndroidTest"
 
     stage 'Stage Beta Release'
     //Update build number
-    sh "./gradlew incrementVersion"
+    sh "./PocketBot/gradlew incrementVersion"
     sh "git config --global user.email \"jenkins@tesseractmobile.com\""
     sh "git config --global user.name \"Jenkins\""
     sh "git commit -a -m\"Updated version number from Jenkins build $buildNumber\""
@@ -28,5 +28,5 @@ node ('ci1') {
     sh "git merge origin/master"
     sh "git push origin beta"
     //Upload to Crashlytics beta
-    sh "./gradlew assembleDebug crashlyticsUploadDistributionDebug"
+    sh "./PocketBot/gradlew assembleDebug crashlyticsUploadDistributionDebug"
 }
