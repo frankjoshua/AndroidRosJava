@@ -66,8 +66,8 @@ android {
             testCoverageEnabled true
             testProguardFile 'proguard-test-rules.pro'
             versionNameSuffix "-beta"
-            //ext.betaDistributionGroupAliases="pocketbotbeta"
-            ext.betaDistributionGroupAliases="josh"
+            ext.betaDistributionGroupAliases="pocketbotbeta"
+            //ext.betaDistributionGroupAliases="josh"
         }
         release {
             minifyEnabled false
