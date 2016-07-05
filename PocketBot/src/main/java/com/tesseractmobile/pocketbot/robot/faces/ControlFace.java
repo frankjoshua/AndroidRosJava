@@ -52,7 +52,7 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     }
 
     private void handleMessage(Message msg) {
-        final String data =  "Heading: " + mJoy2.heading + " JoyX: " + numberFormat.format(mJoy1.X) + " JoyY: " + numberFormat.format(mJoy1.Y);// + " JoyZ: " + numberFormat.format(z);
+        final String data =  "H: " + mJoy2.heading + " X: " + numberFormat.format(mJoy1.X) + " Y: " + numberFormat.format(mJoy1.Y) + " A: " + mJoy1.A + " B: " + mJoy1.B;
         mFaceData.setText(data);
         if(inputText != null){
             mInputTextView.setText(inputText);
