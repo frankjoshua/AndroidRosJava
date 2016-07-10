@@ -79,14 +79,6 @@ public class DataStore implements SharedPreferences.OnSharedPreferenceChangeList
         for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
             onAuthCompleteListener.onAuthComplete(authData);
         }
-
-        setupUser(authData, robotId);
-        setupRobot(robotId);
-        mFirebasePreferenceSync.start(getRobots());
-        //Let everyone know we are logged in
-        for (OnAuthCompleteListener onAuthCompleteListener : mOnAuthCompleteListeners) {
-            onAuthCompleteListener.onAuthComplete(authData);
-        }
         PocketBotSettings.registerOnSharedPreferenceChangeListener(mContext, DataStore.this);
     }
 

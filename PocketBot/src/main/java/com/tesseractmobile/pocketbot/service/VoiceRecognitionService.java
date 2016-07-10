@@ -35,6 +35,9 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
     private VoiceRecognitionListener mVoiceRecognitionListener;
     private VoiceRecognitionState mState = VoiceRecognitionState.READY;
 
+    private boolean doError;
+    private boolean doEndOfSpeech;
+    private boolean doBeginningOfSpeech;
 
     @Override
     public void onCreate() {
@@ -145,13 +148,19 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     @Override
     public void onReadyForSpeech(final Bundle params) {
+        doError = true;
+        doEndOfSpeech = true;
+        doBeginningOfSpeech = true;
         setState(VoiceRecognitionState.READY_FOR_SPEECH);
         //setEmotion(Emotion.ACCEPTED);
     }
 
     @Override
     public void onBeginningOfSpeech() {
-        setState(VoiceRecognitionState.BEGINNING_OF_SPEECH);
+        if (doBeginningOfSpeech) {
+            doBeginningOfSpeech = false;
+            setState(VoiceRecognitionState.BEGINNING_OF_SPEECH);
+        }
         //setEmotion(Emotion.AWARE);
     }
 
@@ -167,7 +176,9 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
 
     @Override
     public void onEndOfSpeech() {
-        setState(VoiceRecognitionState.END_OF_SPEECH);
+        if (doEndOfSpeech) {
+            setState(VoiceRecognitionState.END_OF_SPEECH);
+        }
         //Show joy
         //setEmotion(Emotion.JOY);
     }
@@ -188,6 +199,7 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
                     error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
                 } else {
                     //This should not happen but it does
+                    //https://code.google.com/p/android/issues/detail?id=179293
                     Log.e(TAG, "Bad SpeechRecognizer.ERROR_NO_MATCH error in state " + mState);
                 }
                 break;

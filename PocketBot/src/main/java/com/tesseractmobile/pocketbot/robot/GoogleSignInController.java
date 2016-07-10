@@ -130,11 +130,13 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
 
     @Override
     public void onConnected(Bundle result) {
-        Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mAuthData);
-        Toast.makeText(mContext, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
-        //mSignInButton.setEnabled(true);
-        //Auto sign in next time
-        PocketBotSettings.setAutoSignIn(mContext, true);
+        if(mGoogleApiClient.isConnected()) {
+            Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mAuthData);
+            Toast.makeText(mContext, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
+            //mSignInButton.setEnabled(true);
+            //Auto sign in next time
+            PocketBotSettings.setAutoSignIn(mContext, true);
+        }
     }
 
     @Override

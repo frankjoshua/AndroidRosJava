@@ -2,9 +2,11 @@ buildscript {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070'
         classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.google.gms:google-services:3.0.0'
     }
@@ -17,9 +19,10 @@ allprojects {
     }
 }
 
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-
+apply from: 'auto-version.gradle'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -29,7 +32,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
 
     defaultConfig {
@@ -37,31 +40,40 @@ android {
         //Min sdk 14 required by Quickblox
         minSdkVersion 14
         targetSdkVersion 23
-        //17 - 1.9.4 released 2/10/16
-        versionCode 21
-        versionName "1.9.8"
+        versionCode calculateVersionCode()
+        versionName calculateVersionName()
 
         // Enabling multidex support.
         multiDexEnabled true
 
         //Enable Testing
+        testApplicationId "com.tesseractmobile.pocketbot.test"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-        }
     }
 
     signingConfigs {
         debug {
             storeFile file("debug.keystore")
+        }
+        release {
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false //usb serial for android does not currently work with proguard
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
+            testCoverageEnabled true
+            testProguardFile 'proguard-test-rules.pro'
+            versionNameSuffix "-beta"
+            ext.betaDistributionGroupAliases="pocketbotbeta"
+            //ext.betaDistributionGroupAliases="josh"
+        }
+        release {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -75,11 +87,18 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        //Stops false positives with the % symbol
+        disable "StringFormatInvalid","StringFormatMatches"
+    }
 }
 
 ext {
-    playServicesVersion = '9.0.2'
-    supportLibVersion = '23.4.0'
+    playServicesVersion = '9.2.0'
+    supportLibVersion = '24.0.0'
     qbSdkVersion = '2.5.2'
 }
 
@@ -124,14 +143,36 @@ dependencies {
     compile "com.quickblox:quickblox-android-sdk-videochat-webrtc:${qbSdkVersion}@aar"
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'ai.api:sdk:1.7.1@aar'
+    compile 'ai.api:sdk:1.9.0@aar'
     compile 'commons-io:commons-io:2.4'
     compile "com.google.firebase:firebase-core:${playServicesVersion}"
     compile "com.google.firebase:firebase-database:${playServicesVersion}"
     compile "com.google.firebase:firebase-auth:${playServicesVersion}"
     compile 'org.altbeacon:android-beacon-library:2.+'
-    compile 'com.pubnub:pubnub-android:3.7.5'
     compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
+    //Testing
+    androidTestCompile 'com.android.support:support-annotations:+'
+    compile 'com.android.support:support-annotations:+'
+    androidTestCompile 'com.android.support.test:runner:+'
+    androidTestCompile 'com.android.support.test:rules:+'
+    // Optional -- UI testing with Espresso
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    // Required -- JUnit 4 framework
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'junit:junit:+'
+}
+
+task pushRelease(type: Exec){
+    description "Calls push_release.bat with version name"
+    commandLine 'cmd', '/c', 'push_release', "${calculateVersionName()}"
+}
+
+task grantPermissions(){
+    description "Allows permissions to work with Marshmallow"
+    def adb = android.getAdbExe().toString()
+    def applicationId = "com.tesseractmobile.pocketbot"
+    "${adb} shell pm grant ${applicationId} android.permission.RECORD_AUDIO".execute()
+    "${adb} shell pm grant ${applicationId} android.permission.CAMERA".execute()
 }
 
 apply plugin: 'com.google.gms.google-services'

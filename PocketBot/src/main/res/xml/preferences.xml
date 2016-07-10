@@ -25,4 +25,9 @@
         android:title="Fast Face Tracking"
         android:summary="Turns off smile and landmark detection"
         android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="auto_sign_in"
+        android:title="Sign in Automatically"
+        android:summary="Login when app starts"
+        android:defaultValue="false" />
 </PreferenceScreen>
