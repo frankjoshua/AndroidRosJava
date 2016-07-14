@@ -97,9 +97,9 @@ android {
 }
 
 ext {
-    playServicesVersion = '9.2.0'
+    playServicesVersion = '9.2.1'
     supportLibVersion = '24.0.0'
-    qbSdkVersion = '2.5.2'
+    qbSdkVersion = '2.6'
 }
 
 dependencies {

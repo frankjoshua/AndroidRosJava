@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -47,7 +48,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         mSignInView.findViewById(R.id.sign_in_button).setOnClickListener(this);
 
         mRobotRecyclerView = (RecyclerView) view.findViewById(R.id.rvRobots);
-        mRobotRecyclerView.setHasFixedSize(true);
+        mRobotRecyclerView.setHasFixedSize(false); //If this is true the layout may not show new robots
         mRobotRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         //Setup list view after logging in
@@ -61,10 +62,15 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
 
     @Override
     public void onAuthComplete(final AuthData authData) {
+        setupRecyclerView();
+    }
+
+    private void setupRecyclerView() {
         final Context context = getContext();
         if(context == null){
             return;
         }
+        Log.d(RobotSelectionDialog.class.getSimpleName(), "setupRecyclerView()");
         //Hide sign in
         mSignInView.setVisibility(View.GONE);
         //Set adapter
@@ -73,6 +79,7 @@ public class RobotSelectionDialog extends DialogFragment implements DataStore.On
         mRobotRecyclerView.setAdapter(new FirebaseRecyclerAdapter<RobotInfo.Settings, RobotInfoViewHolder>(RobotInfo.Settings.class, R.layout.robot_list_item, RobotInfoViewHolder.class, userListRef, mOnlyUserRobots) {
             @Override
             protected void populateViewHolder(final RobotInfoViewHolder viewHolder, final RobotInfo.Settings model, final int position) {
+                Log.d(RobotSelectionDialog.class.getSimpleName(), "populateViewHolder()");
                 viewHolder.robotName.setText(model.prefs.robot_name);
 
                 String status = "Robot Status: ";

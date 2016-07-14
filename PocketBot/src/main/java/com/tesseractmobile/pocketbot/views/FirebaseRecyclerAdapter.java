@@ -29,6 +29,7 @@
 package com.tesseractmobile.pocketbot.views;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,6 +105,7 @@ public abstract class FirebaseRecyclerAdapter<T, VH extends RecyclerView.ViewHol
         mSnapshots.setOnChangedListener(new FirebaseArray.OnChangedListener() {
             @Override
             public void onChanged(EventType type, int index, int oldIndex) {
+                Log.d(FirebaseRecyclerAdapter.class.getSimpleName(), "onChanged("+type.toString()+","+index+")");
                 switch (type) {
                     case Added:
                         notifyItemInserted(index);
