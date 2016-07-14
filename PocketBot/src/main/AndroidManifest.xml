@@ -117,7 +117,8 @@
 
         <service android:name=".service.UsbConnectionService" />
         <service android:name=".service.UsbSerialService" />
-        <service android:name=".service.VoiceRecognitionService" />
+        <service android:name=".service.GoogleVoiceRecognitionService" />
+        <service android:name=".service.HoundVoiceRecognitionService" />
         <service android:name=".service.BluetoothService" />
         <service android:name=".service.BluetoothClassicService" />
 

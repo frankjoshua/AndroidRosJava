@@ -14,30 +14,26 @@ import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.tesseractmobile.pocketbot.robot.VoiceRecognitionService;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by josh on 8/25/2015.
  */
-public class VoiceRecognitionService extends Service implements RecognitionListener{
+public class GoogleVoiceRecognitionService extends BaseVoiceRecognitionService implements RecognitionListener{
 
-    private  static final String TAG = VoiceRecognitionService.class.getSimpleName();
-    private static final String  SPEECH_INSTRUTIONS             = "Please wait for the beep before speaking.";//"Touch my mouth if you want to error something";
+    private  static final String TAG = GoogleVoiceRecognitionService.class.getSimpleName();
 
-    private static final int     VOICE_RECOGNITION_REQUEST_CODE = 0;
     private static final boolean HIDE_VOICE_PROMPT              = true;
 
-    final private IBinder binder = new LocalBinder();
     private SpeechRecognizer mSpeechRecognizer;
     private boolean              mHideVoicePrompt;
-
-    private VoiceRecognitionListener mVoiceRecognitionListener;
-    private VoiceRecognitionState mState = VoiceRecognitionState.READY;
-
     private boolean doError;
     private boolean doEndOfSpeech;
     private boolean doBeginningOfSpeech;
+
 
     @Override
     public void onCreate() {
@@ -45,6 +41,10 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         // Load settings
         mHideVoicePrompt = HIDE_VOICE_PROMPT;
 
+        if (checkVoiceRecognition()) {
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
+            mSpeechRecognizer.setRecognitionListener(this);
+        }
     }
 
     @Override
@@ -53,30 +53,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         mSpeechRecognizer.stopListening();
         mSpeechRecognizer.cancel();
         mSpeechRecognizer.destroy();
-    }
-
-    private void error(final String text){
-        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
-        if(voiceRecognitionListener != null){
-            voiceRecognitionListener.onVoiceRecognitionError(text);
-        }
-    }
-
-
-    private void onTextInput(final String text){
-        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
-        if(voiceRecognitionListener != null) {
-            voiceRecognitionListener.onTextInput(text);
-        }
-    }
-
-    private void setState(final VoiceRecognitionState state){
-        mState = state;
-        final VoiceRecognitionListener voiceRecognitionListener = this.mVoiceRecognitionListener;
-        if(voiceRecognitionListener != null) {
-            voiceRecognitionListener.onVoiceRecognitionStateChange(state);
-        }
-        Log.d(TAG, mState.toString());
     }
 
     private boolean checkVoiceRecognition() {
@@ -103,8 +79,8 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
      */
     protected synchronized void lauchListeningIntent(final String prompt) {
 
-        if(mState != VoiceRecognitionState.READY){
-            Log.d(TAG, "Unable to listen. State is " +  mState.toString());
+        if(getState() != VoiceRecognitionState.READY){
+            Log.d(TAG, "Unable to listen. State is " +  getState().toString());
             return;
         }
         Log.d(TAG, "Launching Voice Prompt: " + (prompt != null ? prompt : "null"));
@@ -146,74 +122,6 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         // new BotTask().execute("Are you listening?");
     }
 
-    @Override
-    public void onReadyForSpeech(final Bundle params) {
-        doError = true;
-        doEndOfSpeech = true;
-        doBeginningOfSpeech = true;
-        setState(VoiceRecognitionState.READY_FOR_SPEECH);
-        //setEmotion(Emotion.ACCEPTED);
-    }
-
-    @Override
-    public void onBeginningOfSpeech() {
-        if (doBeginningOfSpeech) {
-            doBeginningOfSpeech = false;
-            setState(VoiceRecognitionState.BEGINNING_OF_SPEECH);
-        }
-        //setEmotion(Emotion.AWARE);
-    }
-
-    @Override
-    public void onRmsChanged(final float rmsdB) {
-        // error("Sound levels changed to " + rmsdB + " decibals");
-    }
-
-    @Override
-    public void onBufferReceived(final byte[] buffer) {
-        error("I hear something");
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-        if (doEndOfSpeech) {
-            setState(VoiceRecognitionState.END_OF_SPEECH);
-        }
-        //Show joy
-        //setEmotion(Emotion.JOY);
-    }
-
-    @Override
-    public void onError(final int error) {
-        Log.d(TAG, "Error in state " + mState.toString() + " error code " + Integer.toString(error));
-
-        //Best practice: call setState() first then out put the error
-        switch (error) {
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                setState(VoiceRecognitionState.READY);
-                error("I didn't hear you. " + SPEECH_INSTRUTIONS);
-                break;
-            case SpeechRecognizer.ERROR_NO_MATCH:
-                if(mState == VoiceRecognitionState.END_OF_SPEECH){
-                    setState(VoiceRecognitionState.READY);
-                    error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
-                } else {
-                    //This should not happen but it does
-                    //https://code.google.com/p/android/issues/detail?id=179293
-                    Log.e(TAG, "Bad SpeechRecognizer.ERROR_NO_MATCH error in state " + mState);
-                }
-                break;
-            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                setState(VoiceRecognitionState.ERROR);
-                error("I'm sorry, but my speech recognizer is busy. Who ever programmed me probably forgot to close the service properly.");
-                break;
-            default:
-                setState(VoiceRecognitionState.ERROR);
-                error("I had and unknown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
-                break;
-        }
-
-    }
 
     @Override
     public synchronized void onResults(final Bundle results) {
@@ -249,30 +157,78 @@ public class VoiceRecognitionService extends Service implements RecognitionListe
         error("Event " + eventType);
     }
 
-    public void registerVoiceRecognitionListener(final VoiceRecognitionListener voiceRecognitionListener){
-        this.mVoiceRecognitionListener = voiceRecognitionListener;
-        if (checkVoiceRecognition()) {
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this, ComponentName.unflattenFromString("com.google.android.googlequicksearchbox/com.google.android.voicesearch.serviceapi.GoogleRecognitionService"));
-            mSpeechRecognizer.setRecognitionListener(this);
-        }
-    }
-
-    public void unregisterVoiceRecognitionListener(final VoiceRecognitionListener voiceRecognitionListener){
-        this.mVoiceRecognitionListener = null;
+    @Override
+    public void onReadyForSpeech(final Bundle params) {
+        doError = true;
+        doEndOfSpeech = true;
+        doBeginningOfSpeech = true;
+        setState(VoiceRecognitionState.READY_FOR_SPEECH);
+        //setEmotion(Emotion.ACCEPTED);
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
+    public void onBeginningOfSpeech() {
+        if (doBeginningOfSpeech) {
+            doBeginningOfSpeech = false;
+            setState(VoiceRecognitionState.BEGINNING_OF_SPEECH);
+        }
+        //setEmotion(Emotion.AWARE);
     }
 
+    @Override
+    public void onRmsChanged(float v) {
+
+    }
+
+    @Override
+    public void onBufferReceived(byte[] bytes) {
+
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        if (doEndOfSpeech) {
+            setState(VoiceRecognitionState.END_OF_SPEECH);
+        }
+        //Show joy
+        //setEmotion(Emotion.JOY);
+    }
+
+    @Override
+    public void onError(final int error) {
+        Log.d(TAG, "Error in state " + getState().toString() + " error code " + Integer.toString(error));
+
+        //Best practice: call setState() first then out put the error
+        switch (error) {
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                setState(VoiceRecognitionState.READY);
+                error("I didn't hear you. " + SPEECH_INSTRUTIONS);
+                break;
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                if(getState() == VoiceRecognitionState.END_OF_SPEECH){
+                    setState(VoiceRecognitionState.READY);
+                    error("I'm sorry, I could not understand you. " + SPEECH_INSTRUTIONS);
+                } else {
+                    //This should not happen but it does
+                    //https://code.google.com/p/android/issues/detail?id=179293
+                    Log.e(TAG, "Bad SpeechRecognizer.ERROR_NO_MATCH error in state " + getState());
+                }
+                break;
+            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                setState(VoiceRecognitionState.ERROR);
+                error("I'm sorry, but my speech recognizer is busy. Who ever programmed me probably forgot to close the service properly.");
+                break;
+            default:
+                setState(VoiceRecognitionState.ERROR);
+                error("I had and unknown error in my speech system. The error code is " + error + ". I'm sorry that I can not be more helpful.");
+                break;
+        }
+
+    }
+
+    @Override
     public void startListening() {
         lauchListeningIntent(null);
     }
 
-    public class LocalBinder extends Binder {
-        public VoiceRecognitionService getService(){
-            return VoiceRecognitionService.this;
-        }
-    }
 }

@@ -10,7 +10,6 @@ import com.tesseractmobile.pocketbot.activities.SpeechState;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 import com.tesseractmobile.pocketbot.views.MouthView;
 

@@ -29,6 +29,9 @@ repositories {
     maven {
         url "https://github.com/QuickBlox/quickblox-android-sdk-releases/raw/master/"
     }
+    maven {
+        url 'https://houndify.com/maven/'
+    }
 }
 
 android {
@@ -38,7 +41,8 @@ android {
     defaultConfig {
         applicationId "com.tesseractmobile.pocketbot"
         //Min sdk 14 required by Quickblox
-        minSdkVersion 14
+        //Sdk 15 required by Houndify
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode calculateVersionCode()
         versionName calculateVersionName()
@@ -105,7 +109,7 @@ ext {
 dependencies {
 
     //compile project(':openCVLibrary300')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "com.android.support:support-v4:${supportLibVersion}"
     //compile 'com.google.android.gms:play-services:7.8.0'
 
@@ -150,6 +154,13 @@ dependencies {
     compile "com.google.firebase:firebase-auth:${playServicesVersion}"
     compile 'org.altbeacon:android-beacon-library:2.+'
     compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
+    //Houndify
+    compile ('hound.android:hound-sdk:0.2.15@aar'){
+        transitive=true
+    }
+    compile ('hound.android:phrasespotter:1.4.0'){
+        transitive=true
+    }
     //Testing
     androidTestCompile 'com.android.support:support-annotations:+'
     compile 'com.android.support:support-annotations:+'

@@ -15,7 +15,10 @@ import com.quickblox.core.QBSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.robot.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.BaseVoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.GoogleVoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.HoundVoiceRecognitionService;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -45,7 +48,7 @@ public class PocketBotApp extends Application{
         final ServiceConnection voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                VoiceRecognitionService voiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
+                VoiceRecognitionService voiceRecognitionService = ((BaseVoiceRecognitionService.LocalBinder) service).getService();
                 voiceRecognitionService.registerVoiceRecognitionListener(Robot.get().getVoiceRecognitionListener());
                 Robot.get().setVoiceRecognitionService(voiceRecognitionService);
             }
@@ -56,7 +59,7 @@ public class PocketBotApp extends Application{
             }
         };
 
-        final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
+        final Intent bindIntent = new Intent(this, HoundVoiceRecognitionService.class);
         if (bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false) {
             throw new UnsupportedOperationException("Error binding to service");
         }

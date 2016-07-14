@@ -8,8 +8,9 @@ import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 import com.tesseractmobile.pocketbot.robot.SpeechStateListener;
+import com.tesseractmobile.pocketbot.robot.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.GoogleVoiceRecognitionService;
 
 /**
  * Created by josh on 10/17/2015.
