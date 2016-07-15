@@ -68,6 +68,7 @@ public class FaceListFragment extends Fragment implements AdapterView.OnItemClic
             final ImageView ivIcon = (ImageView) view.findViewById(R.id.ivFaceIcon);
             final LinearLayout llLock = (LinearLayout) view.findViewById(R.id.llLock);
             final FaceInfo faceInfo = (FaceInfo) listView.getItemAtPosition(position);
+            //view.setBackgroundResource(faceInfo.background);
             tvName.setText(faceInfo.name);
             tvInfo.setText(faceInfo.info);
             ivIcon.setImageResource(faceInfo.icon);

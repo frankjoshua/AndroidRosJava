@@ -182,6 +182,9 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
      * Start searching for devices on the local network
      */
     private void startGoogleNearbyDevicesService(final GoogleApiClient googleApiClient){
+        if(googleApiClient.isConnected() == false){
+            return;
+        }
         //Look for nearby Pocketbots
         mGoogleNearbyConnectionController = new GoogleNearbyConnectionController(googleApiClient);
         //Look for nearby devices
