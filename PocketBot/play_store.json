@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "api-6534348997123710607-944469",
+  "private_key_id": "71fc5f683f0c2defa6341bfab71b51af99efe5af",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCud20AUKy4e1fT\n0mzHauxr0gmEE2Epdtd82+JogCPrhls+O2aNQdI2xLSjz+cMNOstA0qyRHvvEE3X\n6eFzx2gaKVOdoogesIXBuy1g1mNKLsSJTAE7JUVJ7MAXLBZdxyGrZVhbsOk/NkQI\n/a9GX1aNh4e7Fq5n1AmtcELz1x2yIl62iknGiE6Xyycia5bHwdBwGyzuqOX5MBPY\ntlwq8OvnoKFr3PCwoVSlKBoi4PH4DfkmwROshc9QIJyqHzoAGOTSN9sT2Kfjix1P\nFiM9dvYK0OJJdN4Mdayi9tXJVJAMB4pSMhQ7eB7OdZYIOdT9sXa0re3e6l2KInWy\nIT/Rn6AVAgMBAAECggEBAKq4jl8akolLmRvb8zoIdSTkuQ8W76LleePiPuDHU17r\ncGmrMqTTXeLeBW2uyYZ2WhMH/5YF0ciTibjYUhc7b7D586pzGwP89EYo5TS3VR2I\nOiWnzCSWSgEWvLlwGMrXSyku2JGQwg1rCpRJubQBIu8HSlhWz38mS/n9umZlf9eI\nkMuxKX99baJYTkEhVySk/gxueh5PPsJ0zw+UcDWHaTGmqo5btWm1ua38RC4Y5NF6\nQbYoyvCOBUqMUgP1F/fwV86IpzsY7nAfzOXMRh1PG0ZgssmsWHKKAIgbsYQ9dFZw\n93wQATCO05VrBFbr0iyF+nGXB48dBQq6TZSHVlAlX9kCgYEA1ORnjknafLAOJSzO\nis/fdey3P3boV3SsQ2QqfVK9KZIg93qWlzH4U5yRHo3RvlgyULEfoNNMlcFrutxw\n+7xBtOZZ5N7fbt0fJlS65Qohxgsbx3f4dKufBqEKbkTW63aoMxhboln7p5NuUoac\n6bMdYVao/fAk121duQjf+erPrPsCgYEA0csqfu93U32siu50IPc4k145Rqrd7L5R\nt8y+xqNJhSBFeB6dGCRPpufhZBSetuiFqv8mOPf9PDzbvq6B7PAlNKsPkuvt4zwx\nClUONTJMSILZYusZ9o9ZpmwXRVLBhMrf4ULs3cV6oQAxh+M87wa/ZEG6E6K3O3cL\nM1pMt+uKOi8CgYBYrB3Z7Tb80lPB9iy9MqIPux4EaCGUM7uAglsUQf8aLoxeqAfL\nR/v3z3G+eTGQh6nFZFEZKoluotadSS4iHCJ+F6f/pTkJMz7DN2108shodb4HUhgB\neG5PU4pFrZSbFJwwVAfu0m34OXctFnaK/JjTL0ZKJtkhhaMQ6/pmXQBNOwKBgBRb\n+wvGgXYAxDXXXj20wDDM/BH3kwHell+X5wuv3PqmXxeBIQ2uuGwiJKVput1VQ2OM\nz1DIADNQVKL0nHc59uJdl21SqAtdVAUErBRNhUmkKSSIXESpNLIJ21hG57DTX1al\nAAelmnj1Y9kkHE22Aezg1AYDzHRg4R1irf9LRGbRAoGAXZPF1Y6gBXsWGImwyM71\nM+q/JN38WzSpfLg1aXjwXzvutYHySiB4wEwTp8Isn4SnKY1mMO36jIIzKHSyvZcp\nsT3dbF7wvcYuLzV9NhvlxYxYKlHed4gLcVHv7FsTOmxyuUkK3PjOsXtpjchqxX6l\nULaxzZmwtaaDUFFIyWIWU18=\n-----END PRIVATE KEY-----\n",
+  "client_email": "tesseract-playstore@api-6534348997123710607-944469.iam.gserviceaccount.com",
+  "client_id": "109631044711530995780",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/tesseract-playstore%40api-6534348997123710607-944469.iam.gserviceaccount.com"
+}
