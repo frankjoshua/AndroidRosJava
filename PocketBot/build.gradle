@@ -152,6 +152,7 @@ dependencies {
     compile "com.google.firebase:firebase-core:${playServicesVersion}"
     compile "com.google.firebase:firebase-database:${playServicesVersion}"
     compile "com.google.firebase:firebase-auth:${playServicesVersion}"
+    compile "com.google.firebase:firebase-storage:${playServicesVersion}"
     compile 'org.altbeacon:android-beacon-library:2.+'
     compile "com.google.android.gms:play-services-auth:${playServicesVersion}"
     //Houndify
@@ -171,6 +172,7 @@ dependencies {
     // Required -- JUnit 4 framework
     testCompile 'junit:junit:4.12'
     androidTestCompile 'junit:junit:+'
+    androidTestCompile 'tools.fastlane:screengrab:0.3.2'
 }
 
 task pushRelease(type: Exec){
