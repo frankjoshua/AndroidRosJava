@@ -1,1 +1,11 @@
 Connect your android phone to an Arduino to control your robot.
+
+Download the Arduino library from https://github.com/frankjoshua/PocketBot
+
+Speech Recognition
+Simple AI
+Face Tracking
+Speech Recognition
+Send sensor data to Arduino
+Respond to commands
+Show emotions
