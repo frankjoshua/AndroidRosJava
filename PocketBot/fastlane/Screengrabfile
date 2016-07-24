@@ -3,8 +3,8 @@
 app_package_name 'com.tesseractmobile.pocketbot'
 # use_tests_in_packages ['your.screenshot.tests.package']
 
-# app_apk_path 'path/to/your/app.apk'
-# tests_apk_path 'path/to/your/tests.apk'
+app_apk_path 'build/outputs/apk/PocketBot-debug.apk'
+tests_apk_path 'build/outputs/apk/PocketBot-debug-androidTest-unaligned.apk'
 
 #locales ['en-US', 'fr-FR', 'it-IT']
 locales ['en-US']
