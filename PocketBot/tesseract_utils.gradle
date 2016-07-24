@@ -1,3 +1,12 @@
+/*
+*
+* Updated on 7/22/16
+*
+* Holds common gradle tasks for Tesseract Mobile
+*
+ */
+
+
 //http://stackoverflow.com/questions/21414399/android-gradle-dynamically-change-versionname-at-build-time
 ext {
     versionFile = new File(project.rootDir, 'version.properties')
@@ -113,3 +122,37 @@ task incrementGameDataVersion {
         println "Release Database Version: ${readGameDataVersion()}"
     }
 }
+
+task pushRelease(type: Exec){
+    description "Sets the SOLITAIRE_VERSION environmental variable for scripts to use"
+    commandLine 'cmd', '/c', 'push_release', "${calculateVersionName()}"
+}
+
+task customFindbugs(type: FindBugs) {
+    ignoreFailures = false
+    effort = "max"
+    reportLevel = "low"
+    classes = files("$project.buildDir/intermediates/classes")
+//Use this only if you want exclude some errors
+    //excludeFilter = file("$rootProject.rootDir/config/findbugs/exclude.xml")
+
+    source = fileTree('src/main/java/')
+    classpath = files()
+    reports {
+        xml.enabled = true
+        xml.withMessages = true
+        html.enabled = !xml.isEnabled()
+        xml.destination "$project.buildDir/outputs/findbugs/findbugs-output.xml"
+        html.destination "$project.buildDir/outputs/findbugs/findbugs-output.html"
+    }
+}
+
+task grantPermissions(){
+    description "Allows permissions to work with Marshmallow"
+    def adb = android.getAdbExe().toString()
+    def applicationId = "com.tesseractmobile.pocketbot"
+    "${adb} shell pm grant ${applicationId} android.permission.RECORD_AUDIO".execute()
+    "${adb} shell pm grant ${applicationId} android.permission.CAMERA".execute()
+}
+
+println "Version code: ${calculateVersionCode()}, Version name: ${calculateVersionName()}"

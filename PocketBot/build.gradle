@@ -22,7 +22,7 @@ allprojects {
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply from: 'auto-version.gradle'
+apply from: 'tesseract_utils.gradle'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -60,7 +60,23 @@ android {
             storeFile file("debug.keystore")
         }
         release {
+            Properties props = new Properties()
+            props.load(new FileInputStream(System.getProperty("user.home") + '/.signing/signing.properties'))
+            storeFile file(System.getProperty("user.home") + '/.signing/release.keystore')
+            storePassword(props.getProperty("release.password"))
+            keyAlias props.getProperty("release.keyalias")
+            keyPassword props.getProperty("release.password")
         }
+    }
+
+    //Rename release apk with version name
+    applicationVariants.all { variant ->
+        if(variant.buildType.name == "release")
+            variant.outputs.each { output ->
+                output.outputFile = new File(
+                        "release_apk",
+                        output.outputFile.name.replace(".apk", "-${variant.versionName}.apk"))
+            }
     }
 
     buildTypes {
@@ -74,8 +90,8 @@ android {
             //ext.betaDistributionGroupAliases="josh"
         }
         release {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -175,17 +191,5 @@ dependencies {
     androidTestCompile 'tools.fastlane:screengrab:0.3.2'
 }
 
-task pushRelease(type: Exec){
-    description "Calls push_release.bat with version name"
-    commandLine 'cmd', '/c', 'push_release', "${calculateVersionName()}"
-}
-
-task grantPermissions(){
-    description "Allows permissions to work with Marshmallow"
-    def adb = android.getAdbExe().toString()
-    def applicationId = "com.tesseractmobile.pocketbot"
-    "${adb} shell pm grant ${applicationId} android.permission.RECORD_AUDIO".execute()
-    "${adb} shell pm grant ${applicationId} android.permission.CAMERA".execute()
-}
 
 apply plugin: 'com.google.gms.google-services'
