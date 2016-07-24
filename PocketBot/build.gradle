@@ -60,10 +60,11 @@ android {
             storeFile file("debug.keystore")
         }
         release {
-            if(rootProject.file(System.getProperty("user.home") + '/.signing/signing.properties').exists())
+            def signingFile = System.getProperty("user.home") + '/.signing/signing.properties'
+            if(rootProject.file(signingFile).exists())
             {
                 Properties props = new Properties()
-                props.load(new FileInputStream(System.getProperty("user.home") + '/.signing/signing.properties'))
+                props.load(new FileInputStream(signingFile))
                 storeFile file(System.getProperty("user.home") + '/.signing/release.keystore')
                 storePassword(props.getProperty("release.password"))
                 keyAlias props.getProperty("release.keyalias")
