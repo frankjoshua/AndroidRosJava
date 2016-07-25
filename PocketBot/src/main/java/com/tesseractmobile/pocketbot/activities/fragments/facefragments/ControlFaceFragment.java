@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.activities.fragments.facefragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -179,8 +180,13 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
     @Override
     public void onRobotSelected(RobotInfo.Settings robotinfo) {
-        if(robotinfo.prefs.robot_id.equals(PocketBotSettings.getRobotId(getContext()))){
-            Toast.makeText(getContext(), "You must select a remote robot", Toast.LENGTH_LONG).show();
+        final Context context = getContext();
+        if(context == null){
+            //If context is null user has probably exited the app
+            return;
+        }
+        if(robotinfo.prefs.robot_id.equals(PocketBotSettings.getRobotId(context))){
+            Toast.makeText(context, "You must select a remote robot", Toast.LENGTH_LONG).show();
             //Allow if testing
             if(Constants.LOGGING == false){
                 return;
