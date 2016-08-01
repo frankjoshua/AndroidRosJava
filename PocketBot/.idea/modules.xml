@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PocketBot.iml" filepath="$PROJECT_DIR$/PocketBot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android_10/android_10.iml" filepath="$PROJECT_DIR$/android_10/android_10.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android_15/android_15.iml" filepath="$PROJECT_DIR$/android_15/android_15.iml" />
       <module fileurl="file://$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" filepath="$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" />
     </modules>
   </component>

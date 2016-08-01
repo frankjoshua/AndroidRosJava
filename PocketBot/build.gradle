@@ -77,6 +77,15 @@ repositories {
     maven {
         url 'https://houndify.com/maven/'
     }
+    maven {
+        url "http://repository.springsource.com/maven/bundles/release"
+    }
+    maven {
+        url "http://repository.springsource.com/maven/bundles/external"
+    }
+    maven {
+        url "https://github.com/rosjava/rosjava_mvn_repo/raw/master"
+    }
     mavenCentral()
 }
 
@@ -148,10 +157,14 @@ android {
     }
 
     packagingOptions {
+        pickFirst  'META-INF/license.txt'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
+        exclude "META-INF/NOTICE.txt"
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'LICENSE.txt'
+        exclude 'META-INF/maven/commons-io/commons-io/pom.xml'
+        exclude 'META-INF/maven/commons-io/commons-io/pom.properties'
     }
 
     dexOptions {
@@ -163,6 +176,11 @@ android {
         abortOnError false
         //Stops false positives with the % symbol
         disable "StringFormatInvalid","StringFormatMatches"
+    }
+
+    configurations.all {
+        //SEE: http://stackoverflow.com/questions/37347326/errorconflict-with-dependency-com-google-code-findbugsjsr305
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
     }
 }
 
@@ -240,7 +258,7 @@ dependencies {
     androidTestCompile 'junit:junit:+'
     androidTestCompile 'tools.fastlane:screengrab:0.3.2'
     //Android ros support - https://github.com/rosjava/android_core/tree/indigo
-    //compile project(':android_15')
+    compile project(':android_15')
 }
 
 
