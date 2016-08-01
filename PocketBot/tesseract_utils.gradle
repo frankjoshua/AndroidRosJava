@@ -155,4 +155,11 @@ task grantPermissions(){
     "${adb} shell pm grant ${applicationId} android.permission.CAMERA".execute()
 }
 
+
+task uploadToGooglePlay(type:Exec){
+    def version = readVersion()
+    commandLine "./upload_to_google_play.sh", "--apk ./release_apk/PocketBot-release-${version['major']}.${version['minor']}.${version['build']}.apk --track rollout --rollout 0.05"
+}
+
+
 println "Version code: ${calculateVersionCode()}, Version name: ${calculateVersionName()}"

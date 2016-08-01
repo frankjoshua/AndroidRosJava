@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvFaces"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lvFaces"
-        android:layout_gravity="center_horizontal"
-        android:choiceMode="singleChoice" />
+        android:layout_height="wrap_content">
+
+    </android.support.v7.widget.RecyclerView>
 </LinearLayout>
