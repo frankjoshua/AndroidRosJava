@@ -49,6 +49,7 @@ import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
 import com.tesseractmobile.pocketbot.robot.AuthData;
+import com.tesseractmobile.pocketbot.robot.BaseRobot;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.GoogleNearbyConnectionController;
@@ -59,9 +60,20 @@ import com.tesseractmobile.pocketbot.robot.SensorControler;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 
+import org.ros.address.InetAddressFactory;
+import org.ros.android.RosFragmentActivity;
+import org.ros.namespace.GraphName;
+import org.ros.node.ConnectedNode;
+import org.ros.node.Node;
+import org.ros.node.NodeConfiguration;
+import org.ros.node.NodeMain;
+import org.ros.node.NodeMainExecutor;
+import org.ros.node.topic.Publisher;
+
+import geometry_msgs.Twist;
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceFragmentActivity extends FragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
+public class BaseFaceFragmentActivity extends RosFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
@@ -87,6 +99,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
 
     /** For finding local network devices */
     private GoogleNearbyConnectionController mGoogleNearbyConnectionController;
+
+    public BaseFaceFragmentActivity(){
+        super("PocketBot", "PocketBot");
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -282,6 +298,50 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
             mKeepAliveThread = new KeepAliveThread(this, this);
             mKeepAliveThread.startThread();
         }
+
+    }
+
+    @Override
+    protected void init(NodeMainExecutor nodeMainExecutor) {
+        NodeConfiguration nodeConfiguration =
+                NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(),
+                        getMasterUri());
+        nodeMainExecutor
+                .execute(new NodeMain() {
+                    @Override
+                    public GraphName getDefaultNodeName() {
+                        return null;
+                    }
+
+                    @Override
+                    public void onStart(ConnectedNode connectedNode) {
+                        final Publisher<Object> publisher = connectedNode.newPublisher("~cmd_vel", Twist._TYPE);
+                        final geometry_msgs.Twist msg = (Twist) publisher.newMessage();
+                        Robot.get().registerSensorListener(new BaseRobot.SensorListener() {
+                            @Override
+                            public void onSensorUpdate(final SensorData sensorData) {
+                                msg.getAngular().setZ(-sensorData.getControl().joy1.X);
+                                msg.getLinear().setX(sensorData.getControl().joy1.Y);
+                                publisher.publish(msg);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onShutdown(Node node) {
+
+                    }
+
+                    @Override
+                    public void onShutdownComplete(Node node) {
+
+                    }
+
+                    @Override
+                    public void onError(Node node, Throwable throwable) {
+
+                    }
+                }, nodeConfiguration.setNodeName("virtual_joystick"));
 
     }
 
