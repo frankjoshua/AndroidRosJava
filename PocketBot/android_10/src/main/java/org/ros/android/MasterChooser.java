@@ -200,7 +200,7 @@ public class MasterChooser extends Activity {
         } catch (URISyntaxException e) {
           toast("Invalid URI.");
           return false;
-        } catch (XmlRpcTimeoutException e) {
+        } catch (Exception e) {
           toast("Master unreachable!");
           return false;
         }

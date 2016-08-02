@@ -302,46 +302,10 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
     }
 
     @Override
-    protected void init(NodeMainExecutor nodeMainExecutor) {
-        NodeConfiguration nodeConfiguration =
-                NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(),
-                        getMasterUri());
-        nodeMainExecutor
-                .execute(new NodeMain() {
-                    @Override
-                    public GraphName getDefaultNodeName() {
-                        return null;
-                    }
+    protected void init(final NodeMainExecutor nodeMainExecutor) {
 
-                    @Override
-                    public void onStart(ConnectedNode connectedNode) {
-                        final Publisher<Object> publisher = connectedNode.newPublisher("~cmd_vel", Twist._TYPE);
-                        final geometry_msgs.Twist msg = (Twist) publisher.newMessage();
-                        Robot.get().registerSensorListener(new BaseRobot.SensorListener() {
-                            @Override
-                            public void onSensorUpdate(final SensorData sensorData) {
-                                msg.getAngular().setZ(-sensorData.getControl().joy1.X);
-                                msg.getLinear().setX(sensorData.getControl().joy1.Y);
-                                publisher.publish(msg);
-                            }
-                        });
-                    }
+        final PocketBotNode nodeMain = new PocketBotNode(nodeMainExecutor, getMasterUri());
 
-                    @Override
-                    public void onShutdown(Node node) {
-
-                    }
-
-                    @Override
-                    public void onShutdownComplete(Node node) {
-
-                    }
-
-                    @Override
-                    public void onError(Node node, Throwable throwable) {
-
-                    }
-                }, nodeConfiguration.setNodeName("virtual_joystick"));
 
     }
 
