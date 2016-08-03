@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.common.collect.Lists;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
@@ -14,17 +15,37 @@ import com.tesseractmobile.pocketbot.robot.StatusListener;
 import com.tesseractmobile.pocketbot.views.JoystickView;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
+import org.ros.address.InetAddressFactory;
+import org.ros.android.RosFragmentActivity;
+import org.ros.android.view.visualization.VisualizationView;
+import org.ros.android.view.visualization.layer.CameraControlLayer;
+import org.ros.android.view.visualization.layer.CameraControlListener;
+import org.ros.android.view.visualization.layer.LaserScanLayer;
+import org.ros.android.view.visualization.layer.Layer;
+import org.ros.android.view.visualization.layer.OccupancyGridLayer;
+import org.ros.android.view.visualization.layer.RobotLayer;
+import org.ros.node.NodeConfiguration;
+import org.ros.node.NodeMainExecutor;
+import org.ros.time.NtpTimeProvider;
+
+import java.net.URI;
 import java.text.NumberFormat;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by josh on 10/25/2015.
  */
-public class ControlFace extends BaseFace implements JoystickView.JoystickListener, StatusListener {
+public class ControlFace extends BaseFace implements JoystickView.JoystickListener, StatusListener, RosFragmentActivity.NodeInitListener {
+
+    private static final String MAP_FRAME = "map";
+    private static final String ROBOT_FRAME = "base_link";
 
     /** remote message delay in millis */
     public static final int REMOTE_MAX_TRANSMIT_SPEED = 100;
 
     private final TextView mInputTextView;
+    private final VisualizationView mVisualizationView;
+    private final CameraControlLayer mCameraControlLayer;
     private NumberFormat numberFormat = NumberFormat.getNumberInstance();
     //Channel that the remote robot is listening on
     private String mRemoteRobotId;
@@ -43,12 +64,25 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
     private SensorData.Joystick mJoy2 = new SensorData.Joystick();
     private MouthView.SpeechCompleteListener mSpeechCompleteListener;
 
-    public ControlFace(final View view){
+    public ControlFace(final View view, final RosFragmentActivity rosFragmentActivity){
         numberFormat.setMinimumFractionDigits(2);
         mFaceData = (TextView) view.findViewById(R.id.tvFaceData);
+        //Setup Joysticks
         ((JoystickView) view.findViewById(R.id.joyStick)).setJoystickListener(this);
         ((JoystickView) view.findViewById(R.id.joyStickLeft)).setJoystickListener(this);
         mInputTextView = (TextView) view.findViewById(R.id.tvInput);
+        //Setup ROS Visualization view
+        mVisualizationView = (VisualizationView) view.findViewById(R.id.visualization);
+        mCameraControlLayer = new CameraControlLayer();
+        mVisualizationView.onCreate(Lists.<Layer>newArrayList(mCameraControlLayer,
+                new OccupancyGridLayer("map"), new LaserScanLayer("scan"), new RobotLayer(ROBOT_FRAME)));
+        rosFragmentActivity.registerNodeInitListener(this);
+        rosFragmentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mVisualizationView.getCamera().jumpToFrame(ROBOT_FRAME);
+            }
+        });
     }
 
     private void handleMessage(Message msg) {
@@ -191,5 +225,20 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
         //Received sensor data from remote robot
         say("Heading: " + Integer.toString(sensorData.getSensor().heading) + " Battery " + Integer.toString(sensorData.getSensor().battery) + "%\n"
         + "JoyX: " + numberFormat.format(sensorData.getControl().joy1.X) + " JoyY: " + numberFormat.format(sensorData.getControl().joy1.Y));
+    }
+
+    @Override
+    public void onNodeInit(final NodeMainExecutor nodeMainExecutor, final URI masterUri) {
+        mVisualizationView.init(nodeMainExecutor);
+
+        NodeConfiguration nodeConfiguration =
+                NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(),
+                        masterUri);
+        NtpTimeProvider ntpTimeProvider =
+                new NtpTimeProvider(InetAddressFactory.newFromHostString("pool.ntp.org"),
+                        nodeMainExecutor.getScheduledExecutorService());
+        ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
+        nodeConfiguration.setTimeProvider(ntpTimeProvider);
+        nodeMainExecutor.execute(mVisualizationView, nodeConfiguration);
     }
 }

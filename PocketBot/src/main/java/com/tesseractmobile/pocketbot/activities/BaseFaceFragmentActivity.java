@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -49,7 +48,6 @@ import com.tesseractmobile.pocketbot.activities.fragments.TextPreviewFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragment;
 import com.tesseractmobile.pocketbot.activities.fragments.facefragments.FaceFragmentFactory;
 import com.tesseractmobile.pocketbot.robot.AuthData;
-import com.tesseractmobile.pocketbot.robot.BaseRobot;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.Emotion;
 import com.tesseractmobile.pocketbot.robot.GoogleNearbyConnectionController;
@@ -60,17 +58,11 @@ import com.tesseractmobile.pocketbot.robot.SensorControler;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 
-import org.ros.address.InetAddressFactory;
 import org.ros.android.RosFragmentActivity;
-import org.ros.namespace.GraphName;
-import org.ros.node.ConnectedNode;
-import org.ros.node.Node;
-import org.ros.node.NodeConfiguration;
-import org.ros.node.NodeMain;
 import org.ros.node.NodeMainExecutor;
-import org.ros.node.topic.Publisher;
 
-import geometry_msgs.Twist;
+import java.util.ArrayList;
+
 import io.fabric.sdk.android.Fabric;
 
 public class BaseFaceFragmentActivity extends RosFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
@@ -303,10 +295,8 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
 
     @Override
     protected void init(final NodeMainExecutor nodeMainExecutor) {
-
-        final PocketBotNode nodeMain = new PocketBotNode(nodeMainExecutor, getMasterUri());
-
-
+        //Create main PocketBot nodes
+        new PocketBotNode(nodeMainExecutor, getMasterUri());
     }
 
     @Override
@@ -637,6 +627,5 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
             return null;
         }
     }
-
 
 }

@@ -19,6 +19,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 /**
  * Created by josh on 8/1/16.
@@ -31,6 +32,9 @@ abstract public class RosFragmentActivity extends FragmentActivity {
     private final String notificationTitle;
 
     protected NodeMainExecutorService nodeMainExecutorService;
+
+    /** Listen for ROS node connection */
+    final private ArrayList<NodeInitListener> mNodeInitListeners = new ArrayList<NodeInitListener>();
 
     private final class NodeMainExecutorServiceConnection implements ServiceConnection {
 
@@ -112,6 +116,13 @@ abstract public class RosFragmentActivity extends FragmentActivity {
             @Override
             protected Void doInBackground(Void... params) {
                 RosFragmentActivity.this.init(nodeMainExecutorService);
+                //Let everyone know that init is called
+                synchronized (mNodeInitListeners){
+                    for(final NodeInitListener nodeInitListener : mNodeInitListeners){
+                        nodeInitListener.onNodeInit(nodeMainExecutorService, getMasterUri());
+                    }
+                    mNodeInitListeners.clear();
+                }
                 return null;
             }
         }.execute();
@@ -199,5 +210,25 @@ abstract public class RosFragmentActivity extends FragmentActivity {
 
     private String getDefaultHostAddress() {
         return InetAddressFactory.newNonLoopback().getHostAddress();
+    }
+
+    public void registerNodeInitListener(final NodeInitListener nodeInitListener){
+        synchronized (mNodeInitListeners){
+            if(nodeMainExecutorService != null){
+                nodeInitListener.onNodeInit(nodeMainExecutorService, getMasterUri());
+            } else {
+                mNodeInitListeners.add(nodeInitListener);
+            }
+        }
+    }
+
+//    public void unregisterNodeInitListener(final NodeInitListener nodeInitListener){
+//        synchronized (mNodeInitListeners){
+//            mNodeInitListeners.add(nodeInitListener);
+//        }
+//    }
+
+    public interface NodeInitListener {
+        void onNodeInit(final NodeMainExecutor nodeMainExecutor, final URI masterUri);
     }
 }
