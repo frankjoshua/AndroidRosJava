@@ -12,7 +12,7 @@ public class RTCGLVideoViewMediaView extends RTCGLVideoView {
 
     public RTCGLVideoViewMediaView(Context c, AttributeSet attr) {
         super(c, attr);
-        //setZOrderMediaOverlay(true);
+        setZOrderMediaOverlay(true);
     }
 
 }

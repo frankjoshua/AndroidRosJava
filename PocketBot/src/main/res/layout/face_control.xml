@@ -15,8 +15,8 @@
     <org.ros.android.view.visualization.VisualizationView
         android:id="@+id/visualization"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvInput" />
 
         <TextView
             android:layout_width="match_parent"

@@ -63,10 +63,10 @@ public class VisualizationView extends GLSurfaceView implements NodeMain {
 
   public VisualizationView(Context context, AttributeSet attrs) {
     super(context, attrs);
-      if(isInEditMode() == false) {
+      //if(isInEditMode() == false) {
           //This lets up draw views over this view
-          setZOrderMediaOverlay(true);
-      }
+          setZOrderMediaOverlay(false);
+     // }
   }
 
   /**
