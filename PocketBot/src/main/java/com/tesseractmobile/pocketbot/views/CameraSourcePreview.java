@@ -174,5 +174,9 @@ public class CameraSourcePreview extends RelativeLayout {
         Log.d(TAG, "isPortraitMode returning false by default");
         return false;
     }
+
+    public SurfaceView getSurfaceView(){
+        return mSurfaceView;
+    }
 }
 

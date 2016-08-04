@@ -33,8 +33,8 @@ public class AiFragmentActivity extends BaseFaceFragmentActivity implements AI {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         final String token = PocketBotSettings.getApiAiToken(this);
-        final String key = PocketBotSettings.getApiAiKey(this);
-        final AIConfiguration aiConfig = new AIConfiguration(token, key, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
+        //final String key = PocketBotSettings.getApiAiKey(this);
+        final AIConfiguration aiConfig = new AIConfiguration(token, AIConfiguration.SupportedLanguages.English, AIConfiguration.RecognitionEngine.System);
         mAiDataService = new AIDataService(this, aiConfig);
         Robot.get().setAI(this);
         setSensorDelay(120);

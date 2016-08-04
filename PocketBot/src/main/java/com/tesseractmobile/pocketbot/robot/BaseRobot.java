@@ -10,7 +10,6 @@ import com.tesseractmobile.pocketbot.activities.SpeechState;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionListener;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
 import com.tesseractmobile.pocketbot.service.VoiceRecognitionState;
 import com.tesseractmobile.pocketbot.views.MouthView;
 
@@ -107,7 +106,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public void sendSensorData(final boolean required) {
         if(Constants.LOGGING){
-            Log.d(TAG,  "sendSensorData Required: " + required);
+            //Log.d(TAG,  "sendSensorData Required: " + required);
         }
         final long uptime = SystemClock.uptimeMillis();
         if(required || uptime >= mLastSensorTransmision + mSensorDelay) {
@@ -127,7 +126,7 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
             }
         } else {
             if(Constants.LOGGING){
-                Log.d(TAG, mSensorDelay + " Data dropped " + (uptime - mLastSensorTransmision));
+                Log.e(TAG, mSensorDelay + " Data dropped - too fast: " + (uptime - mLastSensorTransmision));
             }
             System.gc();
         }

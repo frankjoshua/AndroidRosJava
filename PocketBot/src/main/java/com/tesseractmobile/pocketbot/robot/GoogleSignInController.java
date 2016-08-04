@@ -108,7 +108,8 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            throw new UnsupportedOperationException("Not implemented!");
+                            Toast.makeText(context, "Could not sign in: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            return;
                         }
                         final AuthData authData = new AuthData(acct);
                         onTokenReceived(context, authData);
@@ -130,21 +131,23 @@ public class GoogleSignInController implements GoogleApiClient.OnConnectionFaile
 
     @Override
     public void onConnected(Bundle result) {
-        Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mAuthData);
-        Toast.makeText(mContext, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
-        //mSignInButton.setEnabled(true);
-        //Auto sign in next time
-        PocketBotSettings.setAutoSignIn(mContext, true);
+        if(mGoogleApiClient.isConnected()) {
+            Robot.get().setAuthToken(PocketBotSettings.getRobotId(mContext), mAuthData);
+            Toast.makeText(mContext, "Google Sign-In Complete", Toast.LENGTH_LONG).show();
+            //mSignInButton.setEnabled(true);
+            //Auto sign in next time
+            PocketBotSettings.setAutoSignIn(mContext, true);
+        }
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        throw new UnsupportedOperationException();
+        //I don't think anything needs to be done here - this would be rare
     }
 
     @Override
     public void onConnectionFailed(final ConnectionResult result) {
-        throw new UnsupportedOperationException();
+        //I don't think anything needs to be done here - this would be rare
     }
 
     public Scope[] getScopeArray() {

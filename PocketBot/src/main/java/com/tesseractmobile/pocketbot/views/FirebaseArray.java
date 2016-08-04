@@ -28,6 +28,8 @@
 
 package com.tesseractmobile.pocketbot.views;
 
+import android.util.Log;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -116,6 +118,7 @@ class FirebaseArray implements ChildEventListener {
 
     // Start of ChildEventListener methods
     public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
+        Log.d(FirebaseArray.class.getSimpleName(), "onChildAdded()");
         int index = getIndexForKey(snapshot);
         mSnapshots.add(index, snapshot);
         notifyChangedListeners(OnChangedListener.EventType.Added, index);

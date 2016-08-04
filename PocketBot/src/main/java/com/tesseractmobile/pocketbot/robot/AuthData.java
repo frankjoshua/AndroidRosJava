@@ -1,5 +1,7 @@
 package com.tesseractmobile.pocketbot.robot;
 
+import android.net.Uri;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.io.StringBufferInputStream;
@@ -16,7 +18,12 @@ public class AuthData {
     public AuthData(final GoogleSignInAccount googleSignInAccount) {
         mUid = googleSignInAccount.getId();
         mDisplayName = googleSignInAccount.getDisplayName();
-        mProfileImageUrl = googleSignInAccount.getPhotoUrl().toString();
+        final Uri photoUrl = googleSignInAccount.getPhotoUrl();
+        if(photoUrl != null){
+            mProfileImageUrl = photoUrl.toString();
+        } else {
+            mProfileImageUrl = "";
+        }
     }
 
     /**

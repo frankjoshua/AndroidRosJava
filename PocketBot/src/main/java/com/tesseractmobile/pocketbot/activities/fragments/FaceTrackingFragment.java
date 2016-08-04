@@ -2,6 +2,9 @@ package com.tesseractmobile.pocketbot.activities.fragments;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +16,17 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.PocketBotSettings;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 import com.tesseractmobile.pocketbot.views.CameraSourcePreview;
 import com.tesseractmobile.pocketbot.views.FaceGraphic;
 import com.tesseractmobile.pocketbot.views.GraphicOverlay;
+
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 
 /**
  * Created by josh on 10/18/2015.
@@ -96,6 +104,10 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
                 .build();
 
         try {
+            mPreview.setDrawingCacheEnabled(true);
+            mPreview.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            mPreview.layout(0, 0, mPreview.getMeasuredWidth(), mPreview.getMeasuredHeight());
             mPreview.start(mCameraSource, mGraphicOverlay);
         } catch (Exception e) {
             //Log.e(TAG, e.getMessage());
@@ -148,6 +160,7 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
         final XYZ xyz = new XYZ();
+        private boolean mTakingPicture = false;
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
@@ -169,6 +182,47 @@ public class FaceTrackingFragment extends CallbackFragment implements SharedPref
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(item);
             mRobotInterface.look(xyz.x, xyz.y, xyz.z);
+
+            if(mTakingPicture == false) {
+                mTakingPicture = true;
+                mPreview.buildDrawingCache(true);
+                Bitmap  bitmap = mPreview.getSurfaceView().getDrawingCache();
+                if(bitmap == null){
+                    return;
+                }
+
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReferenceFromUrl("gs://pocketbot-1161.appspot.com");
+                StorageReference image = storageRef.child(UUID.randomUUID().toString());
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                image.putBytes(byteArray);
+                mTakingPicture = false;
+//                mCameraSource.takePicture(new CameraSource.ShutterCallback() {
+//                    @Override
+//                    public void onShutter() {
+//
+//                    }
+//                }, new CameraSource.PictureCallback() {
+//                    @Override
+//                    public void onPictureTaken(byte[] bytes) {
+//                        try {
+//                            // convert byte array into bitmap
+//                            Bitmap loadedImage = BitmapFactory.decodeByteArray(bytes, 0,
+//                                    bytes.length);
+//
+//                            FirebaseStorage storage = FirebaseStorage.getInstance();
+//                            StorageReference storageRef = storage.getReferenceFromUrl("gs://pocketbot-1161.appspot.com");
+//                            StorageReference image = storageRef.child(UUID.randomUUID().toString());
+//                            image.putBytes(bytes);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        mTakingPicture = false;
+//                    }
+//                });
+            }
         }
 
         @Override

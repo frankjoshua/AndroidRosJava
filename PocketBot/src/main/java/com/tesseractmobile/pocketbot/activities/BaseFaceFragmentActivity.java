@@ -148,6 +148,7 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         if (PocketBotSettings.isAutoSignIn(this)) {
             mGoogleSignInController.startSignin(this, RC_SIGN_IN);
+            //throw new UnsupportedOperationException();
         }
 
         //Start Nearby devices controller when authenticated
@@ -170,8 +171,8 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                     Manifest.permission.RECORD_AUDIO
             };
             for(final String permission : permissionList){
-                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-                    requestPermissions(permissionList, 0);
+                if(checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED){
+                    requestPermissions(new String[]{permission}, 0);
                 }
             }
         }
@@ -181,6 +182,9 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
      * Start searching for devices on the local network
      */
     private void startGoogleNearbyDevicesService(final GoogleApiClient googleApiClient){
+        if(googleApiClient.isConnected() == false){
+            return;
+        }
         //Look for nearby Pocketbots
         mGoogleNearbyConnectionController = new GoogleNearbyConnectionController(googleApiClient);
         //Look for nearby devices

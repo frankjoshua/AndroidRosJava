@@ -19,10 +19,19 @@ public class JoystickView extends View {
 
     //Main circle
     private TouchPad mainPad;
-    //Center Circle
-    private TouchCircle touchCircle;
-    //Toggle Circle
-    private TouchCircle toggleCircle;
+
+    private TouchCircle[] mTouchCircles;
+    private final static int CIRCLE_TOUCH = 0;
+    private final static int CIRCLE_TOGGLE = 1;
+    private final static int CIRCLE_A = 2;
+    private final static int CIRCLE_B = 3;
+
+    private boolean mButtonA;
+    private boolean mButtonB;
+
+    //Button colors
+    private static final int COLOR_ON = Color.WHITE;
+    private static final int COLOR_OFF = Color.DKGRAY;
 
     /** true if the user is touching */
     private boolean mHasFocus;
@@ -36,23 +45,35 @@ public class JoystickView extends View {
     public JoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mainPad = new TouchPad(Color.parseColor("#bcb9e5"), 150);
-        touchCircle = new TouchCircle(Color.parseColor("#e59100"), 200);
-        toggleCircle = new TouchCircle(Color.BLUE, 100);
+        mTouchCircles = new TouchCircle[4];
+        mTouchCircles[0] = new TouchCircle(Color.parseColor("#e59100"), Color.parseColor("#e59100"), 200);
+        mTouchCircles[CIRCLE_TOGGLE] = new TouchCircle(Color.BLUE, Color.RED, 100);
+        mTouchCircles[CIRCLE_A] = new TouchCircle(COLOR_OFF, COLOR_ON, 170);
+        mTouchCircles[CIRCLE_B] = new TouchCircle(COLOR_OFF, COLOR_ON, 170);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         final int size = Math.min(w, h) / 10;
+        //Set locations
         mainPad.set(w / 2, h / 2);
-        touchCircle.set(w / 2, h / 2);
+        //Center
+        mTouchCircles[CIRCLE_TOUCH].set(w / 2, h / 2);
+        //Bottom right
+        mTouchCircles[CIRCLE_TOGGLE].set(size, h - size);
+        //Top left
+        mTouchCircles[CIRCLE_A].set(size, size);
+        //Top right
+        mTouchCircles[CIRCLE_B].set(w - size, size);
 
-        toggleCircle.set(size, h - size);
-
-        toggleCircle.setSize(size);
+        //Set sizes
         mainPad.setSize(Math.min(w, h) / 2);
+        mTouchCircles[CIRCLE_TOUCH].setSize(Math.round(size * 1.5f));
+        mTouchCircles[CIRCLE_TOGGLE].setSize(size);
+        mTouchCircles[CIRCLE_A].setSize(size);
+        mTouchCircles[CIRCLE_B].setSize(size);
 
-        touchCircle.setSize(Math.round(size * 1.5f));
 
         int[] circleColors = new int[]{
                 Color.parseColor("#bcb9e5"),
@@ -68,42 +89,95 @@ public class JoystickView extends View {
                 Color.parseColor("#e09900")
         };
         final Shader touchShader = new LinearGradient(0, 0, w, h, touchColors, null, Shader.TileMode.CLAMP);
-        touchCircle.setShader(touchShader);
+        mTouchCircles[CIRCLE_TOUCH].setShader(touchShader);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         mainPad.draw(canvas);
-        toggleCircle.draw(canvas);
-        touchCircle.draw(canvas);
+        //Draw Circles
+        for(int i = mTouchCircles.length - 1; i >= 0; i--){
+            mTouchCircles[i].draw(canvas);
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN && toggleCircle.isTouched(Math.round(event.getX()), Math.round(event.getY()))){
-            mSticky = !mSticky;
-            toggleCircle.toggle(mSticky);
-            mChangingState = true;
-        } else if(mChangingState == false && (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE)){
-            touchCircle.set(Math.round(event.getX()), Math.round(event.getY()));
+        if(event.getAction() == MotionEvent.ACTION_DOWN){
+            int touchedCircle = touchedCircle(event.getX(), event.getY());
+            switch (touchedCircle){
+                case CIRCLE_TOUCH:
+                    mChangingState = false;
+                    break;
+                case CIRCLE_TOGGLE:
+                    mChangingState = true;
+                    break;
+                case CIRCLE_A:
+                    mButtonA = !mButtonA;
+                    mTouchCircles[CIRCLE_A].toggle(mButtonA);
+                    mChangingState = true;
+                    break;
+                case CIRCLE_B:
+                    mButtonB = !mButtonB;
+                    mTouchCircles[CIRCLE_B].toggle(mButtonB);
+                    mChangingState = true;
+                    break;
+            }
+            update();
+        } else if(mChangingState == false && event.getAction() == MotionEvent.ACTION_MOVE){
+            mTouchCircles[CIRCLE_TOUCH].set(Math.round(event.getX()), Math.round(event.getY()));
             update();
             setHasFocus(true);
         } else if (event.getAction() == MotionEvent.ACTION_UP){
+            int touchedCircle = touchedCircle(event.getX(), event.getY());
+            switch (touchedCircle){
+                case CIRCLE_TOGGLE:
+                    mSticky = !mSticky;
+                    mTouchCircles[CIRCLE_TOGGLE].toggle(mSticky);
+                    break;
+                case CIRCLE_TOUCH:
+                    break;
+                case CIRCLE_A:
+                    mButtonA = !mButtonA;
+                    mTouchCircles[CIRCLE_A].toggle(mButtonA);
+                    break;
+                case CIRCLE_B:
+                    mButtonB = !mButtonB;
+                    mTouchCircles[CIRCLE_B].toggle(mButtonB);
+                    break;
+            }
             if(!mSticky) {
-                touchCircle.set(mainPad.point.x, mainPad.point.y);
-                update();
+                mTouchCircles[CIRCLE_TOUCH].set(mainPad.point.x, mainPad.point.y);
                 setHasFocus(false);
             }
             mChangingState = false;
+            update();
         }
         invalidate();
         return true;
     }
 
+    /**
+     * Returns id of touched cirle or -1 if none
+     * @param x
+     * @param y
+     * @return
+     */
+    private int touchedCircle(final float x, final float y){
+        final int X = Math.round(x);
+        final int Y = Math.round(y);
+        for(int i = mTouchCircles.length - 1; i >= 0; i--){
+            if(mTouchCircles[i].isTouched(X, Y)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void update() {
-        float cx = touchCircle.point.x / (float) getWidth();
-        float cy = touchCircle.point.y / (float) getHeight();
+        float cx = mTouchCircles[CIRCLE_TOUCH].point.x / (float) getWidth();
+        float cy = mTouchCircles[CIRCLE_TOUCH].point.y / (float) getHeight();
 
         float x = cx * 2 - 1;
         float y = -(cy * 2 - 1);
@@ -112,7 +186,7 @@ public class JoystickView extends View {
         x = Math.max(-1.0f, Math.min(1.0f, x));
         y = Math.max(-1.0f, Math.min(1.0f, y));
 
-        mJoystickListener.onPositionChange(this, x, y, mHasFocus ? 1.0f : 0.0f, false, false);
+        mJoystickListener.onPositionChange(this, x, y, mHasFocus ? 1.0f : 0.0f, mButtonA, mButtonB);
     }
 
     public void setJoystickListener(final JoystickListener joystickListener){
@@ -130,10 +204,14 @@ public class JoystickView extends View {
         public Paint paint = new Paint();
         public Point point = new Point();
         public int circleSize;
+        private int mColorNormal;
+        private int mColorSelected;
 
-        public TouchCircle(final int color, final int alpha){
+        public TouchCircle(final int color, final int colorSelected, final int alpha){
             paint.setColor(color);
             paint.setAlpha(alpha);
+            mColorNormal = color;
+            mColorSelected = colorSelected;
         }
 
         public void set(int x, int y) {
@@ -160,9 +238,9 @@ public class JoystickView extends View {
         public void toggle(final boolean sticky){
             int alpha = paint.getAlpha();
             if(sticky){
-                paint.setColor(Color.RED);
+                paint.setColor(mColorSelected);
             } else {
-                paint.setColor(Color.BLUE);
+                paint.setColor(mColorNormal);
             }
             paint.setAlpha(alpha);
         }

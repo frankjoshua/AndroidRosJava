@@ -264,7 +264,7 @@ public class PocketBotSettings {
     }
 
     public static boolean isAutoSignIn(final Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(KEY_AUTO_SIGN_IN, DEFAULT_AUTO_SIGN_IN).commit();
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_AUTO_SIGN_IN, DEFAULT_AUTO_SIGN_IN);
     }
 
     public static SharedPreferences getSharedPrefs(final Context context) {

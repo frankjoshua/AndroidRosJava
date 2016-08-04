@@ -15,7 +15,10 @@ import com.quickblox.core.QBSettings;
 import com.tesseractmobile.pocketbot.robot.DataStore;
 import com.tesseractmobile.pocketbot.robot.RemoteControl;
 import com.tesseractmobile.pocketbot.robot.Robot;
-import com.tesseractmobile.pocketbot.service.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.robot.VoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.BaseVoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.GoogleVoiceRecognitionService;
+import com.tesseractmobile.pocketbot.service.HoundVoiceRecognitionService;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -29,15 +32,6 @@ public class PocketBotApp extends Application{
         super.onCreate();
         //Track errors
         Fabric.with(this, new Crashlytics());
-        //Check if robot is new
-        final String uuid = PreferenceManager.getDefaultSharedPreferences(this).getString(PocketBotSettings.KEY_ROBOT_ID, PocketBotSettings.ROBOT_ID_NOT_SET);
-        final boolean isNew;
-        if(uuid.equals(PocketBotSettings.ROBOT_ID_NOT_SET)){
-            //Mark robot as new
-            isNew = true;
-        } else {
-            isNew = false;
-        }
         //Get robot id first so Shared preference listeners don't trigger
         final String robotId = PreferenceManager.getDefaultSharedPreferences(this).getString(PocketBotSettings.KEY_ROBOT_ID, PocketBotSettings.ROBOT_ID_NOT_SET);
         //Init DataStore
@@ -54,7 +48,7 @@ public class PocketBotApp extends Application{
         final ServiceConnection voiceRecognitionServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                VoiceRecognitionService voiceRecognitionService = ((VoiceRecognitionService.LocalBinder) service).getService();
+                VoiceRecognitionService voiceRecognitionService = ((BaseVoiceRecognitionService.LocalBinder) service).getService();
                 voiceRecognitionService.registerVoiceRecognitionListener(Robot.get().getVoiceRecognitionListener());
                 Robot.get().setVoiceRecognitionService(voiceRecognitionService);
             }
@@ -65,7 +59,7 @@ public class PocketBotApp extends Application{
             }
         };
 
-        final Intent bindIntent = new Intent(this, VoiceRecognitionService.class);
+        final Intent bindIntent = new Intent(this, HoundVoiceRecognitionService.class);
         if (bindService(bindIntent, voiceRecognitionServiceConnection, Service.BIND_AUTO_CREATE) == false) {
             throw new UnsupportedOperationException("Error binding to service");
         }

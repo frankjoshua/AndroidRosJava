@@ -39,11 +39,11 @@
         <color rgba="0.75 0.75 0.75 0.4"/>
       </material>
     </visual>
-    <collision>
+    <!--<collision>
       <geometry>
         <cylinder length="1.04775" radius="0.2032"/>
       </geometry>
-    </collision>
+    </collision>-->
     <inertial>
       <mass value="10.0"/>
       <inertia ixx="1.0" iyy="1.0" izz="1.0"
@@ -51,7 +51,7 @@
     </inertial>
   </link>
 
-  <joint name="center_joint" type="continuous">
+  <joint name="center_joint" type="fixed">
     <axis xyz="0 0 1"/>
     <parent link="base_link"/>
     <child link="body_link"/>
@@ -67,11 +67,11 @@
 	<color rgba="0.1 0.1 1 1"/>
       </material>
     </visual>
-    <collision>
+    <!--<collision>
       <geometry>
         <box size="0.0762 0.2794 0.0762"/> 
       </geometry>
-    </collision>
+    </collision>-->
    <inertial>
       <mass value="0.25"/>
       <inertia ixx="1.0" iyy="1.0" izz="1.0"
@@ -79,55 +79,11 @@
     </inertial>
   </link>
 
-<gazebo reference="camera_link">
-    <sensor type="depth" name="camera_link">       
-        <always_on>1</always_on>
-        <visualize>true</visualize>             
-        <camera>
-            <horizontal_fov>1.047</horizontal_fov>  
-            <image>
-                <width>640</width>
-                <height>480</height>
-                <format>R8G8B8</format>
-            </image>
-            <depth_camera>
-
-            </depth_camera>
-            <clip>
-                <near>0.05</near>
-                <far>8.0</far>
-            </clip>
-        </camera>
-        <plugin name="camera_controller" filename="libgazebo_ros_openni_kinect.so">
-            <cameraName>camera</cameraName>
-            <alwaysOn>true</alwaysOn>
-            <updateRate>10.0</updateRate>
-            <frameName>camera_link</frameName>                   
-            <imageTopicName>rgb/image_rect_color</imageTopicName>
-            <depthImageTopicName>depth_registered/image_raw</depthImageTopicName>
-            <pointCloudTopicName>depth/points</pointCloudTopicName>
-            <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>              
-            <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
-            <pointCloudCutoff>0.4</pointCloudCutoff>                
-            <hackBaseline>0.07</hackBaseline>
-            <distortionK1>0.0</distortionK1>
-            <distortionK2>0.0</distortionK2>
-            <distortionK3>0.0</distortionK3>
-            <distortionT1>0.0</distortionT1>
-            <distortionT2>0.0</distortionT2>
-            <CxPrime>0.0</CxPrime>
-            <Cx>0.0</Cx>
-            <Cy>0.0</Cy>
-            <focalLength>0.0</focalLength>
-        </plugin>
-    </sensor>
-</gazebo>
-
   <joint name="camera_joint" type="continuous">
-    <axis xyz="0 0 1"/>
+    <axis xyz="0 0 0"/>
     <parent link="body_link"/>
     <child link="camera_link"/>
-    <origin rpy="0 0 0" xyz="0.2 0 -0.3"/>
+    <origin rpy="0 0 0" xyz="0.4 0 -0.3"/>
   </joint>  
 
   <link name="laser">
@@ -151,7 +107,7 @@
     </inertial>
   </link>
 
-  <joint name="laser_joint" type="continuous">
+  <joint name="laser_joint" type="fixed">
     <axis xyz="0 0 1"/>
     <parent link="body_link"/>
     <child link="laser"/>
@@ -308,7 +264,7 @@
     <robotBaseFrame>base_link</robotBaseFrame>
     <torque>10</torque>
     <commandTopic>cmd_vel</commandTopic>
-    <broadcastTF>1</broadcastTF>
+    <broadcastTF>0</broadcastTF>
     <odometryFrame>/odom_frame_gazebo</odometryFrame>
     <odometryTopic>/odom_gazebo</odometryTopic>
   </plugin>
@@ -320,7 +276,7 @@
 
 <gazebo reference="laser">
     <material>Gazebo/Blue</material>
-    <sensor type="ray" name="head_hokuyo_sensor">
+    <sensor type="gpu_ray" name="head_hokuyo_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>true</visualize>
       <update_rate>40</update_rate>
@@ -339,12 +295,58 @@
           <resolution>0.01</resolution>
         </range>
       </ray>
-      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_gpu_laser.so">
         <topicName>/scan</topicName>
         <frameName>laser</frameName>
       </plugin>
     </sensor>
   </gazebo>
+
+  <gazebo reference="camera_link">
+    <material>Gazebo/Blue</material>
+    <sensor type="depth" name="camera_link">       
+        <always_on>1</always_on>
+        <visualize>true</visualize>             
+        <camera>
+            <horizontal_fov>1.047</horizontal_fov>  
+            <image>
+                <width>640</width>
+                <height>480</height>
+                <format>R8G8B8</format>
+            </image>
+            <depth_camera>
+
+            </depth_camera>
+            <clip>
+                <near>0.05</near>
+                <far>8.0</far>
+            </clip>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_openni_kinect.so">
+            <cameraName>camera</cameraName>
+            <alwaysOn>true</alwaysOn>
+            <updateRate>10.0</updateRate>
+            <frameName>camera_link</frameName>                   
+            <imageTopicName>rgb/image_rect_color</imageTopicName>
+            <depthImageTopicName>depth_registered/image_raw</depthImageTopicName>
+            <pointCloudTopicName>depth/points</pointCloudTopicName>
+            <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>              
+            <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>            
+            <pointCloudCutoff>0.4</pointCloudCutoff>                
+            <hackBaseline>0.07</hackBaseline>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
+            <CxPrime>0.0</CxPrime>
+            <Cx>0.0</Cx>
+            <Cy>0.0</Cy>
+            <focalLength>0.0</focalLength>
+        </plugin>
+    </sensor>
+</gazebo>
+
 </robot>
 
 

@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.tesseractmobile.pocketbot.R;
+import com.tesseractmobile.pocketbot.robot.faces.EyeAttributes;
 
 public class EyeView extends View {
 
@@ -70,6 +71,8 @@ public class EyeView extends View {
     private float mPupilSizeDst = DEFAULT_PUPIL_SIZE;
     private float mPupilSizeSrc;
     private final ValueAnimator animation;
+
+    private EyeAttributes mEyeAttributes = new EyeAttributes();
     
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
@@ -105,11 +108,11 @@ public class EyeView extends View {
     }
 
     protected LinearGradient getEyeBallGradient(final int w, final int h){
-        return new LinearGradient(0, 0, w, h, Color.parseColor("#b5b5b5"), Color.parseColor("#ffffff"), Shader.TileMode.CLAMP);
+        return new LinearGradient(0, 0, w, h, mEyeAttributes.eyeBallGradientStartColor, mEyeAttributes.eyeBallGradientEndColor, Shader.TileMode.CLAMP);
     }
 
     protected LinearGradient getEyeOuterGradient(final int w, final int h){
-        return new LinearGradient(0, 0, w, h, Color.parseColor("#000000"), Color.parseColor("#4e4e4e"), Shader.TileMode.CLAMP);
+        return new LinearGradient(0, 0, w, h, mEyeAttributes.eyeOuterGradientStartColor, mEyeAttributes.eyeOuterGradientEndColor, Shader.TileMode.CLAMP);
     }
 
     public EyeView(final Context context, final AttributeSet attrs) {
@@ -120,27 +123,12 @@ public class EyeView extends View {
         mEyeCanvas = new Canvas(mEye);
 
         mEyeLidPaint = new Paint();
-        mEyeLidPaint.setColor(getEyelidColor());
-        mEyeLidPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-        
         mCenterPaint = new Paint();
-        mCenterPaint.setColor(Color.argb(255, 181, 181, 181));// White 45 degree
-        mCenterPaint.setAntiAlias(true);
-        
         mInnerRingPaint = new Paint();
-        mInnerRingPaint.setColor(Color.BLACK); //Color.argb(255, 72, 72, 72) 45 degree
-        mInnerRingPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-        mInnerRingPaint.setAntiAlias(true);
-        
         mIrisPaint = new Paint();
-        mIrisPaint.setColor(getIrisColor());
-        mIrisPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-        mIrisPaint.setAntiAlias(true);
-  
         mPupilPaint = new Paint();
-        mPupilPaint.setColor(Color.BLACK); //Color.argb(255, 0, 0, 0) -45 degree
-        mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-        mPupilPaint.setAntiAlias(true);
+
+        setupPaints();
 
         if(Build.VERSION.SDK_INT >= 11) {
             animation = ValueAnimator.ofFloat(0f, 1f);
@@ -158,12 +146,28 @@ public class EyeView extends View {
         }
     }
 
+    private void setupPaints() {
+        mEyeLidPaint.setColor(getEyelidColor());
+        mEyeLidPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mCenterPaint.setColor(Color.argb(255, 181, 181, 181));// White 45 degree
+        mCenterPaint.setAntiAlias(true);
+        mInnerRingPaint.setColor(Color.BLACK); //Color.argb(255, 72, 72, 72) 45 degree
+        mInnerRingPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mInnerRingPaint.setAntiAlias(true);
+        mIrisPaint.setColor(getIrisColor());
+        mIrisPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mIrisPaint.setAntiAlias(true);
+        mPupilPaint.setColor(Color.BLACK); //Color.argb(255, 0, 0, 0) -45 degree
+        mPupilPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+        mPupilPaint.setAntiAlias(true);
+    }
+
     protected int getIrisColor() {
-        return Color.argb(255, 137, 223, 255);
+        return mEyeAttributes.irisColor;
     }
 
     protected int getEyelidColor() {
-        return Color.parseColor("#191919");
+        return mEyeAttributes.eyelidColor;
     }
 
     /**
@@ -380,7 +384,16 @@ public class EyeView extends View {
             startAnimation(100);
         }
     }
-    
+
+    /**
+     * Set new eye attributes
+     * @param eyeAttributes
+     */
+    final protected void setEyeAttributes(EyeAttributes eyeAttributes) {
+        mEyeAttributes = eyeAttributes;
+        setupPaints();
+    }
+
     
     @Override
     public void invalidate() {
