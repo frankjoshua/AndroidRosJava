@@ -56,19 +56,16 @@ public class KeepAliveThread extends Thread{
     @Override
     public void run() {
         while(mRunning.get()){
+            //Keep Arduino awake
+            mKeepAliveListener.onHeartBeat();
+            if (Constants.LOGGING) {
+                Log.d(getName(), "Triggering a sensor send");
+            }
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //Keep Arduino awake
-            if(mRunning.get()) {
-                mKeepAliveListener.onHeartBeat();
-                if (Constants.LOGGING) {
-                    Log.d(getName(), "Triggering a sensor send");
-                }
-            }
-
         }
     }
 
