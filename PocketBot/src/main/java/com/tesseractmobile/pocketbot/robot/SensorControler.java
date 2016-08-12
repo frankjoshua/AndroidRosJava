@@ -73,35 +73,38 @@ public class SensorControler implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            //mGravity = lowPass(event.values.clone(), mGravity);
-            mGravity = lowPass(event.values, mGravity);
-        }
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-            //mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
-            mGeomagnetic = lowPass(event.values, mGeomagnetic);
-        }
-        SensorData sensorData = mRobotInterFace.getSensorData();
-        if (mGravity != null && mGeomagnetic != null) {
-            boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
-            if (success) {
-                SensorManager.getOrientation(ROTATION, ORIENTATION);
-                //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
-                final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
-                if (Math.abs(heading - sensorData.getSensor().heading) > 1) {
-                    sensorData.setHeading(heading);
-                    mRobotInterFace.sendSensorData(false);
-                    //Log.d(TAG, " New Heading " + heading);
+        final RobotInterface robotInterFace = this.mRobotInterFace;
+        if(robotInterFace != null) {
+            SensorData sensorData = robotInterFace.getSensorData();
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                //mGravity = lowPass(event.values.clone(), mGravity);
+                mGravity = lowPass(event.values, mGravity);
+            }
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                //mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
+                mGeomagnetic = lowPass(event.values, mGeomagnetic);
+            }
+            if (mGravity != null && mGeomagnetic != null) {
+                boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
+                if (success) {
+                    SensorManager.getOrientation(ROTATION, ORIENTATION);
+                    //azimut = orientation[0]; // orientation contains: azimut, pitch and roll
+                    final int heading = (int) (Math.toDegrees(ORIENTATION[0]) + 360 + 180) % 360;
+                    if (Math.abs(heading - sensorData.getSensor().heading) > 1) {
+                        sensorData.setHeading(heading);
+                        robotInterFace.sendSensorData(false);
+                        //Log.d(TAG, " New Heading " + heading);
+                    }
                 }
             }
-        }
 
-        if(event.sensor.getType() == Sensor.TYPE_PROXIMITY){
-            final float distance = event.values[0];
-            //Distance is either touching or not
-            sensorData.setProximity(distance < 1.0f);
-            mRobotInterFace.sendSensorData(true);
-            //Log.d(TAG, "Proximity " + Float.toString(distance));
+            if (event.sensor.getType() == Sensor.TYPE_PROXIMITY) {
+                final float distance = event.values[0];
+                //Distance is either touching or not
+                sensorData.setProximity(distance < 1.0f);
+                robotInterFace.sendSensorData(true);
+                //Log.d(TAG, "Proximity " + Float.toString(distance));
+            }
         }
     }
 
