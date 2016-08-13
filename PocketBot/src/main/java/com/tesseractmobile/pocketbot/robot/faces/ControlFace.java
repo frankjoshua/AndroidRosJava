@@ -1,5 +1,6 @@
 package com.tesseractmobile.pocketbot.robot.faces;
 
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -229,16 +230,27 @@ public class ControlFace extends BaseFace implements JoystickView.JoystickListen
 
     @Override
     public void onNodeInit(final NodeMainExecutor nodeMainExecutor, final URI masterUri) {
-        mVisualizationView.init(nodeMainExecutor);
 
-        NodeConfiguration nodeConfiguration =
-                NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(),
-                        masterUri);
-        NtpTimeProvider ntpTimeProvider =
-                new NtpTimeProvider(InetAddressFactory.newFromHostString("pool.ntp.org"),
-                        nodeMainExecutor.getScheduledExecutorService());
-        ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
-        nodeConfiguration.setTimeProvider(ntpTimeProvider);
-        nodeMainExecutor.execute(mVisualizationView, nodeConfiguration);
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected void onPreExecute() {
+                mVisualizationView.init(nodeMainExecutor);
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                NodeConfiguration nodeConfiguration =
+                        NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(),
+                                masterUri);
+                NtpTimeProvider ntpTimeProvider =
+                        new NtpTimeProvider(InetAddressFactory.newFromHostString("pool.ntp.org"),
+                                nodeMainExecutor.getScheduledExecutorService());
+                ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
+                nodeConfiguration.setTimeProvider(ntpTimeProvider);
+                nodeMainExecutor.execute(mVisualizationView, nodeConfiguration);
+                return null;
+            }
+        }.execute();
+
     }
 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Created by josh on 8/1/16.
  */
 abstract public class RosFragmentActivity extends FragmentActivity {
-    private static final int MASTER_CHOOSER_REQUEST_CODE = 0;
+    protected static final int MASTER_CHOOSER_REQUEST_CODE = 0;
 
     private final ServiceConnection nodeMainExecutorServiceConnection;
     private final String notificationTicker;
@@ -157,12 +157,6 @@ abstract public class RosFragmentActivity extends FragmentActivity {
     }
 
     @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        Preconditions.checkArgument(requestCode != MASTER_CHOOSER_REQUEST_CODE);
-        super.startActivityForResult(intent, requestCode);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
@@ -208,7 +202,7 @@ abstract public class RosFragmentActivity extends FragmentActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private String getDefaultHostAddress() {
+    protected String getDefaultHostAddress() {
         return InetAddressFactory.newNonLoopback().getHostAddress();
     }
 

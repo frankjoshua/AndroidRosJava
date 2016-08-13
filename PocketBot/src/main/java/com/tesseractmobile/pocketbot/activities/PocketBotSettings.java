@@ -43,6 +43,7 @@ public class PocketBotSettings {
     public static final boolean DEFAULT_KEEP_ALIVE = false;
     public static final String ROBOT_ID_NOT_SET = "NOT_SET";
     public static final String DEFAULT_ROBOT_NAME = "Robot-1";
+    public static final String KEY_ROS_MASTER_URI = "ros_master_uri";
 
 
     /**
@@ -279,6 +280,23 @@ public class PocketBotSettings {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(KEY_KEEP_ALIVE, DEFAULT_KEEP_ALIVE);
     }
 
+    /**
+     * Save the ROS master host
+     * @param host
+     */
+    public static boolean setRosMasterUri(final Context context, final String host) {
+        return getSharedPrefs(context).edit().putString(KEY_ROS_MASTER_URI, host).commit();
+    }
+
+    /**
+     * Resturn ROS master Uri
+     * @param context
+     * @return
+     */
+    public static String getRosMasterUri(final Context context){
+        return getSharedPrefs(context).getString(KEY_ROS_MASTER_URI, "");
+    }
+
     public static Object getObject(final SharedPreferences sharedPreferences, final String key) {
         if(key.equals(PocketBotSettings.KEY_SELECTED_FACE)){
             return sharedPreferences.getInt(key, 0);
@@ -289,6 +307,8 @@ public class PocketBotSettings {
         } else if (key.equals(PocketBotSettings.KEY_QB_ID)) {
             return sharedPreferences.getInt(key, -1);
         } else if (key.equals(PocketBotSettings.KEY_API_AI_KEY)) {
+            return sharedPreferences.getString(key, "");
+        } else if (key.equals(PocketBotSettings.KEY_ROS_MASTER_URI)) {
             return sharedPreferences.getString(key, "");
         } else if (key.equals(PocketBotSettings.KEY_API_AI_TOKEN)) {
             return sharedPreferences.getString(key, "");
