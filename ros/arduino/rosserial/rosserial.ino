@@ -12,6 +12,8 @@ SabertoothSimplified ST(SWSerial); // Use SWSerial as the serial port.
 #define MOTOR_LEFT 2
 #define MOTOR_RIGHT 1
 
+#define MAX_SPEED 65
+
 /*
 * Helper function to map Floats, based on Arduino map()
 */
@@ -39,11 +41,11 @@ void messageCb( const geometry_msgs::Twist& toggle_msg){
     digitalWrite(13, LOW);
   }
 
-  mSpeed = mapfloat(toggle_msg.linear.x, -1, 1, -127, 127);
-  mDir = mapfloat(toggle_msg.angular.z, -1, 1, -127, 127);
+  mSpeed = mapfloat(toggle_msg.linear.x, -1, 1, -MAX_SPEED, MAX_SPEED);
+  mDir = mapfloat(toggle_msg.angular.z, -1, 1, -MAX_SPEED, MAX_SPEED);
 
-  mGoalLeftPower = constrain(mSpeed + mDir, -127, 127);
-  mGoalRightPower = constrain(mSpeed - mDir, -127, 127);
+  mGoalLeftPower = constrain(mSpeed + mDir, -MAX_SPEED, MAX_SPEED);
+  mGoalRightPower = constrain(mSpeed - mDir, -MAX_SPEED, MAX_SPEED);
 
 }
 
