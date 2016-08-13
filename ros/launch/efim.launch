@@ -1,6 +1,6 @@
 <launch>
   
-  <arg name="base_path" value=".." />
+  <arg name="base_path" default=".." />
 
   <include file="$(arg base_path)/launch/minimal.launch">
     <arg name="base_path" value="$(arg base_path)"/>
