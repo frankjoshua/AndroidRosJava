@@ -89,7 +89,7 @@
   <link name="laser">
     <visual>
       <geometry>
-        <box size="0.0762 0.2794 0.0762"/> 
+        <box size="0.0762 0.0762 0.0762"/> 
       </geometry>
       <material name="blue">
 	<color rgba="0.1 0.1 1 1"/>
@@ -111,7 +111,7 @@
     <axis xyz="0 0 1"/>
     <parent link="body_link"/>
     <child link="laser"/>
-    <origin rpy="0 0 0" xyz="0.0 0 0.55"/>
+    <origin rpy="0 0 0" xyz="0.0 0 0.75"/>
   </joint> 
 
   <link name="hitch_front_link">

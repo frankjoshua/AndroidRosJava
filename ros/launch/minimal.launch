@@ -43,12 +43,16 @@
     
     <!-- Advertising config --> 
     <param name="scan_topic" value="/scan"/>
+
+    <param name="laser_min_dist" value="0.4"/>
+    <param name="laser_max_dist" value="30.0"/> 
+    <param name="laser_z_min_value" value="-1.0"/>
   </node>
 
   <node pkg="tf" type="static_transform_publisher" name="odom_to_base"
-    args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatcher_frame /scanmatch_odom 1"/>
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatcher_frame /scanmatch_odom 10"/>
   <node pkg="tf" type="static_transform_publisher" name="scanmatcher_to_base"
-    args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatch_odom /base_link 1"/>
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatch_odom /base_link 10"/>
 
   <!-- Start Mapping Server -->
   <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->
