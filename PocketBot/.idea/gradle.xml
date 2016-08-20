@@ -8,12 +8,16 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/android_10" />
+            <option value="$PROJECT_DIR$/android_15" />
             <option value="$PROJECT_DIR$/usbSerialForAndroid" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/android_10" />
+            <option value="$PROJECT_DIR$/android_15" />
             <option value="$PROJECT_DIR$/usbSerialForAndroid" />
           </set>
         </option>

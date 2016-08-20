@@ -6,7 +6,8 @@
     <arg name="base_path" value="$(arg base_path)"/>
   </include>
 
-  <include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>
+  <include file="$(find gazebo_ros)/launch/willowgarage_world.launch">
+  </include>
 
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
         args="-param robot_description -urdf -model efim -x 0 -y 0"/>

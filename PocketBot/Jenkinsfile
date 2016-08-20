@@ -31,5 +31,5 @@ node ('ci1') {
     sh "cd PocketBot && git merge origin/master"
     sh "cd PocketBot && git push origin beta"
     //Upload to Crashlytics beta
-    sh "cd PocketBot && ./gradlew assembleDebug crashlyticsUploadDistributionDebug"
+    //sh "cd PocketBot && ./gradlew assembleDebug crashlyticsUploadDistributionDebug"
 }

@@ -1,14 +1,26 @@
+
 buildscript {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://jitpack.io' }
+        maven {
+            url "http://repository.springsource.com/maven/bundles/release"
+        }
+        maven {
+            url "http://repository.springsource.com/maven/bundles/external"
+        }
+        maven {
+            url "https://github.com/rosjava/rosjava_mvn_repo/raw/master"
+        }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
         classpath 'com.github.JakeWharton:sdk-manager-plugin:220bf7a88a7072df3ed16dc8466fb144f2817070'
         classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.google.gms:google-services:3.0.0'
+        classpath "org.ros.rosjava_bootstrap:gradle_plugins:[0.2,0.3)"
     }
 }
 
@@ -16,8 +28,41 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
     }
 }
+
+//configure(subprojects.findAll { it.name.startsWith("android_") }) {
+//    /*
+//     * The android plugin configures a few things:
+//     *
+//     *  - local deployment repository : where it dumps the jars and packaged artifacts)
+//     *  - local maven repositories    : where it finds your locally installed/built artifacts)
+//     *  - external maven repositories : where it goes looking if it can't find dependencies locally
+//     *  - android build tools version : which version we use across the board
+//     *
+//     * To modify, or add repos to the default external maven repositories list, pull request against this code:
+//     *
+//     *   https://github.com/rosjava/rosjava_bootstrap/blob/indigo/gradle_plugins/src/main/groovy/org/ros/gradle_plugins/RosPlugin.groovy#L31
+//     *
+//     * To modify the build tools version, pull request against this code:
+//     *
+//     *   https://github.com/rosjava/rosjava_bootstrap/blob/indigo/gradle_plugins/src/main/groovy/org/ros/gradle_plugins/RosAndroid.groovy#L14
+//     */
+//    apply plugin: "ros-android"
+//    afterEvaluate { project ->
+//        // Change the layout of Android projects to be compatible with Eclipse.
+//        android {
+//            // Exclude a few files that are duplicated across our dependencies and
+//            // prevent packaging Android applications.
+//            packagingOptions {
+//                /* https://github.com/rosjava/android_core/issues/194 */
+//                exclude "META-INF/LICENSE.txt"
+//                exclude "META-INF/NOTICE.txt"
+//            }
+//        }
+//    }
+//}
 
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
@@ -32,6 +77,16 @@ repositories {
     maven {
         url 'https://houndify.com/maven/'
     }
+    maven {
+        url "http://repository.springsource.com/maven/bundles/release"
+    }
+    maven {
+        url "http://repository.springsource.com/maven/bundles/external"
+    }
+    maven {
+        url "https://github.com/rosjava/rosjava_mvn_repo/raw/master"
+    }
+    mavenCentral()
 }
 
 android {
@@ -102,10 +157,14 @@ android {
     }
 
     packagingOptions {
+        pickFirst  'META-INF/license.txt'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE'
+        exclude "META-INF/NOTICE.txt"
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'LICENSE.txt'
+        exclude 'META-INF/maven/commons-io/commons-io/pom.xml'
+        exclude 'META-INF/maven/commons-io/commons-io/pom.properties'
     }
 
     dexOptions {
@@ -117,6 +176,11 @@ android {
         abortOnError false
         //Stops false positives with the % symbol
         disable "StringFormatInvalid","StringFormatMatches"
+    }
+
+    configurations.all {
+        //SEE: http://stackoverflow.com/questions/37347326/errorconflict-with-dependency-com-google-code-findbugsjsr305
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
     }
 }
 
@@ -193,6 +257,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     androidTestCompile 'junit:junit:+'
     androidTestCompile 'tools.fastlane:screengrab:0.3.2'
+    //Android ros support - https://github.com/rosjava/android_core/tree/indigo
+    compile project(':android_15')
 }
 
 

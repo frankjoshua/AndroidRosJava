@@ -15,6 +15,8 @@ import com.tesseractmobile.pocketbot.views.MouthView;
 
 import java.util.ArrayList;
 
+import de.measite.minidns.record.A;
+
 /**
  * Created by josh on 11/16/2015.
  */
@@ -34,6 +36,8 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     private VoiceRecognitionService mVoiceRecognitionService;
     final private SensorData mSensorData = new SensorData();
     final private DataStore mDataStore;
+    /** Updated when new sensor data is received */
+    final private ArrayList<SensorListener> mSensorListeners = new ArrayList<>();
 
     protected BodyInterface mBodyInterface = new BodyInterface() {
         @Override
@@ -129,6 +133,13 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
                 Log.e(TAG, mSensorDelay + " Data dropped - too fast: " + (uptime - mLastSensorTransmision));
             }
             System.gc();
+        }
+        //Update sensor data listeners
+        synchronized (mSensorListeners) {
+            final int size = mSensorListeners.size();
+            for (int i = 0; i < size; i++) {
+                mSensorListeners.get(i).onSensorUpdate(mSensorData);
+            }
         }
     }
 
@@ -368,5 +379,35 @@ abstract public class BaseRobot implements RobotInterface, MouthView.SpeechCompl
     @Override
     public void setIsNew(boolean isNew) {
         mIsNew = isNew;
+    }
+
+    /**
+     * Listen for sensor updates
+     * @param sensorListener
+     */
+    @Override
+    public void registerSensorListener(final SensorListener sensorListener){
+        synchronized (mSensorListeners){
+            mSensorListeners.add(sensorListener);
+        }
+    }
+
+    /**
+     * Stop listening for senspr updates
+     * @param sensorListener
+     */
+    @Override
+    public void unregisterSensorListener(final SensorListener sensorListener){
+        synchronized (mSensorListeners){
+            mSensorListeners.remove(sensorListener);
+        }
+    }
+
+    public interface SensorListener {
+        /**
+         * Called when new sensor data received
+         * @param sensorData
+         */
+        void onSensorUpdate(SensorData sensorData);
     }
 }

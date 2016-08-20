@@ -1,35 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:background="@drawable/efim_background_texture">
 
-
-
-    <FrameLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
-    <com.quickblox.videochat.webrtc.view.RTCGLVideoView
+    <com.tesseractmobile.pocketbot.views.RTCGLVideoViewMediaView
         android:id="@+id/remoteVideoView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp">
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Connect"
-                android:layout_alignParentRight="true"
-                android:id="@+id/btnConnect"/>
-        </RelativeLayout>
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <org.ros.android.view.visualization.VisualizationView
+        android:id="@+id/visualization"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tvInput" />
 
         <TextView
             android:layout_width="match_parent"
@@ -48,21 +35,35 @@
             android:background="#44000000"
             android:id="@+id/tvFaceData"
             android:layout_gravity="bottom|center_horizontal"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
         <com.tesseractmobile.pocketbot.views.JoystickView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:id="@+id/joyStickLeft"
             android:layout_gravity="bottom|left"
-            android:layout_margin="10dp" />
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
         <com.tesseractmobile.pocketbot.views.JoystickView
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:id="@+id/joyStick"
             android:layout_gravity="bottom|right"
-            android:layout_margin="10dp" />
-    </FrameLayout>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect"
+        android:id="@+id/btnConnect"
+        android:layout_below="@+id/tvInput"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
-
-</LinearLayout>
+</RelativeLayout>

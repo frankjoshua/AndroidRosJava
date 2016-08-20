@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -59,9 +58,21 @@ import com.tesseractmobile.pocketbot.robot.SensorControler;
 import com.tesseractmobile.pocketbot.robot.SensorData;
 import com.tesseractmobile.pocketbot.robot.SpeechListener;
 
+import org.ros.address.InetAddressFactory;
+import org.ros.android.MasterChooser;
+import org.ros.android.RosFragmentActivity;
+import org.ros.exception.RosRuntimeException;
+import org.ros.node.NodeMainExecutor;
+
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+
 import io.fabric.sdk.android.Fabric;
 
-public class BaseFaceFragmentActivity extends FragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
+public class BaseFaceFragmentActivity extends RosFragmentActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener, SpeechListener, KeepAliveThread.KeepAliveListener, KeepAliveThread.InternetAliveListener {
 
     private static final String TAG = BaseFaceFragmentActivity.class.getSimpleName();
 
@@ -87,6 +98,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
 
     /** For finding local network devices */
     private GoogleNearbyConnectionController mGoogleNearbyConnectionController;
+
+    public BaseFaceFragmentActivity(){
+        super("PocketBot", "PocketBot");
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -286,6 +301,12 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
     }
 
     @Override
+    protected void init(final NodeMainExecutor nodeMainExecutor) {
+        //Create main PocketBot nodes
+        new PocketBotNode(nodeMainExecutor, getMasterUri());
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         //Listen for preference changes
@@ -479,10 +500,11 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                 break;
             case R.id.btnFeedback:
                 //Launch user feedback website
-                String url = "https://feedback.userreport.com/eb1b841d-4f55-44a7-9432-36e77efefb77/";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+//                String url = "https://feedback.userreport.com/eb1b841d-4f55-44a7-9432-36e77efefb77/";
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse(url));
+//                startActivity(i);
+                startActivityForResult(new Intent(this, MasterChooser.class), RosFragmentActivity.MASTER_CHOOSER_REQUEST_CODE);
                 break;
             case R.id.tvModes:
                 //Toggle Modes View visibility
@@ -555,6 +577,10 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
                     String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                     Log.d(TAG, "Sent " + ids.length + " Invitations");
                     break;
+                case RosFragmentActivity.MASTER_CHOOSER_REQUEST_CODE:
+                    //save the ros master uri
+                    PocketBotSettings.setRosMasterUri(this, nodeMainExecutorService.getMasterUri().toString());
+                    break;
             }
         }
     }
@@ -614,5 +640,14 @@ public class BaseFaceFragmentActivity extends FragmentActivity implements Shared
         }
     }
 
-
+    @Override
+    public URI getMasterUri() {
+        final String savedHost = PocketBotSettings.getRosMasterUri(this);
+        if(savedHost.equals("")){
+            return super.getMasterUri();
+        } else {
+            final URI rosUri = URI.create(savedHost);
+            return  rosUri;
+        }
+    }
 }

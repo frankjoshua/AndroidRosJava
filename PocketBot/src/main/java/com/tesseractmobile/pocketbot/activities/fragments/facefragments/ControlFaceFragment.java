@@ -26,6 +26,9 @@ import com.tesseractmobile.pocketbot.robot.faces.ControlFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotFace;
 import com.tesseractmobile.pocketbot.robot.faces.RobotInterface;
 
+import org.ros.android.RosFragmentActivity;
+import org.ros.android.view.visualization.VisualizationView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +41,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
 
     private RobotFace mRobotFace;
     private RTCGLVideoView mRemoteVideoView;
+    private VisualizationView mVisualizationView;
     private Button mConnectButton;
     private RemoteState mRemoteState = RemoteState.NOT_CONNECTED;
     private QBRTCSession mSession;
@@ -61,7 +65,8 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         mConnectButton = (Button) view.findViewById(R.id.btnConnect);
         mConnectButton.setOnClickListener(this);
         mRemoteVideoView = (RTCGLVideoView) view.findViewById(R.id.remoteVideoView);
-        mRobotFace = new ControlFace(view);
+        mVisualizationView = (VisualizationView) view.findViewById(R.id.visualization);
+        mRobotFace = new ControlFace(view, (RosFragmentActivity) getActivity());
         return view;
     }
 
@@ -151,6 +156,7 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
                 //Setup Remote video
                 TelepresenceFaceFragment.fillVideoView(mRemoteVideoView, qbrtcVideoTrack, true);
                 mRemoteVideoView.setVisibility(View.VISIBLE);
+                mVisualizationView.setVisibility(View.GONE);
             }
         });;
     }
@@ -172,7 +178,8 @@ public class ControlFaceFragment extends QuickBloxFragment implements View.OnCli
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mRemoteVideoView.setVisibility(View.INVISIBLE);
+                mRemoteVideoView.setVisibility(View.GONE);
+                mVisualizationView.setVisibility(View.VISIBLE);
                 setRemoteState(RemoteState.NOT_CONNECTED);
             }
         });
