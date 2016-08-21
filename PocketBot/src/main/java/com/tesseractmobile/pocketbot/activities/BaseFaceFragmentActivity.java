@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -131,6 +133,7 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
         findViewById(R.id.tvModes).setOnClickListener(this);
         findViewById(R.id.tvSettings).setOnClickListener(this);
         findViewById(R.id.tvEmotions).setOnClickListener(this);
+        findViewById(R.id.tvRobotId).setOnClickListener(this);
 
         //Hide views
         findViewById(R.id.llModes).setVisibility(View.GONE);
@@ -222,8 +225,10 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
     private void updateUI() {
         //Setup Robot Id
         final TextView tvRobotId = (TextView) findViewById(R.id.tvRobotId);
-        tvRobotId.setText(PocketBotSettings.getRobotId(this));
-
+        //tvRobotId.setText(PocketBotSettings.getRobotId(this));
+        final WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+        final String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        tvRobotId.setText(ip);
         //Setup Robot Name
         final TextView tvRobotName = (TextView) findViewById(R.id.tvRobotName);
         tvRobotName.setText(PocketBotSettings.getRobotName(this));
@@ -302,6 +307,13 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
 
     @Override
     protected void init(final NodeMainExecutor nodeMainExecutor) {
+        //This is run from an acync task so update the ui from a runnable
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((TextView) findViewById(R.id.tvRobotId)).setText("Connected to: " + getMasterUri().toString());
+            }
+        });
         //Create main PocketBot nodes
         new PocketBotNode(nodeMainExecutor, getMasterUri());
     }
@@ -500,12 +512,11 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
                 break;
             case R.id.btnFeedback:
                 //Launch user feedback website
-//                String url = "https://feedback.userreport.com/eb1b841d-4f55-44a7-9432-36e77efefb77/";
-//                Intent i = new Intent(Intent.ACTION_VIEW);
-//                i.setData(Uri.parse(url));
-//                startActivity(i);
-                startActivityForResult(new Intent(this, MasterChooser.class), RosFragmentActivity.MASTER_CHOOSER_REQUEST_CODE);
-                break;
+                String url = "https://feedback.userreport.com/eb1b841d-4f55-44a7-9432-36e77efefb77/";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+                 break;
             case R.id.tvModes:
                 //Toggle Modes View visibility
                 final View modesLayout = findViewById(R.id.llModes);
@@ -517,6 +528,9 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
             case R.id.tvEmotions:
                 final View emotionsFragment = findViewById(R.id.emotionsFragment);
                 toggleViewVisibility(emotionsFragment);
+                break;
+            case R.id.tvRobotId:
+                startActivityForResult(new Intent(this, MasterChooser.class), RosFragmentActivity.MASTER_CHOOSER_REQUEST_CODE);
                 break;
             default:
                 throw new UnsupportedOperationException("Not implemented");
@@ -641,10 +655,10 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
     }
 
     @Override
-    public URI getMasterUri() {
+    public URI getSavedMasterUri() {
         final String savedHost = PocketBotSettings.getRosMasterUri(this);
         if(savedHost.equals("")){
-            return super.getMasterUri();
+            return null;
         } else {
             final URI rosUri = URI.create(savedHost);
             return  rosUri;
