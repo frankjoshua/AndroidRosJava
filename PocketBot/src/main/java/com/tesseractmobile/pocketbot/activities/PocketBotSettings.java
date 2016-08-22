@@ -294,7 +294,8 @@ public class PocketBotSettings {
      * @return
      */
     public static String getRosMasterUri(final Context context){
-        return getSharedPrefs(context).getString(KEY_ROS_MASTER_URI, "");
+        return null;
+        //return getSharedPrefs(context).getString(KEY_ROS_MASTER_URI, "");
     }
 
     public static Object getObject(final SharedPreferences sharedPreferences, final String key) {

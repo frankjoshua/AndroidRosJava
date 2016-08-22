@@ -83,8 +83,18 @@ abstract public class RosFragmentActivity extends FragmentActivity {
         super();
         this.notificationTicker = notificationTicker;
         this.notificationTitle = notificationTitle;
-        nodeMainExecutorServiceConnection = new NodeMainExecutorServiceConnection(customMasterUri);
+        if(customMasterUri == null){
+            nodeMainExecutorServiceConnection = new NodeMainExecutorServiceConnection(getSavedMasterUri());
+        } else {
+            nodeMainExecutorServiceConnection = new NodeMainExecutorServiceConnection(null);
+        }
     }
+
+    /**
+     * Saved ROS Master URI or null if none
+     * @return
+     */
+    abstract protected URI getSavedMasterUri();
 
     @Override
     protected void onStart() {

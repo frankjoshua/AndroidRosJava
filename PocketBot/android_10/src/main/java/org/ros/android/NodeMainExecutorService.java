@@ -97,6 +97,7 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     listeners =
         new ListenerGroup<NodeMainExecutorServiceListener>(
             nodeMainExecutor.getScheduledExecutorService());
+    startMaster(false);
   }
 
   @Override

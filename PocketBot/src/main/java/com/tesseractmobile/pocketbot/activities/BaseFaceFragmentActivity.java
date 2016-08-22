@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -41,6 +42,7 @@ import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotThought;
 import com.google.code.chatterbotapi.ChatterBotType;
+import com.tesseractmobile.pocketbot.BuildConfig;
 import com.tesseractmobile.pocketbot.R;
 import com.tesseractmobile.pocketbot.activities.fragments.ApiAiKeyDialog;
 import com.tesseractmobile.pocketbot.activities.fragments.CallbackFragment;
@@ -311,7 +313,16 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((TextView) findViewById(R.id.tvRobotId)).setText("Connected to: " + getMasterUri().toString());
+                final String masterUri = getMasterUri().toString();
+                final String finalUri;
+                if(masterUri.contains("android")){
+                    WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+                    String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+                    finalUri = "http://" + ip + ":11311";
+                } else {
+                    finalUri = "Connected to: " + masterUri;
+                }
+                ((TextView) findViewById(R.id.tvRobotId)).setText(finalUri);
             }
         });
         //Create main PocketBot nodes
@@ -657,7 +668,7 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
     @Override
     public URI getSavedMasterUri() {
         final String savedHost = PocketBotSettings.getRosMasterUri(this);
-        if(savedHost.equals("")){
+        if(savedHost == null || savedHost.equals("")){
             return null;
         } else {
             final URI rosUri = URI.create(savedHost);
