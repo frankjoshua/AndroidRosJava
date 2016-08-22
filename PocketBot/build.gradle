@@ -142,7 +142,7 @@ android {
         debug {
             minifyEnabled false //usb serial for android does not currently work with proguard
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-rules-debug.pro'
-            testCoverageEnabled true
+            testCoverageEnabled false
             testProguardFile 'proguard-test-rules.pro'
             versionNameSuffix "-beta"
             ext.betaDistributionGroupAliases="pocketbotbeta"
@@ -185,8 +185,8 @@ android {
 }
 
 ext {
-    playServicesVersion = '9.2.1'
-    supportLibVersion = '24.0.0'
+    playServicesVersion = '9.4.0'
+    supportLibVersion = '24.2.0'
     qbSdkVersion = '2.6'
 }
 
@@ -232,7 +232,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'ai.api:sdk:1.9.0@aar'
-    compile 'commons-io:commons-io:2.4'
+    //compile 'commons-io:commons-io:2.4'
     compile "com.google.firebase:firebase-core:${playServicesVersion}"
     compile "com.google.firebase:firebase-database:${playServicesVersion}"
     compile "com.google.firebase:firebase-auth:${playServicesVersion}"
