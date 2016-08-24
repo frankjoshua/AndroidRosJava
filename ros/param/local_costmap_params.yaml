@@ -1,7 +1,0 @@
-local_costmap:
-  global_frame: scanmatch_odom
-  robot_base_frame: base_link
-  rolling_window: true
-  static_map: false
-  update_frequency: 10.0
-  publish_frequency: 10.0
