@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.common.base.Preconditions;
@@ -26,15 +29,19 @@ import java.util.ArrayList;
  */
 abstract public class RosFragmentActivity extends FragmentActivity {
     protected static final int MASTER_CHOOSER_REQUEST_CODE = 0;
+    private final URI mCustomMasterUri;
 
-    private final ServiceConnection nodeMainExecutorServiceConnection;
+    private ServiceConnection nodeMainExecutorServiceConnection;
     private final String notificationTicker;
     private final String notificationTitle;
 
     protected NodeMainExecutorService nodeMainExecutorService;
 
-    /** Listen for ROS node connection */
+    /**
+     * Listen for ROS node connection
+     */
     final private ArrayList<NodeInitListener> mNodeInitListeners = new ArrayList<NodeInitListener>();
+
 
     private final class NodeMainExecutorServiceConnection implements ServiceConnection {
 
@@ -73,7 +80,9 @@ abstract public class RosFragmentActivity extends FragmentActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
         }
-    };
+    }
+
+    ;
 
     protected RosFragmentActivity(String notificationTicker, String notificationTitle) {
         this(notificationTicker, notificationTitle, null);
@@ -83,7 +92,13 @@ abstract public class RosFragmentActivity extends FragmentActivity {
         super();
         this.notificationTicker = notificationTicker;
         this.notificationTitle = notificationTitle;
-        if(customMasterUri == null){
+        this.mCustomMasterUri = customMasterUri;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (mCustomMasterUri == null) {
             nodeMainExecutorServiceConnection = new NodeMainExecutorServiceConnection(getSavedMasterUri());
         } else {
             nodeMainExecutorServiceConnection = new NodeMainExecutorServiceConnection(null);
@@ -92,6 +107,7 @@ abstract public class RosFragmentActivity extends FragmentActivity {
 
     /**
      * Saved ROS Master URI or null if none
+     *
      * @return
      */
     abstract protected URI getSavedMasterUri();
@@ -127,8 +143,8 @@ abstract public class RosFragmentActivity extends FragmentActivity {
             protected Void doInBackground(Void... params) {
                 RosFragmentActivity.this.init(nodeMainExecutorService);
                 //Let everyone know that init is called
-                synchronized (mNodeInitListeners){
-                    for(final NodeInitListener nodeInitListener : mNodeInitListeners){
+                synchronized (mNodeInitListeners) {
+                    for (final NodeInitListener nodeInitListener : mNodeInitListeners) {
                         nodeInitListener.onNodeInit(nodeMainExecutorService, getMasterUri());
                     }
                     mNodeInitListeners.clear();
@@ -144,8 +160,7 @@ abstract public class RosFragmentActivity extends FragmentActivity {
      * and a {@link NodeMainExecutorService} has started. Your {@link NodeMain}s
      * should be started here using the provided {@link NodeMainExecutor}.
      *
-     * @param nodeMainExecutor
-     *          the {@link NodeMainExecutor} created for this {@link Activity}
+     * @param nodeMainExecutor the {@link NodeMainExecutor} created for this {@link Activity}
      */
     protected abstract void init(NodeMainExecutor nodeMainExecutor);
 
@@ -216,9 +231,9 @@ abstract public class RosFragmentActivity extends FragmentActivity {
         return InetAddressFactory.newNonLoopback().getHostAddress();
     }
 
-    public void registerNodeInitListener(final NodeInitListener nodeInitListener){
-        synchronized (mNodeInitListeners){
-            if(nodeMainExecutorService != null){
+    public void registerNodeInitListener(final NodeInitListener nodeInitListener) {
+        synchronized (mNodeInitListeners) {
+            if (nodeMainExecutorService != null) {
                 nodeInitListener.onNodeInit(nodeMainExecutorService, getMasterUri());
             } else {
                 mNodeInitListeners.add(nodeInitListener);

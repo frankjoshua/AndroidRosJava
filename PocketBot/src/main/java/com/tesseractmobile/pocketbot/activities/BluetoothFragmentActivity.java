@@ -61,7 +61,7 @@ public class BluetoothFragmentActivity extends AiFragmentActivity {
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         //Only phones with API 18+ have Bluetooth LE
         if(Build.VERSION.SDK_INT < 18){

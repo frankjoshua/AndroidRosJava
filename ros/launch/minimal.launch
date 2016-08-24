@@ -53,6 +53,8 @@
     args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatcher_frame /scanmatch_odom 10"/>
   <node pkg="tf" type="static_transform_publisher" name="scanmatcher_to_base"
     args="0.0 0.0 0.0 0.0 0.0 0.0 /scanmatch_odom /base_link 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="pocketbot_to_base"
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /base_link /pocketbot 10"/>
 
   <!-- Start Mapping Server -->
   <!--<node name="map_server" pkg="map_server" type="map_server" args="/home/josh/efim/ros_ws/src/efim/map.yaml"/>-->

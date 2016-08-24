@@ -43,7 +43,7 @@ public class UsbAccessoryFragmentActivity extends AiFragmentActivity {
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         unbindService(conn);
         super.onStop();
     }

@@ -262,7 +262,10 @@ public class SensorData {
         public int heading;
         public boolean proximity;
         public SensorData.Gps gps = new SensorData.Gps();
+        public SensorData.Imu imu = new SensorData.Imu();
         public int battery;
+        /** Time stamp in millis */
+        public long timestamp;
     }
 
 
@@ -274,6 +277,50 @@ public class SensorData {
         public String toString() {
             final String toString = "X: " + Double.toString(joy1.X) + " Y: " + Double.toString(joy1.Y);
             return toString;
+        }
+    }
+
+    static public class Imu {
+        public float linear_x;
+        public float linear_y;
+        public float linear_z;
+        public float angular_x;
+        public float angular_y;
+        public float angular_z;
+        public float orientation_w;
+        public float orientation_x;
+        public float orientation_y;
+        public float orientation_z;
+
+        /**
+         * Update linearVaules
+         * @param values 3 floats {x,y,z}
+         */
+        public void updateLinearVelocity(final float[] values) {
+            linear_x = values[0];
+            linear_y = values[1];
+            linear_z = values[2];
+        }
+
+        /**
+         * Update Angular Velocity
+         * @param values 3 floats {x,y,z}
+         */
+        public void updateAngularVelocity(final float[] values) {
+            angular_x = values[0];
+            angular_y = values[1];
+            angular_z = values[2];
+        }
+
+        /**
+         * Update orientation
+         * @param quaternion 4 floats {x,x,y,z}
+         */
+        public void updateOrientation(final float[] quaternion) {
+            orientation_w = quaternion[0];
+            orientation_x = quaternion[1];
+            orientation_y = quaternion[2];
+            orientation_z = quaternion[3];
         }
     }
 }

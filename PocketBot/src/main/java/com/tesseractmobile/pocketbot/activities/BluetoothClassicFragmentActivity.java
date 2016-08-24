@@ -94,7 +94,7 @@ public class BluetoothClassicFragmentActivity extends AiFragmentActivity {
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         //Unbind from bluetooth service
         if(mBluetoothEnabled) {

@@ -330,7 +330,7 @@ public class BaseFaceFragmentActivity extends RosFragmentActivity implements Sha
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         //Listen for preference changes
         PocketBotSettings.unregisterOnSharedPreferenceChangeListener(this, this);

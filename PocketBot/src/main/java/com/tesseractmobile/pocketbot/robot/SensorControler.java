@@ -31,6 +31,8 @@ public class SensorControler implements SensorEventListener {
     private RobotInterface mRobotInterFace;
     /** For battery level updates */
     private BroadcastReceiver mBatteryReceiver;
+    /** w,x,y,z quaternion */
+    private float[] mOrientation = new float[4];
 
     public SensorControler(final Context context) {
         //Start senors
@@ -43,6 +45,8 @@ public class SensorControler implements SensorEventListener {
         //Start listening for orientation
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_UI);
         //Listen to proximity sensor
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY), SensorManager.SENSOR_DELAY_UI);
 
@@ -75,14 +79,23 @@ public class SensorControler implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         final RobotInterface robotInterFace = this.mRobotInterFace;
         if(robotInterFace != null) {
-            SensorData sensorData = robotInterFace.getSensorData();
+            final SensorData sensorData = robotInterFace.getSensorData();
+            sensorData.getSensor().timestamp = event.timestamp;
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 //mGravity = lowPass(event.values.clone(), mGravity);
                 mGravity = lowPass(event.values, mGravity);
-            }
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                //Update linear acceleration
+                sensorData.getSensor().imu.updateLinearVelocity(event.values);
+            } else if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                //Update Angular Velocity
+                sensorData.getSensor().imu.updateAngularVelocity(event.values);
+            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                 //mGeomagnetic = lowPass(event.values.clone(), mGeomagnetic);
                 mGeomagnetic = lowPass(event.values, mGeomagnetic);
+            } else if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+                //Update rotation
+                SensorManager.getQuaternionFromVector(mOrientation, event.values);
+                sensorData.getSensor().imu.updateOrientation(mOrientation);
             }
             if (mGravity != null && mGeomagnetic != null) {
                 boolean success = SensorManager.getRotationMatrix(ROTATION, INCLINATION, mGravity, mGeomagnetic);
