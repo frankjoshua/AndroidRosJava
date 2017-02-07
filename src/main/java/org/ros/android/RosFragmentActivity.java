@@ -8,8 +8,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
 import com.google.common.base.Preconditions;
 
@@ -186,7 +188,7 @@ abstract public class RosFragmentActivity extends FragmentActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == MASTER_CHOOSER_REQUEST_CODE) {
-                String host;
+                String host = "";
                 String networkInterfaceName = data.getStringExtra("ROS_MASTER_NETWORK_INTERFACE");
                 // Handles the default selection and prevents possible errors
                 if (networkInterfaceName == null || networkInterfaceName.equals("")) {
@@ -196,7 +198,8 @@ abstract public class RosFragmentActivity extends FragmentActivity {
                         NetworkInterface networkInterface = NetworkInterface.getByName(networkInterfaceName);
                         host = InetAddressFactory.newNonLoopbackForNetworkInterface(networkInterface).getHostAddress();
                     } catch (SocketException e) {
-                        throw new RosRuntimeException(e);
+                        Toast.makeText(this, "No non loopback interface found. Are you connected to wifi?", Toast.LENGTH_LONG).show();
+                        return;
                     }
                 }
                 nodeMainExecutorService.setRosHostname(host);
@@ -207,7 +210,8 @@ abstract public class RosFragmentActivity extends FragmentActivity {
                     try {
                         uri = new URI(data.getStringExtra("ROS_MASTER_URI"));
                     } catch (URISyntaxException e) {
-                        throw new RosRuntimeException(e);
+                        Toast.makeText(this, "Bad ROS master URI. Format should be http://ros_master_ip:11311", Toast.LENGTH_LONG).show();
+                        return;
                     }
                     nodeMainExecutorService.setMasterUri(uri);
                 }
