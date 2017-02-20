@@ -101,7 +101,7 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     listeners =
         new ListenerGroup<NodeMainExecutorServiceListener>(
             nodeMainExecutor.getScheduledExecutorService());
-    startMaster(false);
+    //startMaster(false);
   }
 
   @Override
@@ -298,7 +298,13 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     } else if (rosHostname != null) {
       rosCore = RosCore.newPublic(rosHostname, 11311);
     } else {
-      rosCore = RosCore.newPublic(11311);
+      try {
+        rosCore = RosCore.newPublic(11311);
+      } catch (Exception ex){
+        //Probally not connected to wifi
+        Log.e(getClass().getSimpleName(), ex.getMessage());
+        return;
+      }
     }
     rosCore.start();
     try {
