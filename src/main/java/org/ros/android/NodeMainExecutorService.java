@@ -18,13 +18,10 @@ package org.ros.android;
 
 import com.google.common.base.Preconditions;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -36,13 +33,12 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 import org.ros.RosCore;
 import org.ros.android.android_15.R;
-import org.ros.address.InetAddressFactory;
 import org.ros.concurrent.ListenerGroup;
 import org.ros.concurrent.SignalRunnable;
 import org.ros.exception.RosRuntimeException;
@@ -99,9 +95,8 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     nodeMainExecutor = DefaultNodeMainExecutor.newDefault();
     binder = new LocalBinder();
     listeners =
-        new ListenerGroup<NodeMainExecutorServiceListener>(
-            nodeMainExecutor.getScheduledExecutorService());
-    //startMaster(false);
+            new ListenerGroup<NodeMainExecutorServiceListener>(
+                    nodeMainExecutor.getScheduledExecutorService());
   }
 
   @Override
@@ -124,7 +119,7 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
 
   @Override
   public void execute(NodeMain nodeMain, NodeConfiguration nodeConfiguration,
-      Collection<NodeListener> nodeListeneners) {
+                      Collection<NodeListener> nodeListeneners) {
     nodeMainExecutor.execute(nodeMain, nodeConfiguration, nodeListeneners);
   }
 
@@ -145,28 +140,27 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
 
   @Override
   public void shutdown() {
-//    handler.post(new Runnable() {
-//      @Override
-//      public void run() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(NodeMainExecutorService.this);
-//        builder.setMessage("Continue shutting down?");
-//        builder.setPositiveButton("Shutdown", new OnClickListener() {
-//          @Override
-//          public void onClick(DialogInterface dialog, int which) {
-//            forceShutdown();
-//          }
-//        });
-//        builder.setNegativeButton("Cancel", new OnClickListener() {
-//          @Override
-//          public void onClick(DialogInterface dialog, int which) {
-//          }
-//        });
-//        AlertDialog alertDialog = builder.create();
-//        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-//        alertDialog.show();
-//      }
-//    });
-    forceShutdown();
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(NodeMainExecutorService.this);
+        builder.setMessage("Continue shutting down?");
+        builder.setPositiveButton("Shutdown", new OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            forceShutdown();
+          }
+        });
+        builder.setNegativeButton("Cancel", new OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+          }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        alertDialog.show();
+      }
+    });
   }
 
   public void forceShutdown() {
@@ -212,23 +206,19 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     if (intent.getAction().equals(ACTION_START)) {
       Preconditions.checkArgument(intent.hasExtra(EXTRA_NOTIFICATION_TICKER));
       Preconditions.checkArgument(intent.hasExtra(EXTRA_NOTIFICATION_TITLE));
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.icon)
-                        .setContentTitle(intent.getStringExtra(EXTRA_NOTIFICATION_TITLE))
-                        .setContentText("Tap to shutdown " + intent.getStringExtra(EXTRA_NOTIFICATION_TICKER));
-
+      NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
       Intent notificationIntent = new Intent(this, NodeMainExecutorService.class);
       notificationIntent.setAction(NodeMainExecutorService.ACTION_SHUTDOWN);
       PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
-
-        mBuilder.setContentIntent(pendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        //Close notification after clicking
-        mBuilder.setAutoCancel(true);
-        // 1001 allows you to update the notification later on.
-        mNotificationManager.notify(1001, mBuilder.build());
+      Notification notification = builder.setContentIntent(pendingIntent)
+              .setSmallIcon(R.drawable.icon)
+              .setTicker(intent.getStringExtra(EXTRA_NOTIFICATION_TICKER))
+              .setWhen(System.currentTimeMillis())
+              .setContentTitle(intent.getStringExtra(EXTRA_NOTIFICATION_TITLE))
+              .setAutoCancel(true)
+              .setContentText("Tap to shutdown.")
+              .build();
+      startForeground(ONGOING_NOTIFICATION, notification);
     }
     if (intent.getAction().equals(ACTION_SHUTDOWN)) {
       shutdown();
@@ -298,13 +288,7 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     } else if (rosHostname != null) {
       rosCore = RosCore.newPublic(rosHostname, 11311);
     } else {
-      try {
-        rosCore = RosCore.newPublic(11311);
-      } catch (Exception ex){
-        //Probally not connected to wifi
-        Log.e(getClass().getSimpleName(), ex.getMessage());
-        return;
-      }
+      rosCore = RosCore.newPublic(11311);
     }
     rosCore.start();
     try {
