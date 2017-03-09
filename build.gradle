@@ -14,8 +14,8 @@
  * the License.
  */
 
-//apply plugin: "ros-android"
-apply plugin: 'com.android.library'
+
+apply plugin: "ros-android"
 
 dependencies {
   compile 'org.ros.rosjava_core:rosjava_geometry:[0.2,0.3)'
@@ -25,15 +25,15 @@ dependencies {
   compile "org.ros.rosjava_messages:sensor_msgs:[1.11,1.12)"
 }
 
-
+apply plugin: 'com.android.library'
 
 android {
-  compileSdkVersion 25
-  buildToolsVersion '25.0.2'
+  compileSdkVersion 24
+  buildToolsVersion "23.0.3"
 
   defaultConfig {
     minSdkVersion 15
-    targetSdkVersion 25
+    targetSdkVersion 15
     versionCode 1
     versionName "1.0"
   }
