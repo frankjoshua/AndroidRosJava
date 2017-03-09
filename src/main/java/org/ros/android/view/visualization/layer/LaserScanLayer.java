@@ -32,7 +32,7 @@ import sensor_msgs.LaserScan;
 
 /**
  * A {@link SubscriberLayer} that visualizes sensor_msgs/LaserScan messages.
- * 
+ *
  * @author munjaldesai@google.com (Munjal Desai)
  * @author damonkohler@google.com (Damon Kohler)
  */
@@ -86,6 +86,7 @@ public class LaserScanLayer extends SubscriberLayer<sensor_msgs.LaserScan> imple
   }
 
   private void updateVertexBuffer(LaserScan laserScan, int stride) {
+    int vertexCount = 0;
     float[] ranges = laserScan.getRanges();
     int size = ((ranges.length / stride) + 2) * 3;
     if (vertexBackBuffer == null || vertexBackBuffer.capacity() < size) {
@@ -96,6 +97,7 @@ public class LaserScanLayer extends SubscriberLayer<sensor_msgs.LaserScan> imple
     vertexBackBuffer.put(0);
     vertexBackBuffer.put(0);
     vertexBackBuffer.put(0);
+    vertexCount++;
     float minimumRange = laserScan.getRangeMin();
     float maximumRange = laserScan.getRangeMax();
     float angle = laserScan.getAngleMin();
@@ -111,10 +113,12 @@ public class LaserScanLayer extends SubscriberLayer<sensor_msgs.LaserScan> imple
         vertexBackBuffer.put((float) (range * Math.cos(angle)));
         vertexBackBuffer.put((float) (range * Math.sin(angle)));
         vertexBackBuffer.put(0);
+        vertexCount++;
       }
       angle += angleIncrement * stride;
     }
     vertexBackBuffer.position(0);
+    vertexBackBuffer.limit(vertexCount * 3);
     synchronized (mutex) {
       FloatBuffer tmp = vertexFrontBuffer;
       vertexFrontBuffer = vertexBackBuffer;
